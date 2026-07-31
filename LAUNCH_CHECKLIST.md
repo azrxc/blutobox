@@ -25,6 +25,10 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - **B2 CORS rule**: currently allows only `http://localhost:3000` as an origin. Needs your production URL added once you have one
 - **NEXTAUTH_URL**: currently `http://localhost:3000`, needs to become the real domain in production env vars
 
+## 🐛 Open issue
+
+- **`blutobox.vercel.app` returns 404 despite a successful deployment.** As of 2026-08-01: the build succeeds ("Ready" status, commit `5bbbccb` which added `prisma generate && next build` to fix earlier build failures), and Vercel's Domains settings page shows `blutobox.vercel.app` as "Valid Configuration" connected to Production. Yet the URL returns a genuine (non-cached) `X-Vercel-Error: NOT_FOUND` from Vercel's edge, confirmed both via direct requests and in-browser. The env vars also haven't been added to Vercel yet (see below), so even once this resolves, expect further errors until those are in place. Next steps to try: wait longer for propagation, try a manual "Redeploy" from the Deployments tab, or check Vercel's status page / contact support if it persists.
+
 ## ⚠️ Still needs doing regardless of domain
 
 - **Push local commits**: check GitHub Desktop for unpushed commits and push them — I can't push myself (blocked by permission settings), so this is on you each time
