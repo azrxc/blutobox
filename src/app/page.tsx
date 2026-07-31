@@ -8,6 +8,9 @@ export default async function Home() {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
       <main className="flex flex-col items-center gap-4 text-center">
         <h1 className="text-2xl font-semibold">Bluto Box</h1>
+        <Link href="/upload" className="rounded border px-4 py-2 text-sm">
+          Upload a file
+        </Link>
         {session?.user ? (
           <div className="space-y-3">
             <p className="text-sm text-neutral-500">
