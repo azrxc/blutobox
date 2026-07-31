@@ -9,6 +9,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import {
   maxUploadBytesFor,
   MULTIPART_THRESHOLD_BYTES,
@@ -33,6 +34,12 @@ export async function POST(req: Request) {
   const session = await auth();
   const planTier = (session?.user?.planTier as "FREE" | "PRO" | undefined) ?? null;
 
+  const ip = getClientIp(req);
+  const banned = await prisma.bannedIp.findUnique({ where: { ip } });
+  if (banned) {
+    return NextResponse.json({ error: "Uploads are disabled for this network" }, { status: 403 });
+  }
+
   const maxBytes = maxUploadBytesFor(planTier);
   if (size > maxBytes) {
     return NextResponse.json(
@@ -41,7 +48,6 @@ export async function POST(req: Request) {
     );
   }
 
-  const ip = getClientIp(req);
   const key = `uploads/${randomUUID()}/${filename}`;
   const s3 = getS3Client();
   const bucket = B2_BUCKET();
