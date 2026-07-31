@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlanTier {
+  FREE
+  PRO
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum FileStatus {
+  ACTIVE
+  REMOVED
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  REMOVED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  emailVerified   DateTime?
+  role            Role      @default(USER)
+  planTier        PlanTier  @default(FREE)
+  storageUsedBytes BigInt   @default(0)
+  banned          Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  files           File[]
+  subscription    Subscription?
+  verificationTokens VerificationToken[]
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model File {
+  id            String     @id @default(cuid())
+  ownerId       String?
+  owner         User?      @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  uploaderIp    String
+  filename      String
+  sizeBytes     BigInt
+  mimeType      String
+  b2Key         String     @unique
+  isNsfw        Boolean    @default(false)
+  downloadCount Int        @default(0)
+  status        FileStatus @default(ACTIVE)
+  createdAt     DateTime   @default(now())
+
+  shareLinks    ShareLink[]
+  reports       Report[]
+
+  @@index([ownerId])
+  @@index([uploaderIp])
+}
+
+model ShareLink {
+  id           String    @id @default(cuid())
+  fileId       String
+  file         File      @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  slug         String    @unique
+  expiresAt    DateTime?
+  passwordHash String?
+  createdAt    DateTime  @default(now())
+}
+
+model Report {
+  id            String       @id @default(cuid())
+  fileId        String
+  file          File         @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  reporterEmail String
+  reason        String
+  status        ReportStatus @default(OPEN)
+  createdAt     DateTime     @default(now())
+
+  @@index([fileId])
+  @@index([status])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId     String   @unique
+  stripeSubscriptionId String?  @unique
+  tier                 PlanTier @default(FREE)
+  status               String
+  updatedAt            DateTime @updatedAt
+}
+
+model BannedIp {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  reason    String
+  createdAt DateTime @default(now())
+}
