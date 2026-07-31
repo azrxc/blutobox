@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 import { CompleteMultipartUploadCommand } from "@aws-sdk/client-s3";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
 import { auth } from "@/lib/auth";
@@ -17,6 +18,8 @@ const completeSchema = z.object({
   parts: z
     .array(z.object({ ETag: z.string(), PartNumber: z.number() }))
     .optional(),
+  linkPassword: z.string().min(1).max(100).optional(),
+  expiresInHours: z.number().int().positive().max(24 * 365).optional(),
 });
 
 export async function POST(req: Request) {
@@ -25,7 +28,7 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid completion request" }, { status: 400 });
   }
-  const { key, filename, size, mimeType, isNsfw, uploadId, parts } = parsed.data;
+  const { key, filename, size, mimeType, isNsfw, uploadId, parts, linkPassword, expiresInHours } = parsed.data;
 
   if (uploadId) {
     if (!parts || parts.length === 0) {
@@ -57,9 +60,15 @@ export async function POST(req: Request) {
     },
   });
 
+  const isPro = session?.user?.planTier === "PRO";
+  const passwordHash = isPro && linkPassword ? await bcrypt.hash(linkPassword, 12) : null;
+  const expiresAt = isPro && expiresInHours
+    ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000)
+    : null;
+
   const slug = generateSlug();
   await prisma.shareLink.create({
-    data: { fileId: file.id, slug },
+    data: { fileId: file.id, slug, passwordHash, expiresAt },
   });
 
   if (session?.user?.id) {

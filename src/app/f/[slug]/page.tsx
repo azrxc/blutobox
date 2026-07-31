@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { FileViewer } from "./file-viewer";
 import { ReportForm } from "./report-form";
+import { PasswordGate } from "./password-gate";
+import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 function formatBytes(bytes: bigint) {
   const n = Number(bytes);
@@ -36,6 +39,14 @@ export default async function FilePage({
         <p className="text-sm text-neutral-500">This link has expired.</p>
       </main>
     );
+  }
+
+  if (link.passwordHash) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(unlockCookieName(slug))?.value;
+    if (!verifyUnlockToken(slug, token)) {
+      return <PasswordGate slug={slug} />;
+    }
   }
 
   const { file } = link;

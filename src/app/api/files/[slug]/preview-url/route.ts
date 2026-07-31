@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
+import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
@@ -17,6 +18,13 @@ export async function GET(
   }
   if (link.expiresAt && link.expiresAt < new Date()) {
     return NextResponse.json({ error: "This link has expired" }, { status: 410 });
+  }
+  if (link.passwordHash) {
+    const cookieHeader = req.headers.get("cookie") ?? "";
+    const match = cookieHeader.match(new RegExp(`${unlockCookieName(slug)}=([^;]+)`));
+    if (!verifyUnlockToken(slug, match?.[1])) {
+      return NextResponse.json({ error: "Locked" }, { status: 401 });
+    }
   }
 
   const url = await getSignedDownloadUrl(link.file.b2Key);

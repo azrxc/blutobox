@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { uploadFile } from "@/lib/upload-client";
 
 export default function UploadPage() {
+  const { data: session } = useSession();
+  const isPro = session?.user?.planTier === "PRO";
+
   const [file, setFile] = useState<File | null>(null);
   const [isNsfw, setIsNsfw] = useState(false);
+  const [linkPassword, setLinkPassword] = useState("");
+  const [expiresInHours, setExpiresInHours] = useState<string>("");
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +24,15 @@ export default function UploadPage() {
     setUploading(true);
     setProgress(0);
     try {
-      const { slug } = await uploadFile(file, isNsfw, setProgress);
+      const { slug } = await uploadFile(
+        file,
+        {
+          isNsfw,
+          linkPassword: isPro ? linkPassword : undefined,
+          expiresInHours: isPro && expiresInHours ? Number(expiresInHours) : undefined,
+        },
+        setProgress
+      );
       setShareSlug(slug);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
@@ -48,6 +62,8 @@ export default function UploadPage() {
                 setFile(null);
                 setShareSlug(null);
                 setProgress(0);
+                setLinkPassword("");
+                setExpiresInHours("");
               }}
               className="rounded border px-4 py-2 text-sm"
             >
@@ -79,6 +95,47 @@ export default function UploadPage() {
           />
           This file contains NSFW / adult content
         </label>
+
+        {isPro ? (
+          <div className="space-y-2 rounded border p-3">
+            <p className="text-xs font-medium text-neutral-500">Pro options</p>
+            <div className="space-y-1">
+              <label className="text-xs" htmlFor="linkPassword">
+                Password-protect this link (optional)
+              </label>
+              <input
+                id="linkPassword"
+                type="text"
+                value={linkPassword}
+                onChange={(e) => setLinkPassword(e.target.value)}
+                disabled={uploading}
+                className="w-full rounded border px-2 py-1 text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs" htmlFor="expiresInHours">
+                Link expires after (hours, optional)
+              </label>
+              <input
+                id="expiresInHours"
+                type="number"
+                min={1}
+                value={expiresInHours}
+                onChange={(e) => setExpiresInHours(e.target.value)}
+                disabled={uploading}
+                className="w-full rounded border px-2 py-1 text-sm"
+              />
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-neutral-400">
+            <Link href="/pricing" className="underline">
+              Upgrade to Pro
+            </Link>{" "}
+            to password-protect or set expiry on your links.
+          </p>
+        )}
+
         {uploading && (
           <div className="h-2 w-full overflow-hidden rounded bg-neutral-200">
             <div

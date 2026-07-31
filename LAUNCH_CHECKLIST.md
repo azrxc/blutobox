@@ -14,6 +14,9 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - Stripe Pro tier: Checkout, billing portal, pricing page ($4.99/mo) — **built in LIVE mode**
 - Rate limiting: anonymous uploads capped at 10/hour per IP (Upstash)
 - Terms of Service + Privacy Policy pages (template — see below), required checkbox at signup
+- Pro perks: password-protected share links + custom link expiry (Free links are permanent/public)
+- Pricing page: feature comparison table (Free vs Pro)
+- Inactive-file cleanup: files with no downloads in 30 days are auto-deleted to control storage cost — **Pro-owned files are exempt**. Runs via Vercel Cron daily at 3am UTC (`vercel.json`), hitting `/api/cron/cleanup`, protected by `CRON_SECRET`. Note: Vercel Cron only fires on deployed environments, not locally — the sweep logic itself is tested and confirmed working, but the actual daily schedule can only be verified once deployed
 
 ## ⏳ Deferred until you buy blutobox.com
 
@@ -39,6 +42,7 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - Stripe (**live mode** — be careful testing)
 - Resend (sandbox mode only, see above)
 - Upstash (rate limiting)
+- `CRON_SECRET` (self-generated, protects the cleanup endpoint from unauthorized triggering)
 
 ## Where things live
 

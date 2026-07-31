@@ -66,6 +66,7 @@ model File {
   downloadCount Int        @default(0)
   status        FileStatus @default(ACTIVE)
   createdAt     DateTime   @default(now())
+  lastAccessedAt DateTime  @default(now())
 
   shareLinks    ShareLink[]
   reports       Report[]

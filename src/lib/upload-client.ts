@@ -1,5 +1,11 @@
 export type UploadProgress = (fraction: number) => void;
 
+export type UploadOptions = {
+  isNsfw: boolean;
+  linkPassword?: string;
+  expiresInHours?: number;
+};
+
 function putWithProgress(
   url: string,
   body: Blob,
@@ -27,7 +33,7 @@ function putWithProgress(
 
 export async function uploadFile(
   file: File,
-  isNsfw: boolean,
+  options: UploadOptions,
   onProgress: UploadProgress
 ): Promise<{ slug: string }> {
   const presignRes = await fetch("/api/uploads/presign", {
@@ -43,6 +49,16 @@ export async function uploadFile(
 
   const presign = await presignRes.json();
   let uploaded = 0;
+
+  const completeBody = {
+    key: presign.key,
+    filename: file.name,
+    size: file.size,
+    mimeType: file.type || "application/octet-stream",
+    isNsfw: options.isNsfw,
+    linkPassword: options.linkPassword || undefined,
+    expiresInHours: options.expiresInHours,
+  };
 
   if (presign.type === "single") {
     await putWithProgress(presign.uploadUrl, file, file.type || "application/octet-stream", (loaded) => {
@@ -68,15 +84,7 @@ export async function uploadFile(
     const completeRes = await fetch("/api/uploads/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        key: presign.key,
-        filename: file.name,
-        size: file.size,
-        mimeType: file.type || "application/octet-stream",
-        isNsfw,
-        uploadId: presign.uploadId,
-        parts,
-      }),
+      body: JSON.stringify({ ...completeBody, uploadId: presign.uploadId, parts }),
     });
     if (!completeRes.ok) {
       const data = await completeRes.json().catch(() => ({}));
@@ -88,13 +96,7 @@ export async function uploadFile(
   const completeRes = await fetch("/api/uploads/complete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      key: presign.key,
-      filename: file.name,
-      size: file.size,
-      mimeType: file.type || "application/octet-stream",
-      isNsfw,
-    }),
+    body: JSON.stringify(completeBody),
   });
   if (!completeRes.ok) {
     const data = await completeRes.json().catch(() => ({}));
