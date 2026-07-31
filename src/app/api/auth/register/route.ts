@@ -39,7 +39,12 @@ export async function POST(req: Request) {
     },
   });
 
-  await sendVerificationEmail(email, token);
+  let emailSent = true;
+  try {
+    await sendVerificationEmail(email, token);
+  } catch {
+    emailSent = false;
+  }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, emailSent });
 }

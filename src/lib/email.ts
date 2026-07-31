@@ -13,10 +13,15 @@ export async function sendVerificationEmail(email: string, token: string) {
     return;
   }
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: process.env.EMAIL_FROM ?? "noreply@localhost",
     to: email,
     subject: "Verify your email",
     html: `<p>Click the link below to verify your email address:</p><p><a href="${verifyUrl}">${verifyUrl}</a></p><p>This link expires in 24 hours.</p>`,
   });
+
+  if (error) {
+    console.error(`[email] Failed to send verification email to ${email}:`, error);
+    throw new Error("Failed to send verification email");
+  }
 }
