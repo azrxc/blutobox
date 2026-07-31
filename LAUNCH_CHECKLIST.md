@@ -27,7 +27,7 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 
 ## ⚠️ Still needs doing regardless of domain
 
-- **Push latest commit**: one local commit (rate limiting + Vercel build fixes) hasn't been pushed yet — do this via GitHub Desktop
+- **Push local commits**: check GitHub Desktop for unpushed commits and push them — I can't push myself (blocked by permission settings), so this is on you each time
 - **Add all env vars to Vercel project settings** (Vercel → Project → Settings → Environment Variables). Nothing will work in production until these are added — see `.env.example` for the full list
 - **Test the full Stripe webhook flow with one real purchase** — Checkout session creation is verified working, but the webhook that actually upgrades a user to Pro after payment hasn't been tested end-to-end yet. Needs a webhook endpoint configured in Stripe (Developers → Webhooks → Add endpoint → point at `https://yourdomain.com/api/stripe/webhook`, select `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`) and the resulting signing secret added as `STRIPE_WEBHOOK_SECRET`
 - **Rotate the Stripe live secret key** before calling this "production ready" — it ended up in this chat's history during setup. Stripe dashboard → API keys → roll key
