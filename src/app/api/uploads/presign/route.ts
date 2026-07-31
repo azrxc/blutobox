@@ -16,6 +16,7 @@ import {
   MULTIPART_PART_SIZE_BYTES,
 } from "@/lib/limits";
 import { getClientIp } from "@/lib/request-ip";
+import { checkAnonUploadLimit } from "@/lib/rate-limit";
 
 const presignSchema = z.object({
   filename: z.string().min(1).max(500),
@@ -38,6 +39,16 @@ export async function POST(req: Request) {
   const banned = await prisma.bannedIp.findUnique({ where: { ip } });
   if (banned) {
     return NextResponse.json({ error: "Uploads are disabled for this network" }, { status: 403 });
+  }
+
+  if (!session?.user) {
+    const { success } = await checkAnonUploadLimit(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many uploads from this network. Log in for higher limits, or try again later." },
+        { status: 429 }
+      );
+    }
   }
 
   const maxBytes = maxUploadBytesFor(planTier);
