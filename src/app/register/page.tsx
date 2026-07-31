@@ -11,9 +11,14 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setError("You must agree to the Terms and Privacy Policy");
+      return;
+    }
     setError(null);
     setLoading(true);
 
@@ -80,6 +85,24 @@ export default function RegisterPage() {
             className="w-full rounded border px-3 py-2 text-sm"
           />
         </div>
+        <label className="flex items-start gap-2 text-xs text-neutral-500">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            I agree to the{" "}
+            <Link href="/terms" className="underline" target="_blank">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="underline" target="_blank">
+              Privacy Policy
+            </Link>
+          </span>
+        </label>
         <button
           type="submit"
           disabled={loading}
