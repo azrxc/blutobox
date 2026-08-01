@@ -16,10 +16,14 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [unverified, setUnverified] = useState(false);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setUnverified(false);
+    setResendStatus("idle");
     setLoading(true);
 
     const res = await signIn("credentials", {
@@ -31,18 +35,29 @@ function LoginForm() {
     setLoading(false);
 
     if (res?.error) {
-      setError(
-        res.error === "email_not_verified"
-          ? "Please verify your email before logging in — check your inbox for the verification link."
-          : res.error === "too_many_attempts"
-            ? "Too many login attempts from this network. Please try again in a few minutes."
-            : "Invalid email or password"
-      );
+      if (res.error === "email_not_verified") {
+        setError("Please verify your email before logging in — check your inbox for the verification link.");
+        setUnverified(true);
+      } else if (res.error === "too_many_attempts") {
+        setError("Too many login attempts from this network. Please try again in a few minutes.");
+      } else {
+        setError("Invalid email or password");
+      }
       return;
     }
 
     router.push("/?welcome=1");
     router.refresh();
+  }
+
+  async function handleResend() {
+    setResendStatus("sending");
+    await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    }).catch(() => {});
+    setResendStatus("sent");
   }
 
   return (
@@ -62,7 +77,19 @@ function LoginForm() {
         </p>
       )}
       {error && (
-        <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <div className="space-y-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">
+          <p>{error}</p>
+          {unverified && (
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendStatus !== "idle"}
+              className="text-xs underline underline-offset-2 disabled:opacity-60"
+            >
+              {resendStatus === "sent" ? "Verification email sent" : resendStatus === "sending" ? "Sending…" : "Resend verification email"}
+            </button>
+          )}
+        </div>
       )}
       <div className="space-y-1.5">
         <label className="text-sm font-medium" htmlFor="email">
