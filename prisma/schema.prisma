@@ -43,10 +43,20 @@ model User {
   files           File[]
   subscription    Subscription?
   verificationTokens VerificationToken[]
+  passwordResetTokens PasswordResetToken[]
   cancellationFeedback CancellationFeedback[]
 }
 
 model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String

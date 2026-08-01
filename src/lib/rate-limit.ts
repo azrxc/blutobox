@@ -67,3 +67,24 @@ export async function checkRegisterLimit(ip: string) {
   const { success } = await getRegisterLimiter().limit(ip);
   return { success };
 }
+
+let _forgotPasswordLimiter: Ratelimit | null = null;
+
+function getForgotPasswordLimiter(): Ratelimit {
+  if (!_forgotPasswordLimiter) {
+    _forgotPasswordLimiter = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(5, "1 h"),
+      prefix: "ratelimit:forgot-password",
+    });
+  }
+  return _forgotPasswordLimiter;
+}
+
+export async function checkForgotPasswordLimit(ip: string) {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return { success: true };
+  }
+  const { success } = await getForgotPasswordLimiter().limit(ip);
+  return { success };
+}

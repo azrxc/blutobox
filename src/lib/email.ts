@@ -48,6 +48,28 @@ export async function sendDeletionWarningEmail(email: string, filename: string, 
   }
 }
 
+export async function sendPasswordResetEmail(email: string, token: string) {
+  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
+
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log(`[dev] Password reset link for ${email}: ${resetUrl}`);
+    return;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `Bluto Box <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: "Reset your password",
+      html: `<p>Click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>`,
+    });
+  } catch (error) {
+    console.error(`[email] Failed to send password reset email to ${email}:`, error);
+    throw new Error("Failed to send password reset email");
+  }
+}
+
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
 
