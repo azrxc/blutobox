@@ -69,7 +69,9 @@ export default async function FilePage({
   const { slug } = await params;
   const link = await prisma.shareLink.findUnique({
     where: { slug },
-    include: { file: { include: { owner: true } } },
+    include: {
+      file: { include: { owner: { include: { creatorLinks: { orderBy: { order: "asc" } } } } } },
+    },
   });
 
   if (!link || link.file.status !== "ACTIVE") {
@@ -115,42 +117,22 @@ export default async function FilePage({
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
           </div>
 
-          {file.owner?.planTier === "PRO" &&
-            (file.owner.discordUrl || file.owner.youtubeUrl || file.owner.supportUrl) && (
-              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
-                <span className="text-muted">From the creator:</span>
-                {file.owner.discordUrl && (
-                  <a
-                    href={file.owner.discordUrl}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    className="underline underline-offset-2 transition-colors hover:text-accent"
-                  >
-                    Discord
-                  </a>
-                )}
-                {file.owner.youtubeUrl && (
-                  <a
-                    href={file.owner.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    className="underline underline-offset-2 transition-colors hover:text-accent"
-                  >
-                    YouTube
-                  </a>
-                )}
-                {file.owner.supportUrl && (
-                  <a
-                    href={file.owner.supportUrl}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    className="underline underline-offset-2 transition-colors hover:text-accent"
-                  >
-                    Support
-                  </a>
-                )}
-              </div>
-            )}
+          {file.owner?.planTier === "PRO" && file.owner.creatorLinks.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
+              <span className="text-muted">From the creator:</span>
+              {file.owner.creatorLinks.map((cl) => (
+                <a
+                  key={cl.id}
+                  href={cl.url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="underline underline-offset-2 transition-colors hover:text-accent"
+                >
+                  {cl.label}
+                </a>
+              ))}
+            </div>
+          )}
         </NsfwGate>
 
         <div className="flex justify-end">

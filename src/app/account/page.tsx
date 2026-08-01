@@ -65,7 +65,7 @@ export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const [user, files, subscription] = await Promise.all([
+  const [user, files, subscription, creatorLinks] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id } }),
     prisma.file.findMany({
       where: { ownerId: session.user.id, status: "ACTIVE" },
@@ -73,6 +73,7 @@ export default async function AccountPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.subscription.findUnique({ where: { userId: session.user.id } }),
+    prisma.creatorLink.findMany({ where: { userId: session.user.id }, orderBy: { order: "asc" } }),
   ]);
 
   if (!user) redirect("/login");
@@ -119,12 +120,12 @@ export default async function AccountPage() {
         </div>
 
         {isPro ? (
-          <CreatorLinksForm discordUrl={user.discordUrl} youtubeUrl={user.youtubeUrl} supportUrl={user.supportUrl} />
+          <CreatorLinksForm initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))} />
         ) : (
           <div className="max-w-sm space-y-1">
             <h2 className="text-sm font-semibold">Creator links</h2>
             <p className="text-xs text-muted">
-              Upgrade to Pro to show your Discord and support links on your file pages.
+              Upgrade to Pro to show your Discord, socials, and support links on your file pages.
             </p>
           </div>
         )}

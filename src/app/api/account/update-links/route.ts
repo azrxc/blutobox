@@ -4,12 +4,17 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCurrentPlanTier } from "@/lib/plan";
 
-const urlField = z.string().trim().url().max(300).optional().or(z.literal(""));
+const MAX_LINKS = 5;
 
 const schema = z.object({
-  discordUrl: urlField,
-  youtubeUrl: urlField,
-  supportUrl: urlField,
+  links: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1).max(50),
+        url: z.string().trim().url().max(300),
+      })
+    )
+    .max(MAX_LINKS),
 });
 
 export async function POST(req: Request) {
@@ -26,17 +31,23 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Please enter valid URLs" }, { status: 400 });
+    return NextResponse.json(
+      { error: `Each link needs a name and a valid URL (max ${MAX_LINKS} links)` },
+      { status: 400 }
+    );
   }
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
-      discordUrl: parsed.data.discordUrl || null,
-      youtubeUrl: parsed.data.youtubeUrl || null,
-      supportUrl: parsed.data.supportUrl || null,
-    },
-  });
+  await prisma.$transaction([
+    prisma.creatorLink.deleteMany({ where: { userId: session.user.id } }),
+    prisma.creatorLink.createMany({
+      data: parsed.data.links.map((link, i) => ({
+        userId: session.user.id,
+        label: link.label,
+        url: link.url,
+        order: i,
+      })),
+    }),
+  ]);
 
   return NextResponse.json({ ok: true });
 }
