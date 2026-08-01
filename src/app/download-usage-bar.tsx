@@ -1,14 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { UsageBar } from "./usage-bar";
 
 type UsageData = {
   usedBytes: number;
   totalBytes: number;
 };
 
-function formatGB(bytes: number) {
-  return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+function resetLabel() {
+  const now = new Date();
+  const nextMidnightUtc = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0)
+  );
+  const ms = nextMidnightUtc.getTime() - now.getTime();
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+  return `Resets in ${hours}h ${minutes}m`;
 }
 
 export function DownloadUsageBar() {
@@ -23,22 +31,12 @@ export function DownloadUsageBar() {
 
   if (!data) return null;
 
-  const usedFraction = Math.min(1, data.usedBytes / data.totalBytes);
-
   return (
-    <div className="rounded-2xl border border-border bg-surface p-4">
-      <div className="mb-2 flex items-center justify-between text-xs">
-        <span className="font-medium text-muted">Download usage today</span>
-        <span className="text-muted">
-          {formatGB(data.usedBytes)} GB of {formatGB(data.totalBytes)} GB
-        </span>
-      </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
-        <div
-          className={`h-full rounded-full ${usedFraction > 0.9 ? "bg-red-500" : "bg-accent"}`}
-          style={{ width: `${usedFraction * 100}%` }}
-        />
-      </div>
-    </div>
+    <UsageBar
+      label="Download usage today"
+      usedBytes={data.usedBytes}
+      totalBytes={data.totalBytes}
+      resetLabel={resetLabel()}
+    />
   );
 }

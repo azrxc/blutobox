@@ -6,10 +6,8 @@ import { totalStorageBytesFor } from "@/lib/limits";
 import { ChangePasswordForm } from "./change-password-form";
 import { FileList, type AccountFile } from "./file-list";
 import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
-
-function formatGB(bytes: number) {
-  return (bytes / (1024 * 1024 * 1024)).toFixed(2);
-}
+import { DownloadUsageBar } from "../download-usage-bar";
+import { UsageBar } from "../usage-bar";
 
 function buildSubscriptionInfo(
   isPro: boolean,
@@ -74,7 +72,6 @@ export default async function AccountPage() {
   const isPro = user.planTier === "PRO";
   const totalBytes = totalStorageBytesFor(user.planTier);
   const usedBytes = Number(user.storageUsedBytes);
-  const usedFraction = Math.min(1, usedBytes / totalBytes);
 
   const accountFiles = buildAccountFiles(files, isPro);
 
@@ -92,18 +89,11 @@ export default async function AccountPage() {
 
         <SubscriptionCard subscription={subscriptionInfo} />
 
-        <div className="rounded-2xl border border-border bg-surface p-5">
-          <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-medium">Storage</span>
-            <span className="text-muted">
-              {formatGB(usedBytes)} GB of {formatGB(totalBytes)} GB used
-            </span>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
-            <div
-              className={`h-full rounded-full ${usedFraction > 0.9 ? "bg-red-500" : "bg-accent"}`}
-              style={{ width: `${usedFraction * 100}%` }}
-            />
+        <div>
+          <h2 className="mb-3 text-sm font-semibold">Usage</h2>
+          <div className="space-y-4">
+            <UsageBar label="Storage used" usedBytes={usedBytes} totalBytes={totalBytes} />
+            <DownloadUsageBar />
           </div>
         </div>
 
