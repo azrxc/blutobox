@@ -54,6 +54,9 @@ export default function RootLayout({
             <span>© {new Date().getFullYear()} Bluto Box</span>
             <div className="flex gap-6">
               <SupportButton />
+              <Link href="/qr" className="transition-colors hover:text-foreground">
+                QR code
+              </Link>
               <Link href="/changelog" className="transition-colors hover:text-foreground">
                 Changelog
               </Link>
