@@ -14,9 +14,9 @@ export function Header() {
           <Image
             src="/logo.png"
             alt=""
-            width={24}
-            height={24}
-            className="dark:invert"
+            width={28}
+            height={28}
+            className="shrink-0 dark:invert"
             priority
           />
           Bluto Box
