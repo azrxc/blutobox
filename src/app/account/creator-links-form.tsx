@@ -62,8 +62,8 @@ export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
       )}
       <div className="space-y-3">
         {links.map((link, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <div className="grid flex-1 grid-cols-2 gap-2">
+          <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+            <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
               <input
                 type="text"
                 placeholder="Name (e.g. Discord)"
@@ -83,7 +83,7 @@ export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
             <button
               type="button"
               onClick={() => removeLink(i)}
-              className="shrink-0 px-1 py-2.5 text-xs text-muted transition-colors hover:text-foreground"
+              className="self-end text-xs text-muted transition-colors hover:text-foreground sm:shrink-0 sm:self-start sm:px-1 sm:py-2.5"
             >
               Remove
             </button>

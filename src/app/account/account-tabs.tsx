@@ -21,12 +21,12 @@ export function AccountTabs({
 
   return (
     <div>
-      <div className="flex gap-1 border-b border-border">
+      <div className="flex gap-1 overflow-x-auto border-b border-border">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActive(tab)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 px-3 py-2.5 text-sm font-medium transition-colors sm:px-4 ${
               active === tab
                 ? "border-b-2 border-foreground text-foreground"
                 : "text-muted hover:text-foreground"

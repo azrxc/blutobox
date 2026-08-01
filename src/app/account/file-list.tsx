@@ -29,18 +29,24 @@ function formatBytes(bytesStr: string) {
 function FileRow({ file }: { file: AccountFile }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleDelete() {
-    if (!confirm(`Delete "${file.filename}"? This cannot be undone.`)) return;
     setDeleting(true);
+    setError(null);
     const res = await fetch(`/api/account/files/${file.id}`, { method: "DELETE" });
     setDeleting(false);
-    if (res.ok) router.refresh();
-    else alert("Failed to delete file");
+    if (res.ok) {
+      router.refresh();
+    } else {
+      setError("Failed to delete file");
+      setConfirming(false);
+    }
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-border py-4 text-sm last:border-0">
+    <div className="flex flex-col gap-2 border-b border-border py-4 text-sm last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <div className="min-w-0 flex-1">
         {file.slug ? (
           <Link href={`/f/${file.slug}`} className="break-all font-medium underline underline-offset-2">
@@ -57,14 +63,34 @@ function FileRow({ file }: { file: AccountFile }) {
               ? "Pending deletion"
               : `Auto-deletes in ${file.daysUntilDeletion} day${file.daysUntilDeletion === 1 ? "" : "s"} if unused`}
         </p>
+        {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
       </div>
-      <button
-        onClick={handleDelete}
-        disabled={deleting}
-        className="shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/10 disabled:opacity-50 dark:text-red-400"
-      >
-        {deleting ? "Deleting…" : "Delete"}
-      </button>
+      {confirming ? (
+        <div className="flex shrink-0 items-center gap-2 text-xs">
+          <span className="text-muted">Delete?</span>
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="font-medium text-red-600 underline transition-colors hover:opacity-80 disabled:opacity-50 dark:text-red-400"
+          >
+            {deleting ? "…" : "Yes"}
+          </button>
+          <button
+            onClick={() => setConfirming(false)}
+            disabled={deleting}
+            className="text-muted underline transition-colors hover:text-foreground"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setConfirming(true)}
+          className="shrink-0 self-end rounded-full border border-border px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/10 dark:text-red-400 sm:self-auto"
+        >
+          Delete
+        </button>
+      )}
     </div>
   );
 }
