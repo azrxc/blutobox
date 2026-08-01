@@ -6,6 +6,7 @@ import { ReportForm } from "./report-form";
 import { PasswordGate } from "./password-gate";
 import { CopyButton } from "./copy-button";
 import { NsfwGate } from "./nsfw-gate";
+import { DownloadButton } from "./download-button";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 function formatBytes(bytes: bigint) {
@@ -69,12 +70,7 @@ export default async function FilePage({
           </div>
 
           <div className="mt-6 flex items-center gap-3">
-            <a
-              href={`/api/files/${slug}/download`}
-              className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
-            >
-              Download
-            </a>
+            <DownloadButton slug={slug} filename={file.filename} sizeBytes={Number(file.sizeBytes)} />
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
           </div>
         </NsfwGate>

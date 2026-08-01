@@ -15,6 +15,14 @@ export class UploadCancelledError extends Error {
 
 const MULTIPART_CONCURRENCY = 5;
 
+async function hashFile(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 async function throwForResponse(res: Response, fallback: string): Promise<never> {
   const data = await res.json().catch(() => null);
   throw new Error(data?.error ?? `${fallback} (status ${res.status})`);
@@ -116,6 +124,7 @@ export async function uploadFile(
   }
 
   const presign = await presignRes.json();
+  const hashPromise = hashFile(file).catch(() => undefined);
 
   const completeBody = {
     key: presign.key,
@@ -151,7 +160,7 @@ export async function uploadFile(
       const completeRes = await fetch("/api/uploads/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...completeBody, uploadId: presign.uploadId, parts }),
+        body: JSON.stringify({ ...completeBody, uploadId: presign.uploadId, parts, sha256: await hashPromise }),
         signal,
       });
       if (!completeRes.ok) {
@@ -177,7 +186,7 @@ export async function uploadFile(
   const completeRes = await fetch("/api/uploads/complete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(completeBody),
+    body: JSON.stringify({ ...completeBody, sha256: await hashPromise }),
     signal,
   });
   if (!completeRes.ok) {

@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { CompleteMultipartUploadCommand } from "@aws-sdk/client-s3";
+import { CompleteMultipartUploadCommand, AbortMultipartUploadCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateSlug } from "@/lib/slug";
 import { getClientIp } from "@/lib/request-ip";
+import { isKnownMalicious } from "@/lib/virustotal";
 
 export const maxDuration = 60;
 
@@ -22,6 +23,7 @@ const completeSchema = z.object({
     .optional(),
   linkPassword: z.string().min(1).max(100).optional(),
   expiresInHours: z.number().int().positive().max(24 * 365).optional(),
+  sha256: z.string().regex(/^[a-f0-9]{64}$/i).optional(),
 });
 
 export async function POST(req: Request) {
@@ -30,7 +32,20 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid completion request" }, { status: 400 });
   }
-  const { key, filename, size, mimeType, isNsfw, uploadId, parts, linkPassword, expiresInHours } = parsed.data;
+  const { key, filename, size, mimeType, isNsfw, uploadId, parts, linkPassword, expiresInHours, sha256 } = parsed.data;
+
+  if (sha256 && (await isKnownMalicious(sha256))) {
+    const s3 = getS3Client();
+    if (uploadId) {
+      await s3.send(new AbortMultipartUploadCommand({ Bucket: B2_BUCKET(), Key: key, UploadId: uploadId })).catch(() => {});
+    } else {
+      await s3.send(new DeleteObjectCommand({ Bucket: B2_BUCKET(), Key: key })).catch(() => {});
+    }
+    return NextResponse.json(
+      { error: "This file was flagged as malware by VirusTotal and was rejected." },
+      { status: 400 }
+    );
+  }
 
   if (uploadId) {
     if (!parts || parts.length === 0) {
