@@ -119,7 +119,7 @@ export default async function AccountPage() {
         </div>
 
         {isPro ? (
-          <CreatorLinksForm discordUrl={user.discordUrl} donationUrl={user.donationUrl} />
+          <CreatorLinksForm discordUrl={user.discordUrl} youtubeUrl={user.youtubeUrl} supportUrl={user.supportUrl} />
         ) : (
           <div className="max-w-sm space-y-1">
             <h2 className="text-sm font-semibold">Creator links</h2>

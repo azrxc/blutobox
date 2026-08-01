@@ -40,7 +40,8 @@ model User {
   banned          Boolean   @default(false)
   createdAt       DateTime  @default(now())
   discordUrl      String?
-  donationUrl     String?
+  youtubeUrl      String?
+  supportUrl      String?
 
   files           File[]
   subscription    Subscription?

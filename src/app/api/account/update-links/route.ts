@@ -4,9 +4,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCurrentPlanTier } from "@/lib/plan";
 
+const urlField = z.string().trim().url().max(300).optional().or(z.literal(""));
+
 const schema = z.object({
-  discordUrl: z.string().trim().url().max(300).optional().or(z.literal("")),
-  donationUrl: z.string().trim().url().max(300).optional().or(z.literal("")),
+  discordUrl: urlField,
+  youtubeUrl: urlField,
+  supportUrl: urlField,
 });
 
 export async function POST(req: Request) {
@@ -30,7 +33,8 @@ export async function POST(req: Request) {
     where: { id: session.user.id },
     data: {
       discordUrl: parsed.data.discordUrl || null,
-      donationUrl: parsed.data.donationUrl || null,
+      youtubeUrl: parsed.data.youtubeUrl || null,
+      supportUrl: parsed.data.supportUrl || null,
     },
   });
 

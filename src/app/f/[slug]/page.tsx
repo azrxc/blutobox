@@ -115,31 +115,42 @@ export default async function FilePage({
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
           </div>
 
-          {file.owner?.planTier === "PRO" && (file.owner.discordUrl || file.owner.donationUrl) && (
-            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
-              <span className="text-muted">Support the creator:</span>
-              {file.owner.discordUrl && (
-                <a
-                  href={file.owner.discordUrl}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="underline underline-offset-2 transition-colors hover:text-accent"
-                >
-                  Discord
-                </a>
-              )}
-              {file.owner.donationUrl && (
-                <a
-                  href={file.owner.donationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="underline underline-offset-2 transition-colors hover:text-accent"
-                >
-                  Support/Donate
-                </a>
-              )}
-            </div>
-          )}
+          {file.owner?.planTier === "PRO" &&
+            (file.owner.discordUrl || file.owner.youtubeUrl || file.owner.supportUrl) && (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
+                <span className="text-muted">From the creator:</span>
+                {file.owner.discordUrl && (
+                  <a
+                    href={file.owner.discordUrl}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="underline underline-offset-2 transition-colors hover:text-accent"
+                  >
+                    Discord
+                  </a>
+                )}
+                {file.owner.youtubeUrl && (
+                  <a
+                    href={file.owner.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="underline underline-offset-2 transition-colors hover:text-accent"
+                  >
+                    YouTube
+                  </a>
+                )}
+                {file.owner.supportUrl && (
+                  <a
+                    href={file.owner.supportUrl}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="underline underline-offset-2 transition-colors hover:text-accent"
+                  >
+                    Support
+                  </a>
+                )}
+              </div>
+            )}
         </NsfwGate>
 
         <div className="flex justify-end">
