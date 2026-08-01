@@ -23,14 +23,14 @@ export function ReportActions({ reportId }: { reportId: string }) {
       <button
         onClick={() => act("remove")}
         disabled={loading !== null}
-        className="rounded bg-red-600 px-3 py-1 text-xs text-white disabled:opacity-50"
+        className="rounded-full bg-red-600 px-3.5 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-85 disabled:opacity-50"
       >
         {loading === "remove" ? "Removing…" : "Remove file"}
       </button>
       <button
         onClick={() => act("dismiss")}
         disabled={loading !== null}
-        className="rounded border px-3 py-1 text-xs disabled:opacity-50"
+        className="rounded-full border border-border px-3.5 py-1.5 text-xs font-medium transition-colors hover:bg-background disabled:opacity-50"
       >
         {loading === "dismiss" ? "Dismissing…" : "Dismiss"}
       </button>

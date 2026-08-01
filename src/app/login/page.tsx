@@ -42,13 +42,20 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-      <h1 className="text-xl font-semibold">Log in</h1>
+    <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-5">
+      <div>
+        <h1 className="text-xl font-semibold">Log in</h1>
+        <p className="mt-1 text-sm text-muted">Welcome back.</p>
+      </div>
       {verified && (
-        <p className="text-sm text-green-600">Email verified — you can log in now.</p>
+        <p className="rounded-lg bg-green-500/10 px-3 py-2 text-sm text-green-700 dark:text-green-400">
+          Email verified — you can log in now.
+        </p>
       )}
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <div className="space-y-1">
+      {error && (
+        <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+      )}
+      <div className="space-y-1.5">
         <label className="text-sm font-medium" htmlFor="email">
           Email
         </label>
@@ -58,10 +65,10 @@ function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-foreground/30"
         />
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <label className="text-sm font-medium" htmlFor="password">
           Password
         </label>
@@ -71,19 +78,19 @@ function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded border px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-foreground/30"
         />
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded bg-black text-white py-2 text-sm font-medium disabled:opacity-50"
+        className="w-full rounded-full bg-accent py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
       >
         {loading ? "Logging in…" : "Log in"}
       </button>
-      <p className="text-sm text-neutral-500">
+      <p className="text-center text-sm text-muted">
         Need an account?{" "}
-        <Link href="/register" className="underline">
+        <Link href="/register" className="text-foreground underline underline-offset-2">
           Sign up
         </Link>
       </p>
@@ -93,7 +100,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
+    <main className="flex flex-1 items-center justify-center px-6 py-16">
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>

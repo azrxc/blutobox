@@ -22,6 +22,8 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - Vercel env vars added to production project (`blutobox-14ks`)
 - Account page (`/account`): file history with per-file "auto-deletes in N days" countdown, live storage quota bar (5GB Free / 50GB Pro, enforced server-side on upload — not just cosmetic), delete-your-own-file, change password
 - Storage quota (total per account, separate from per-file size limit): 5GB Free / 50GB Pro, enforced in the presign route; auto-cleanup now correctly decrements the quota counter too (was a bug — files deleted by the 30-day sweep weren't updating `storageUsedBytes`, now fixed)
+- **Verification emails now send via Gmail SMTP (`aoinyx.dev@gmail.com`), not Resend.** This means real strangers CAN complete signup now — no domain purchase needed for this. Resend is still installed/configured but unused; can be removed later or kept as a backup. Free tier: 500 emails/day via Gmail, plenty for now
+- Minimalist design pass across every page (OpenAI-inspired: warm off-white/charcoal palette, rounded-2xl cards, pill buttons, consistent header/nav) — see `globals.css` for the color tokens (`--background`, `--surface`, `--foreground`, `--muted`, `--border`, `--accent`)
 
 ## 🐛 Resolved issues (kept for history)
 
@@ -33,7 +35,7 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 ## ⏳ Deferred until you buy blutobox.com
 
 - **Cloudflare in front of B2**: right now uploads/downloads talk directly to B2. Once you have a domain, front the bucket with Cloudflare for free egress via the Bandwidth Alliance (this is what keeps bandwidth costs near-zero at scale)
-- **Resend domain verification**: emails currently only deliver to your own Resend account email (sandbox mode restriction). Real users can't get verification emails until a custom domain is verified in Resend — this means **real strangers can't complete signup right now** since they can't verify their email (see the login-requires-verification fix above)
+- ~~Resend domain verification~~ — no longer needed for signups, switched to Gmail SMTP instead (free, works today). Could still set up Resend + domain later for a more "professional" sender if desired
 - **B2 CORS rule**: currently allows `localhost:3000` + `blutobox-14ks.vercel.app`. Needs your real domain added (and possibly the old vercel.app origin removed) once you have one
 - **NEXTAUTH_URL**: currently `https://blutobox-14ks.vercel.app` in Vercel env vars, needs to become the real domain
 
@@ -52,7 +54,8 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - Neon (Postgres)
 - Backblaze B2 (storage)
 - Stripe (**live mode** — be careful testing)
-- Resend (sandbox mode only, see above)
+- Resend (installed but unused — sandbox mode only, see above)
+- Gmail SMTP (`aoinyx.dev@gmail.com` + app password) — active email sender
 - Upstash (rate limiting)
 - `CRON_SECRET` (self-generated, protects the cleanup endpoint from unauthorized triggering)
 

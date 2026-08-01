@@ -14,24 +14,22 @@ export default async function AdminReportsPage() {
   });
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-6">
-      <h1 className="text-xl font-semibold">Open reports ({reports.length})</h1>
-      {reports.length === 0 && (
-        <p className="text-sm text-neutral-500">No open reports.</p>
-      )}
-      <div className="space-y-3">
-        {reports.map((report) => (
-          <div key={report.id} className="space-y-2 rounded border p-4 text-sm">
-            <p className="break-all font-medium">{report.file.filename}</p>
-            <p className="text-xs text-neutral-500">
-              Reported by {report.reporterEmail} on {report.createdAt.toLocaleString()}
-            </p>
-            <p className="whitespace-pre-wrap rounded bg-neutral-50 p-2 text-xs dark:bg-neutral-900">
-              {report.reason}
-            </p>
-            <ReportActions reportId={report.id} />
-          </div>
-        ))}
+    <main className="flex flex-1 flex-col items-center px-6 py-16">
+      <div className="w-full max-w-2xl space-y-6">
+        <h1 className="text-2xl font-semibold tracking-tight">Open reports ({reports.length})</h1>
+        {reports.length === 0 && <p className="text-sm text-muted">No open reports.</p>}
+        <div className="space-y-3">
+          {reports.map((report) => (
+            <div key={report.id} className="space-y-3 rounded-2xl border border-border bg-surface p-5 text-sm">
+              <p className="break-all font-medium">{report.file.filename}</p>
+              <p className="text-xs text-muted">
+                Reported by {report.reporterEmail} on {report.createdAt.toLocaleString()}
+              </p>
+              <p className="whitespace-pre-wrap rounded-lg bg-background p-3 text-xs">{report.reason}</p>
+              <ReportActions reportId={report.id} />
+            </div>
+          ))}
+        </div>
       </div>
     </main>
   );

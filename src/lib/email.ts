@@ -1,26 +1,39 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+let _transporter: nodemailer.Transporter | null = null;
+
+function getTransporter(): nodemailer.Transporter | null {
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return null;
+  if (!_transporter) {
+    _transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+  }
+  return _transporter;
+}
 
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${process.env.NEXTAUTH_URL}/verify?token=${token}`;
 
-  if (!resend) {
-    // No email provider configured yet (e.g. local dev before Resend is set up).
+  const transporter = getTransporter();
+  if (!transporter) {
+    // No email provider configured yet (e.g. local dev before Gmail SMTP is set up).
     console.log(`[dev] Verification link for ${email}: ${verifyUrl}`);
     return;
   }
 
-  const { error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM ?? "noreply@localhost",
-    to: email,
-    subject: "Verify your email",
-    html: `<p>Click the link below to verify your email address:</p><p><a href="${verifyUrl}">${verifyUrl}</a></p><p>This link expires in 24 hours.</p>`,
-  });
-
-  if (error) {
+  try {
+    await transporter.sendMail({
+      from: `Bluto Box <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: "Verify your email",
+      html: `<p>Click the link below to verify your email address:</p><p><a href="${verifyUrl}">${verifyUrl}</a></p><p>This link expires in 24 hours.</p>`,
+    });
+  } catch (error) {
     console.error(`[email] Failed to send verification email to ${email}:`, error);
     throw new Error("Failed to send verification email");
   }

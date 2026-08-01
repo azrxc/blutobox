@@ -40,16 +40,16 @@ function FileRow({ file }: { file: AccountFile }) {
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b py-3 text-sm last:border-0">
+    <div className="flex items-center justify-between gap-3 border-b border-border py-4 text-sm last:border-0">
       <div className="min-w-0 flex-1">
         {file.slug ? (
-          <Link href={`/f/${file.slug}`} className="break-all font-medium underline">
+          <Link href={`/f/${file.slug}`} className="break-all font-medium underline underline-offset-2">
             {file.filename}
           </Link>
         ) : (
           <span className="break-all font-medium">{file.filename}</span>
         )}
-        <p className="text-xs text-neutral-500">
+        <p className="mt-0.5 text-xs text-muted">
           {formatBytes(file.sizeBytes)} · {file.downloadCount} downloads ·{" "}
           {file.daysUntilDeletion === null
             ? "Never auto-deleted (Pro)"
@@ -61,7 +61,7 @@ function FileRow({ file }: { file: AccountFile }) {
       <button
         onClick={handleDelete}
         disabled={deleting}
-        className="shrink-0 rounded border px-3 py-1 text-xs text-red-600 disabled:opacity-50"
+        className="shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/10 disabled:opacity-50 dark:text-red-400"
       >
         {deleting ? "Deleting…" : "Delete"}
       </button>
@@ -71,7 +71,7 @@ function FileRow({ file }: { file: AccountFile }) {
 
 export function FileList({ files }: { files: AccountFile[] }) {
   if (files.length === 0) {
-    return <p className="text-sm text-neutral-500">You haven&apos;t uploaded any files yet.</p>;
+    return <p className="py-5 text-sm text-muted">You haven&apos;t uploaded any files yet.</p>;
   }
   return (
     <div>

@@ -62,39 +62,41 @@ export default async function AccountPage() {
   const accountFiles = buildAccountFiles(files, isPro);
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 p-6">
-      <div className="w-full max-w-2xl space-y-8">
+    <main className="flex flex-1 flex-col items-center px-6 py-16">
+      <div className="w-full max-w-2xl space-y-10">
         <div>
-          <h1 className="text-xl font-semibold">Account</h1>
-          <p className="text-sm text-neutral-500">
+          <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
+          <p className="mt-1 text-sm text-muted">
             {user.email} · {user.planTier} plan ·{" "}
-            <Link href="/pricing" className="underline">
+            <Link href="/pricing" className="text-foreground underline underline-offset-2">
               {isPro ? "Manage subscription" : "Upgrade to Pro"}
             </Link>
           </p>
         </div>
 
-        <div>
-          <div className="mb-1 flex items-center justify-between text-sm">
+        <div className="rounded-2xl border border-border bg-surface p-5">
+          <div className="mb-2 flex items-center justify-between text-sm">
             <span className="font-medium">Storage</span>
-            <span className="text-neutral-500">
+            <span className="text-muted">
               {formatGB(usedBytes)} GB of {formatGB(totalBytes)} GB used
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded bg-neutral-200 dark:bg-neutral-800">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
             <div
-              className={`h-full ${usedFraction > 0.9 ? "bg-red-500" : "bg-black dark:bg-white"}`}
+              className={`h-full rounded-full ${usedFraction > 0.9 ? "bg-red-500" : "bg-accent"}`}
               style={{ width: `${usedFraction * 100}%` }}
             />
           </div>
         </div>
 
         <div>
-          <h2 className="mb-2 text-sm font-semibold">Your uploads ({accountFiles.length})</h2>
-          <FileList files={accountFiles} />
+          <h2 className="mb-3 text-sm font-semibold">Your uploads ({accountFiles.length})</h2>
+          <div className="rounded-2xl border border-border bg-surface px-5">
+            <FileList files={accountFiles} />
+          </div>
         </div>
 
-        <div className="border-t pt-6">
+        <div className="border-t border-border pt-8">
           <ChangePasswordForm />
         </div>
       </div>

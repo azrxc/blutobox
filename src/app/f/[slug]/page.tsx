@@ -35,8 +35,8 @@ export default async function FilePage({
 
   if (link.expiresAt && link.expiresAt < new Date()) {
     return (
-      <main className="flex flex-1 items-center justify-center p-6">
-        <p className="text-sm text-neutral-500">This link has expired.</p>
+      <main className="flex flex-1 items-center justify-center px-6 py-16">
+        <p className="text-sm text-muted">This link has expired.</p>
       </main>
     );
   }
@@ -52,23 +52,23 @@ export default async function FilePage({
   const { file } = link;
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-4 p-6">
-      <div className="w-full max-w-2xl space-y-4">
+    <main className="flex flex-1 flex-col items-center px-6 py-16">
+      <div className="w-full max-w-2xl space-y-6">
         <div>
           <h1 className="break-all text-lg font-semibold">{file.filename}</h1>
-          <p className="text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-muted">
             {formatBytes(file.sizeBytes)} · {file.downloadCount} downloads
           </p>
         </div>
 
-        <div className="flex justify-center rounded border p-4">
+        <div className="flex justify-center rounded-2xl border border-border bg-surface p-6">
           <FileViewer slug={slug} isNsfw={file.isNsfw} />
         </div>
 
         <div className="flex items-center justify-between">
           <a
             href={`/api/files/${slug}/download`}
-            className="rounded bg-black text-white px-4 py-2 text-sm"
+            className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
           >
             Download
           </a>

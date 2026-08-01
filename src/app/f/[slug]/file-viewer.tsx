@@ -11,15 +11,15 @@ type PreviewData = {
 function PreviewMedia({ data }: { data: PreviewData }) {
   if (data.mimeType.startsWith("image/")) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={data.url} alt={data.filename} className="max-h-[70vh] max-w-full rounded" />;
+    return <img src={data.url} alt={data.filename} className="max-h-[70vh] max-w-full rounded-xl" />;
   }
   if (data.mimeType.startsWith("video/")) {
-    return <video src={data.url} controls className="max-h-[70vh] max-w-full rounded" />;
+    return <video src={data.url} controls className="max-h-[70vh] max-w-full rounded-xl" />;
   }
   if (data.mimeType.startsWith("audio/")) {
     return <audio src={data.url} controls className="w-full" />;
   }
-  return <p className="text-sm text-neutral-500">No preview available for this file type.</p>;
+  return <p className="text-sm text-muted">No preview available for this file type.</p>;
 }
 
 export function FileViewer({ slug, isNsfw }: { slug: string; isNsfw: boolean }) {
@@ -40,12 +40,12 @@ export function FileViewer({ slug, isNsfw }: { slug: string; isNsfw: boolean }) 
 
   if (!confirmed) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded border border-red-300 bg-red-50 p-6 text-center dark:bg-red-950/20">
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-red-500/20 bg-red-500/5 p-8 text-center">
         <p className="text-sm font-medium">This file is flagged as NSFW / adult content.</p>
-        <p className="text-xs text-neutral-500">You must be 18 or older to view it.</p>
+        <p className="text-xs text-muted">You must be 18 or older to view it.</p>
         <button
           onClick={() => setConfirmed(true)}
-          className="rounded bg-black text-white px-4 py-2 text-sm"
+          className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
         >
           I am 18+, show content
         </button>
@@ -54,7 +54,7 @@ export function FileViewer({ slug, isNsfw }: { slug: string; isNsfw: boolean }) 
   }
 
   if (error) return <p className="text-sm text-red-500">{error}</p>;
-  if (!data) return <p className="text-sm text-neutral-500">Loading preview…</p>;
+  if (!data) return <p className="text-sm text-muted">Loading preview…</p>;
 
   return <PreviewMedia data={data} />;
 }

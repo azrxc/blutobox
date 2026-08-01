@@ -1,12 +1,12 @@
 export default function TermsPage() {
   return (
-    <main className="mx-auto max-w-2xl flex-1 space-y-6 p-6 text-sm leading-relaxed">
-      <div className="rounded border border-yellow-400 bg-yellow-50 p-3 text-xs text-yellow-800 dark:bg-yellow-950/20 dark:text-yellow-200">
+    <main className="mx-auto max-w-2xl flex-1 space-y-6 px-6 py-16 text-sm leading-relaxed">
+      <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3.5 text-xs text-yellow-800 dark:text-yellow-300">
         Template — replace placeholder details below and have this reviewed by a lawyer before public launch.
       </div>
 
-      <h1 className="text-2xl font-semibold">Terms of Service</h1>
-      <p className="text-neutral-500">Last updated: [DATE]</p>
+      <h1 className="text-2xl font-semibold tracking-tight">Terms of Service</h1>
+      <p className="text-muted">Last updated: [DATE]</p>
 
       <section className="space-y-2">
         <h2 className="text-lg font-medium">1. What this service is</h2>

@@ -23,12 +23,12 @@ const rows: Row[] = [
 function Cell({ value }: { value: string | boolean }) {
   if (typeof value === "boolean") {
     return (
-      <span className={value ? "text-green-600" : "text-neutral-300 dark:text-neutral-700"}>
-        {value ? "✓" : "✗"}
+      <span className={value ? "text-foreground" : "text-muted/50"}>
+        {value ? "✓" : "—"}
       </span>
     );
   }
-  return <span>{value}</span>;
+  return <span className="text-muted">{value}</span>;
 }
 
 export default function PricingPage() {
@@ -54,74 +54,71 @@ export default function PricingPage() {
   const isPro = session?.user?.planTier === "PRO";
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 p-6">
+    <main className="flex flex-1 flex-col items-center gap-10 px-6 py-16">
       <div className="text-center">
-        <h1 className="text-2xl font-semibold">Pricing</h1>
-        <p className="text-sm text-neutral-500">Simple, honest pricing. No surprises.</p>
+        <h1 className="text-3xl font-semibold tracking-tight">Pricing</h1>
+        <p className="mt-2 text-sm text-muted">Simple, honest pricing. No surprises.</p>
       </div>
 
-      <div className="w-full max-w-2xl overflow-x-auto rounded border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-neutral-50 dark:bg-neutral-900">
-              <th className="p-3 text-left font-medium">Feature</th>
-              <th className="p-3 text-center font-medium">
-                Free
-                <div className="text-lg font-bold">$0</div>
-              </th>
-              <th className="p-3 text-center font-medium">
-                Pro
-                <div className="text-lg font-bold">$4.99/mo</div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.label} className="border-b last:border-0">
-                <td className="p-3 text-neutral-600 dark:text-neutral-400">{row.label}</td>
-                <td className="p-3 text-center">
-                  <Cell value={row.free} />
-                </td>
-                <td className="p-3 text-center">
-                  <Cell value={row.pro} />
-                </td>
-              </tr>
-            ))}
-            <tr>
-              <td className="p-3"></td>
-              <td className="p-3 text-center">
-                {!session?.user && (
-                  <Link href="/login" className="rounded border px-4 py-2 text-xs">
-                    Log in
-                  </Link>
-                )}
-              </td>
-              <td className="p-3 text-center">
-                {!session?.user ? (
-                  <Link href="/login" className="rounded bg-black px-4 py-2 text-xs text-white">
-                    Log in to upgrade
-                  </Link>
-                ) : isPro ? (
-                  <button
-                    onClick={manage}
-                    disabled={loading}
-                    className="rounded border px-4 py-2 text-xs disabled:opacity-50"
-                  >
-                    Manage subscription
-                  </button>
-                ) : (
-                  <button
-                    onClick={upgrade}
-                    disabled={loading}
-                    className="rounded bg-black px-4 py-2 text-xs text-white disabled:opacity-50"
-                  >
-                    {loading ? "Redirecting…" : "Upgrade to Pro"}
-                  </button>
-                )}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface">
+        <div className="grid grid-cols-[1fr_auto_auto] gap-x-6 gap-y-4 px-6 pt-6 text-sm">
+          <div />
+          <div className="text-center">
+            <p className="text-xs font-medium text-muted">Free</p>
+            <p className="text-2xl font-semibold">$0</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs font-medium text-muted">Pro</p>
+            <p className="text-2xl font-semibold">$4.99<span className="text-sm font-normal text-muted">/mo</span></p>
+          </div>
+        </div>
+
+        <div className="mt-6 divide-y divide-border border-t border-border">
+          {rows.map((row) => (
+            <div key={row.label} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-6 px-6 py-3.5 text-sm">
+              <span className="text-muted">{row.label}</span>
+              <span className="text-center"><Cell value={row.free} /></span>
+              <span className="text-center"><Cell value={row.pro} /></span>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-x-6 border-t border-border px-6 py-5">
+          <span />
+          <span className="text-center">
+            {!session?.user && (
+              <Link href="/login" className="text-xs text-muted underline underline-offset-2">
+                Log in
+              </Link>
+            )}
+          </span>
+          <span className="text-center">
+            {!session?.user ? (
+              <Link
+                href="/login"
+                className="inline-block rounded-full bg-accent px-4 py-2 text-xs font-medium text-accent-foreground transition-opacity hover:opacity-85"
+              >
+                Log in to upgrade
+              </Link>
+            ) : isPro ? (
+              <button
+                onClick={manage}
+                disabled={loading}
+                className="rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-background disabled:opacity-50"
+              >
+                Manage subscription
+              </button>
+            ) : (
+              <button
+                onClick={upgrade}
+                disabled={loading}
+                className="rounded-full bg-accent px-4 py-2 text-xs font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-50"
+              >
+                {loading ? "Redirecting…" : "Upgrade to Pro"}
+              </button>
+            )}
+          </span>
+        </div>
       </div>
     </main>
   );
