@@ -39,6 +39,9 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 text-xs text-muted">
             <span>© {new Date().getFullYear()} Bluto Box</span>
             <div className="flex gap-6">
+              <Link href="/changelog" className="transition-colors hover:text-foreground">
+                Changelog
+              </Link>
               <Link href="/terms" className="transition-colors hover:text-foreground">
                 Terms
               </Link>
