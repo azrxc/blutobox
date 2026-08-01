@@ -17,8 +17,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   title: "Bluto Box",
   description: "Upload and share files.",
+  openGraph: {
+    title: "Bluto Box",
+    description: "Upload and share files.",
+    siteName: "Bluto Box",
+    images: ["/icon.png"],
+  },
+  twitter: {
+    card: "summary",
+    title: "Bluto Box",
+    description: "Upload and share files.",
+    images: ["/icon.png"],
+  },
 };
 
 export default function RootLayout({

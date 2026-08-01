@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { FileViewer } from "./file-viewer";
 import { ReportForm } from "./report-form";
@@ -21,6 +22,43 @@ function formatBytes(bytes: bigint) {
     unit++;
   }
   return `${value.toFixed(1)} ${units[unit]}`;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const link = await prisma.shareLink.findUnique({ where: { slug }, include: { file: true } });
+
+  if (!link || link.file.status !== "ACTIVE" || (link.expiresAt && link.expiresAt < new Date())) {
+    return { title: "File not found — Bluto Box" };
+  }
+
+  if (link.passwordHash) {
+    const title = "Password-protected file — Bluto Box";
+    const description = "This file is protected. Enter the password to view it.";
+    return {
+      title,
+      description,
+      openGraph: { title, description, siteName: "Bluto Box", images: ["/icon.png"] },
+      twitter: { card: "summary", title, description, images: ["/icon.png"] },
+    };
+  }
+
+  const { file } = link;
+  const title = file.isNsfw ? "NSFW file — Bluto Box" : file.filename;
+  const description = file.isNsfw
+    ? "This file is flagged as NSFW/adult content. 18+ only."
+    : `${formatBytes(file.sizeBytes)} · Shared via Bluto Box`;
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, siteName: "Bluto Box", images: ["/icon.png"] },
+    twitter: { card: "summary", title, description, images: ["/icon.png"] },
+  };
 }
 
 export default async function FilePage({
