@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { checkReportLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
 
 const reportSchema = z.object({
   slug: z.string().min(1),
@@ -9,6 +11,15 @@ const reportSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const { success } = await checkReportLimit(ip);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many reports from this network. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = reportSchema.safeParse(body);
   if (!parsed.success) {

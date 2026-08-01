@@ -1,90 +1,28 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-let _anonUploadLimiter: Ratelimit | null = null;
+function makeLimitChecker(prefix: string, limit: number, window: `${number} ${"s" | "m" | "h" | "d"}`) {
+  let limiter: Ratelimit | null = null;
 
-function getAnonUploadLimiter(): Ratelimit {
-  if (!_anonUploadLimiter) {
+  return async function check(identifier: string) {
     if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-      throw new Error("Missing required env vars: UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN");
+      // Rate limiting not configured (e.g. local dev before Upstash is set up) - allow through.
+      return { success: true };
     }
-    _anonUploadLimiter = new Ratelimit({
-      redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(10, "1 h"),
-      prefix: "ratelimit:anon-upload",
-    });
-  }
-  return _anonUploadLimiter;
+    if (!limiter) {
+      limiter = new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(limit, window),
+        prefix: `ratelimit:${prefix}`,
+      });
+    }
+    const { success } = await limiter.limit(identifier);
+    return { success };
+  };
 }
 
-export async function checkAnonUploadLimit(ip: string) {
-  if (!process.env.UPSTASH_REDIS_REST_URL) {
-    // Rate limiting not configured (e.g. local dev before Upstash is set up) - allow through.
-    return { success: true };
-  }
-  const { success } = await getAnonUploadLimiter().limit(ip);
-  return { success };
-}
-
-let _loginLimiter: Ratelimit | null = null;
-
-function getLoginLimiter(): Ratelimit {
-  if (!_loginLimiter) {
-    _loginLimiter = new Ratelimit({
-      redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(8, "15 m"),
-      prefix: "ratelimit:login",
-    });
-  }
-  return _loginLimiter;
-}
-
-export async function checkLoginLimit(ip: string) {
-  if (!process.env.UPSTASH_REDIS_REST_URL) {
-    return { success: true };
-  }
-  const { success } = await getLoginLimiter().limit(ip);
-  return { success };
-}
-
-let _registerLimiter: Ratelimit | null = null;
-
-function getRegisterLimiter(): Ratelimit {
-  if (!_registerLimiter) {
-    _registerLimiter = new Ratelimit({
-      redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(5, "1 h"),
-      prefix: "ratelimit:register",
-    });
-  }
-  return _registerLimiter;
-}
-
-export async function checkRegisterLimit(ip: string) {
-  if (!process.env.UPSTASH_REDIS_REST_URL) {
-    return { success: true };
-  }
-  const { success } = await getRegisterLimiter().limit(ip);
-  return { success };
-}
-
-let _forgotPasswordLimiter: Ratelimit | null = null;
-
-function getForgotPasswordLimiter(): Ratelimit {
-  if (!_forgotPasswordLimiter) {
-    _forgotPasswordLimiter = new Ratelimit({
-      redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(5, "1 h"),
-      prefix: "ratelimit:forgot-password",
-    });
-  }
-  return _forgotPasswordLimiter;
-}
-
-export async function checkForgotPasswordLimit(ip: string) {
-  if (!process.env.UPSTASH_REDIS_REST_URL) {
-    return { success: true };
-  }
-  const { success } = await getForgotPasswordLimiter().limit(ip);
-  return { success };
-}
+export const checkAnonUploadLimit = makeLimitChecker("anon-upload", 10, "1 h");
+export const checkLoginLimit = makeLimitChecker("login", 8, "15 m");
+export const checkRegisterLimit = makeLimitChecker("register", 5, "1 h");
+export const checkForgotPasswordLimit = makeLimitChecker("forgot-password", 5, "1 h");
+export const checkReportLimit = makeLimitChecker("report", 5, "1 h");
