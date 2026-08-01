@@ -29,6 +29,11 @@ export function Header() {
           <Link href="/pricing" className="transition-colors hover:text-foreground">
             Pricing
           </Link>
+          {session?.user?.role === "ADMIN" && (
+            <Link href="/admin/reports" className="transition-colors hover:text-foreground">
+              Admin
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">
