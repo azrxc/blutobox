@@ -40,9 +40,11 @@ export function Header() {
           {session?.user ? (
             <Link
               href="/account"
-              className="rounded-full px-4 py-1.5 text-sm text-muted transition-colors hover:text-foreground"
+              aria-label="Account"
+              title="Account"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-semibold text-accent-foreground transition-opacity hover:opacity-85"
             >
-              Account
+              {(session.user.name || session.user.email || "?").charAt(0).toUpperCase()}
             </Link>
           ) : (
             <>

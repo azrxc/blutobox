@@ -10,6 +10,7 @@ import { FileList, type AccountFile } from "./file-list";
 import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
 import { DownloadUsageBar } from "../download-usage-bar";
 import { UsageBar } from "../usage-bar";
+import { AccountTabs } from "./account-tabs";
 
 function buildSubscriptionInfo(
   isPro: boolean,
@@ -98,39 +99,46 @@ export default async function AccountPage() {
           </p>
         </div>
 
-        <SubscriptionCard subscription={subscriptionInfo} />
-
-        <div>
-          <h2 className="mb-3 text-sm font-semibold">Usage</h2>
-          <div className="space-y-4">
-            <UsageBar label="Storage used" usedBytes={usedBytes} totalBytes={totalBytes} />
-            <DownloadUsageBar />
-          </div>
-        </div>
-
-        <div>
-          <h2 className="mb-3 text-sm font-semibold">Your uploads ({accountFiles.length})</h2>
-          <div className="rounded-2xl border border-border bg-surface px-5">
-            <FileList files={accountFiles} />
-          </div>
-        </div>
-
-        <div className="border-t border-border pt-8">
-          <UpdateNameForm currentName={user.name} />
-        </div>
-
-        {isPro ? (
-          <CreatorLinksForm initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))} />
-        ) : (
-          <div className="max-w-sm space-y-1">
-            <h2 className="text-sm font-semibold">Creator links</h2>
-            <p className="text-xs text-muted">
-              Upgrade to Pro to show your Discord, socials, and support links on your file pages.
-            </p>
-          </div>
-        )}
-
-        <ChangePasswordForm hasPassword={Boolean(user.passwordHash)} />
+        <AccountTabs
+          overview={
+            <div className="space-y-10">
+              <SubscriptionCard subscription={subscriptionInfo} />
+              <div>
+                <h2 className="mb-3 text-sm font-semibold">Usage</h2>
+                <div className="space-y-4">
+                  <UsageBar label="Storage used" usedBytes={usedBytes} totalBytes={totalBytes} />
+                  <DownloadUsageBar />
+                </div>
+              </div>
+            </div>
+          }
+          files={
+            <div>
+              <h2 className="mb-3 text-sm font-semibold">Your uploads ({accountFiles.length})</h2>
+              <div className="rounded-2xl border border-border bg-surface px-5">
+                <FileList files={accountFiles} />
+              </div>
+            </div>
+          }
+          profile={
+            <div className="space-y-10">
+              <UpdateNameForm currentName={user.name} />
+              <ChangePasswordForm hasPassword={Boolean(user.passwordHash)} />
+            </div>
+          }
+          creator={
+            isPro ? (
+              <CreatorLinksForm initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))} />
+            ) : (
+              <div className="max-w-sm space-y-1">
+                <h2 className="text-sm font-semibold">Creator links</h2>
+                <p className="text-xs text-muted">
+                  Upgrade to Pro to show your Discord, socials, and support links on your file pages.
+                </p>
+              </div>
+            )
+          }
+        />
       </div>
     </main>
   );
