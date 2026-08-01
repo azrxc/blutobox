@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { generateSlug } from "@/lib/slug";
 import { getClientIp } from "@/lib/request-ip";
 
+export const maxDuration = 60;
+
 const completeSchema = z.object({
   key: z.string().min(1),
   filename: z.string().min(1).max(500),

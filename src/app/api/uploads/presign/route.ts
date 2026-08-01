@@ -19,6 +19,8 @@ import {
 import { getClientIp } from "@/lib/request-ip";
 import { checkAnonUploadLimit } from "@/lib/rate-limit";
 
+export const maxDuration = 30;
+
 const presignSchema = z.object({
   filename: z.string().min(1).max(500),
   size: z.number().int().positive(),

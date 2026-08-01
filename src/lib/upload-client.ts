@@ -8,6 +8,11 @@ export type UploadOptions = {
 
 const MULTIPART_CONCURRENCY = 5;
 
+async function throwForResponse(res: Response, fallback: string): Promise<never> {
+  const data = await res.json().catch(() => null);
+  throw new Error(data?.error ?? `${fallback} (status ${res.status})`);
+}
+
 function putWithProgress(
   url: string,
   body: Blob,
@@ -82,8 +87,7 @@ export async function uploadFile(
   });
 
   if (!presignRes.ok) {
-    const data = await presignRes.json().catch(() => ({}));
-    throw new Error(data.error ?? "Failed to start upload");
+    await throwForResponse(presignRes, "Failed to start upload");
   }
 
   const presign = await presignRes.json();
@@ -116,8 +120,7 @@ export async function uploadFile(
       body: JSON.stringify({ ...completeBody, uploadId: presign.uploadId, parts }),
     });
     if (!completeRes.ok) {
-      const data = await completeRes.json().catch(() => ({}));
-      throw new Error(data.error ?? "Failed to finalize upload");
+      await throwForResponse(completeRes, "Failed to finalize upload");
     }
     return completeRes.json();
   }
@@ -128,8 +131,7 @@ export async function uploadFile(
     body: JSON.stringify(completeBody),
   });
   if (!completeRes.ok) {
-    const data = await completeRes.json().catch(() => ({}));
-    throw new Error(data.error ?? "Failed to finalize upload");
+    await throwForResponse(completeRes, "Failed to finalize upload");
   }
   return completeRes.json();
 }

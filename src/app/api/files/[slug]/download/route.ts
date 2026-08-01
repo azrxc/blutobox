@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { getClientIp } from "@/lib/request-ip";
 import { dailyDownloadBytesFor } from "@/lib/limits";
 import { checkDownloadQuota, consumeDownloadQuota } from "@/lib/download-quota";
+import { createStreamToken } from "@/lib/stream-token";
 
 export async function GET(
   req: Request,
@@ -61,5 +62,15 @@ export async function GET(
     forceDownload: true,
   });
 
-  return NextResponse.redirect(url);
+  if (planTier === "PRO") {
+    return NextResponse.redirect(url);
+  }
+
+  const token = await createStreamToken({
+    url,
+    filename: link.file.filename,
+    exp: Date.now() + 5 * 60 * 1000,
+  });
+  const origin = new URL(req.url).origin;
+  return NextResponse.redirect(`${origin}/api/stream?t=${encodeURIComponent(token)}`);
 }
