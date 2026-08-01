@@ -1,8 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 type Row = {
@@ -35,23 +34,14 @@ function Cell({ value }: { value: string | boolean }) {
   return <span className="text-muted">{value}</span>;
 }
 
-function SuccessRefresh() {
-  const params = useSearchParams();
-  const { update } = useSession();
+export default function PricingPage() {
+  const { data: session, update } = useSession();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (params.get("success") === "1") {
-      update();
-    }
+    update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
-
-  return null;
-}
-
-export default function PricingPage() {
-  const { data: session } = useSession();
-  const [loading, setLoading] = useState(false);
+  }, []);
 
   async function upgrade() {
     setLoading(true);
@@ -73,9 +63,6 @@ export default function PricingPage() {
 
   return (
     <main className="flex flex-1 flex-col items-center gap-10 px-6 py-16">
-      <Suspense fallback={null}>
-        <SuccessRefresh />
-      </Suspense>
       <div className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Pricing</h1>
         <p className="mt-2 text-sm text-muted">Simple, honest pricing. No surprises.</p>

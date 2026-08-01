@@ -36,7 +36,13 @@ export async function POST(req: Request) {
   const { filename, size, mimeType } = parsed.data;
 
   const session = await auth();
-  const planTier = (session?.user?.planTier as "FREE" | "PRO" | undefined) ?? null;
+  const currentUser = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { planTier: true, storageUsedBytes: true },
+      })
+    : null;
+  const planTier = currentUser?.planTier ?? null;
 
   const ip = getClientIp(req);
   const banned = await prisma.bannedIp.findUnique({ where: { ip } });
@@ -64,11 +70,7 @@ export async function POST(req: Request) {
 
   if (session?.user) {
     const totalBytes = totalStorageBytesFor((planTier as "FREE" | "PRO") ?? "FREE");
-    const currentUsage = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { storageUsedBytes: true },
-    });
-    const used = Number(currentUsage?.storageUsedBytes ?? 0);
+    const used = Number(currentUser?.storageUsedBytes ?? 0);
     if (used + size > totalBytes) {
       return NextResponse.json(
         {

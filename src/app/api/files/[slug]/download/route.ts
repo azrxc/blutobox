@@ -7,6 +7,7 @@ import { getClientIp } from "@/lib/request-ip";
 import { dailyDownloadBytesFor } from "@/lib/limits";
 import { checkDownloadQuota, consumeDownloadQuota } from "@/lib/download-quota";
 import { createStreamToken } from "@/lib/stream-token";
+import { getCurrentPlanTier } from "@/lib/plan";
 
 export async function GET(
   req: Request,
@@ -33,7 +34,7 @@ export async function GET(
   }
 
   const session = await auth();
-  const planTier = (session?.user?.planTier as "FREE" | "PRO" | undefined) ?? null;
+  const planTier = await getCurrentPlanTier(session?.user?.id);
   const identifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
   const dailyLimit = dailyDownloadBytesFor(planTier);
   const fileBytes = Number(link.file.sizeBytes);

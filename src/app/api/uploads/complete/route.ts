@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { generateSlug } from "@/lib/slug";
 import { getClientIp } from "@/lib/request-ip";
 import { isKnownMalicious } from "@/lib/virustotal";
+import { getCurrentPlanTier } from "@/lib/plan";
 
 export const maxDuration = 60;
 
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
     },
   });
 
-  const isPro = session?.user?.planTier === "PRO";
+  const isPro = (await getCurrentPlanTier(session?.user?.id)) === "PRO";
   const passwordHash = isPro && linkPassword ? await bcrypt.hash(linkPassword, 12) : null;
   const expiresAt = isPro && expiresInHours
     ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000)

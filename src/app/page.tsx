@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
+import { getCurrentPlanTier } from "@/lib/plan";
 
 const features = [
   {
@@ -18,6 +19,7 @@ const features = [
 
 export default async function Home() {
   const session = await auth();
+  const planTier = session?.user ? await getCurrentPlanTier(session.user.id) : null;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -47,7 +49,7 @@ export default async function Home() {
         {session?.user && (
           <div className="mt-10 flex items-center gap-3 text-sm text-muted">
             <span>
-              Logged in as {session.user.email} · {session.user.planTier === "PRO" ? "Pro plan" : "Free plan"}
+              Logged in as {session.user.email} · {planTier === "PRO" ? "Pro plan" : "Free plan"}
             </span>
             <form
               action={async () => {

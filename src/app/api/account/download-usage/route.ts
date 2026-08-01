@@ -3,10 +3,11 @@ import { auth } from "@/lib/auth";
 import { getClientIp } from "@/lib/request-ip";
 import { dailyDownloadBytesFor } from "@/lib/limits";
 import { checkDownloadQuota } from "@/lib/download-quota";
+import { getCurrentPlanTier } from "@/lib/plan";
 
 export async function GET(req: Request) {
   const session = await auth();
-  const planTier = (session?.user?.planTier as "FREE" | "PRO" | undefined) ?? null;
+  const planTier = await getCurrentPlanTier(session?.user?.id);
   const identifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
   const totalBytes = dailyDownloadBytesFor(planTier);
 

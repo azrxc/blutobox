@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { uploadFile, UploadCancelledError } from "@/lib/upload-client";
@@ -8,8 +8,13 @@ import { CopyLinkField } from "../copy-link-field";
 import { StorageUsageBar } from "../storage-usage-bar";
 
 export default function UploadPage() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const isPro = session?.user?.planTier === "PRO";
+
+  useEffect(() => {
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [file, setFile] = useState<File | null>(null);
   const [isNsfw, setIsNsfw] = useState(false);
