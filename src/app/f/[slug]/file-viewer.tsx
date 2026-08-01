@@ -8,16 +8,43 @@ type PreviewData = {
   filename: string;
 };
 
+const IMAGE_EXTS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "avif"];
+const VIDEO_EXTS = ["mp4", "webm", "mov", "mkv", "avi", "m4v"];
+const AUDIO_EXTS = ["mp3", "wav", "ogg", "m4a", "flac", "aac"];
+
+function getExt(filename: string) {
+  return filename.split(".").pop()?.toLowerCase() ?? "";
+}
+
 function PreviewMedia({ data }: { data: PreviewData }) {
-  if (data.mimeType.startsWith("image/")) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={data.url} alt={data.filename} className="max-h-[70vh] max-w-full rounded-xl" />;
+  const [failed, setFailed] = useState(false);
+  const ext = getExt(data.filename);
+  const isImage = data.mimeType.startsWith("image/") || IMAGE_EXTS.includes(ext);
+  const isVideo = data.mimeType.startsWith("video/") || VIDEO_EXTS.includes(ext);
+  const isAudio = data.mimeType.startsWith("audio/") || AUDIO_EXTS.includes(ext);
+
+  if (failed) {
+    return <p className="text-sm text-red-500">Failed to load preview. You can still download the file below.</p>;
   }
-  if (data.mimeType.startsWith("video/")) {
-    return <video src={data.url} controls className="max-h-[70vh] max-w-full rounded-xl" />;
+
+  if (isImage) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={data.url}
+        alt={data.filename}
+        className="max-h-[70vh] max-w-full rounded-xl"
+        onError={() => setFailed(true)}
+      />
+    );
   }
-  if (data.mimeType.startsWith("audio/")) {
-    return <audio src={data.url} controls className="w-full" />;
+  if (isVideo) {
+    return (
+      <video src={data.url} controls className="max-h-[70vh] max-w-full rounded-xl" onError={() => setFailed(true)} />
+    );
+  }
+  if (isAudio) {
+    return <audio src={data.url} controls className="w-full" onError={() => setFailed(true)} />;
   }
   return <p className="text-sm text-muted">No preview available for this file type.</p>;
 }
