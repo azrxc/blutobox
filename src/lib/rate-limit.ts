@@ -46,3 +46,24 @@ export async function checkLoginLimit(ip: string) {
   const { success } = await getLoginLimiter().limit(ip);
   return { success };
 }
+
+let _registerLimiter: Ratelimit | null = null;
+
+function getRegisterLimiter(): Ratelimit {
+  if (!_registerLimiter) {
+    _registerLimiter = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(5, "1 h"),
+      prefix: "ratelimit:register",
+    });
+  }
+  return _registerLimiter;
+}
+
+export async function checkRegisterLimit(ip: string) {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return { success: true };
+  }
+  const { success } = await getRegisterLimiter().limit(ip);
+  return { success };
+}

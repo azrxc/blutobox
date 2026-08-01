@@ -4,6 +4,8 @@ import { randomBytes } from "crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
+import { checkRegisterLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -12,6 +14,15 @@ const registerSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const { success } = await checkRegisterLimit(ip);
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many accounts created from this network. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
