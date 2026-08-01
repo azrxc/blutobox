@@ -12,6 +12,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   maxUploadBytesFor,
+  totalStorageBytesFor,
   MULTIPART_THRESHOLD_BYTES,
   MULTIPART_PART_SIZE_BYTES,
 } from "@/lib/limits";
@@ -57,6 +58,23 @@ export async function POST(req: Request) {
       { error: `File too large. Max allowed is ${Math.floor(maxBytes / (1024 * 1024))}MB for your plan.` },
       { status: 413 }
     );
+  }
+
+  if (session?.user) {
+    const totalBytes = totalStorageBytesFor((planTier as "FREE" | "PRO") ?? "FREE");
+    const currentUsage = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { storageUsedBytes: true },
+    });
+    const used = Number(currentUsage?.storageUsedBytes ?? 0);
+    if (used + size > totalBytes) {
+      return NextResponse.json(
+        {
+          error: `This would exceed your storage limit (${Math.floor(totalBytes / (1024 * 1024 * 1024))}GB). Delete some files or upgrade to Pro.`,
+        },
+        { status: 413 }
+      );
+    }
   }
 
   const key = `uploads/${randomUUID()}/${filename}`;

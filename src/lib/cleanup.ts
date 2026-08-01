@@ -2,7 +2,7 @@ import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "@/lib/prisma";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
 
-const INACTIVITY_DAYS = 30;
+export const INACTIVITY_DAYS = 30;
 
 export async function deleteInactiveFreeFiles() {
   const cutoff = new Date(Date.now() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
@@ -13,7 +13,7 @@ export async function deleteInactiveFreeFiles() {
       lastAccessedAt: { lt: cutoff },
       OR: [{ owner: null }, { owner: { planTier: "FREE" } }],
     },
-    select: { id: true, b2Key: true },
+    select: { id: true, b2Key: true, ownerId: true, sizeBytes: true },
   });
 
   if (staleFiles.length === 0) {
@@ -33,6 +33,12 @@ export async function deleteInactiveFreeFiles() {
     await prisma.shareLink.deleteMany({ where: { fileId: file.id } });
     await prisma.report.deleteMany({ where: { fileId: file.id } });
     await prisma.file.delete({ where: { id: file.id } });
+    if (file.ownerId) {
+      await prisma.user.update({
+        where: { id: file.ownerId },
+        data: { storageUsedBytes: { decrement: file.sizeBytes } },
+      });
+    }
   }
 
   return { deleted: staleFiles.length };

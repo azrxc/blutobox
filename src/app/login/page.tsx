@@ -29,7 +29,11 @@ function LoginForm() {
     setLoading(false);
 
     if (res?.error) {
-      setError("Invalid email or password");
+      setError(
+        res.error === "email_not_verified"
+          ? "Please verify your email before logging in — check your inbox for the verification link."
+          : "Invalid email or password"
+      );
       return;
     }
 

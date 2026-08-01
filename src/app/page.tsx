@@ -21,6 +21,9 @@ export default async function Home() {
             <p className="text-sm text-neutral-500">
               Logged in as {session.user.email} ({session.user.planTier})
             </p>
+            <Link href="/account" className="rounded border px-4 py-2 text-sm">
+              My account
+            </Link>
             <form
               action={async () => {
                 "use server";
