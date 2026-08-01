@@ -6,6 +6,8 @@ export type UploadOptions = {
   expiresInHours?: number;
 };
 
+const MULTIPART_CONCURRENCY = 5;
+
 function putWithProgress(
   url: string,
   body: Blob,
@@ -31,6 +33,43 @@ function putWithProgress(
   });
 }
 
+async function uploadPartsConcurrently(
+  file: File,
+  partUrls: string[],
+  partSize: number,
+  onProgress: (loaded: number) => void
+): Promise<{ ETag: string; PartNumber: number }[]> {
+  const partBytesLoaded = new Array(partUrls.length).fill(0);
+  const results: { ETag: string; PartNumber: number }[] = new Array(partUrls.length);
+  const contentType = file.type || "application/octet-stream";
+
+  function reportProgress() {
+    onProgress(partBytesLoaded.reduce((a, b) => a + b, 0));
+  }
+
+  let nextIndex = 0;
+  async function worker() {
+    while (nextIndex < partUrls.length) {
+      const i = nextIndex++;
+      const start = i * partSize;
+      const end = Math.min(start + partSize, file.size);
+      const chunk = file.slice(start, end);
+      const etag = await putWithProgress(partUrls[i], chunk, contentType, (loaded) => {
+        partBytesLoaded[i] = loaded;
+        reportProgress();
+      });
+      if (!etag) throw new Error("Upload part missing ETag");
+      partBytesLoaded[i] = chunk.size;
+      reportProgress();
+      results[i] = { ETag: etag, PartNumber: i + 1 };
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(MULTIPART_CONCURRENCY, partUrls.length) }, () => worker());
+  await Promise.all(workers);
+  return results;
+}
+
 export async function uploadFile(
   file: File,
   options: UploadOptions,
@@ -48,7 +87,6 @@ export async function uploadFile(
   }
 
   const presign = await presignRes.json();
-  let uploaded = 0;
 
   const completeBody = {
     key: presign.key,
@@ -65,21 +103,12 @@ export async function uploadFile(
       onProgress(loaded / file.size);
     });
   } else {
-    const parts: { ETag: string; PartNumber: number }[] = [];
     const partSize: number = presign.partSize;
     const partUrls: string[] = presign.partUrls;
 
-    for (let i = 0; i < partUrls.length; i++) {
-      const start = i * partSize;
-      const end = Math.min(start + partSize, file.size);
-      const chunk = file.slice(start, end);
-      const etag = await putWithProgress(partUrls[i], chunk, file.type || "application/octet-stream", (loaded) => {
-        onProgress((uploaded + loaded) / file.size);
-      });
-      uploaded += chunk.size;
-      if (!etag) throw new Error("Upload part missing ETag");
-      parts.push({ ETag: etag, PartNumber: i + 1 });
-    }
+    const parts = await uploadPartsConcurrently(file, partUrls, partSize, (loaded) => {
+      onProgress(loaded / file.size);
+    });
 
     const completeRes = await fetch("/api/uploads/complete", {
       method: "POST",

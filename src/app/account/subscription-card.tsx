@@ -29,7 +29,21 @@ export function SubscriptionCard({ subscription }: { subscription: SubscriptionI
     );
   }
 
+  const dateStr = subscription.currentPeriodEnd
+    ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
   async function act(action: "cancel" | "resume") {
+    if (action === "cancel") {
+      const confirmed = confirm(
+        `Cancel your Pro subscription? You'll keep Pro access until${dateStr ? ` ${dateStr}` : " the end of your current billing period"}, then it won't renew.`
+      );
+      if (!confirmed) return;
+    }
     setLoading(true);
     setError(null);
     const res = await fetch(`/api/stripe/${action}`, { method: "POST" });
@@ -41,14 +55,6 @@ export function SubscriptionCard({ subscription }: { subscription: SubscriptionI
     }
     router.refresh();
   }
-
-  const dateStr = subscription.currentPeriodEnd
-    ? new Date(subscription.currentPeriodEnd).toLocaleDateString(undefined, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : null;
 
   return (
     <div className="rounded-2xl border border-border bg-surface p-5">
