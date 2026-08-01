@@ -8,6 +8,7 @@ import { CopyButton } from "./copy-button";
 import { NsfwGate } from "./nsfw-gate";
 import { DownloadButton } from "./download-button";
 import { StorageUsageBar } from "../../storage-usage-bar";
+import { DownloadUsageBar } from "../../download-usage-bar";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 function formatBytes(bytes: bigint) {
@@ -75,6 +76,8 @@ export default async function FilePage({
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
           </div>
         </NsfwGate>
+
+        <DownloadUsageBar />
 
         <div className="flex justify-end">
           <ReportForm slug={slug} />
