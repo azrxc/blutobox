@@ -209,64 +209,70 @@ export default function UploadPage() {
           This file contains NSFW / adult content
         </label>
 
-        <div className="space-y-3 rounded-xl border border-border bg-surface p-4">
-          <div className="space-y-1">
-            <label className="text-xs text-muted" htmlFor="expiryChoice">
-              Link expires
-            </label>
-            <select
-              id="expiryChoice"
-              value={expiryChoice}
-              onChange={(e) => setExpiryChoice(e.target.value)}
-              disabled={uploading}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-            >
-              <option value="">Never</option>
-              <option value="24">24 hours</option>
-              <option value="168">7 days</option>
-              {isPro && <option value="custom">Custom…</option>}
-            </select>
-          </div>
-          {isPro && expiryChoice === "custom" && (
+        <details className="group rounded-xl border border-border bg-surface">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium marker:content-none">
+            <span>Options</span>
+            <span className="text-muted transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="space-y-3 border-t border-border p-4">
             <div className="space-y-1">
-              <label className="text-xs text-muted" htmlFor="customHours">
-                Custom expiry (hours)
+              <label className="text-xs text-muted" htmlFor="expiryChoice">
+                Link expires
               </label>
-              <input
-                id="customHours"
-                type="number"
-                min={1}
-                value={customHours}
-                onChange={(e) => setCustomHours(e.target.value)}
+              <select
+                id="expiryChoice"
+                value={expiryChoice}
+                onChange={(e) => setExpiryChoice(e.target.value)}
                 disabled={uploading}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              />
+              >
+                <option value="">Never</option>
+                <option value="24">24 hours</option>
+                <option value="168">7 days</option>
+                {isPro && <option value="custom">Custom…</option>}
+              </select>
             </div>
-          )}
+            {isPro && expiryChoice === "custom" && (
+              <div className="space-y-1">
+                <label className="text-xs text-muted" htmlFor="customHours">
+                  Custom expiry (hours)
+                </label>
+                <input
+                  id="customHours"
+                  type="number"
+                  min={1}
+                  value={customHours}
+                  onChange={(e) => setCustomHours(e.target.value)}
+                  disabled={uploading}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+            )}
 
-          {isPro ? (
-            <div className="space-y-1">
-              <label className="text-xs text-muted" htmlFor="linkPassword">
-                Password-protect this link (optional)
-              </label>
-              <input
-                id="linkPassword"
-                type="text"
-                value={linkPassword}
-                onChange={(e) => setLinkPassword(e.target.value)}
-                disabled={uploading}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              />
-            </div>
-          ) : (
-            <p className="text-xs text-muted">
-              <Link href="/pricing" className="underline underline-offset-2">
-                Upgrade to Pro
-              </Link>{" "}
-              to password-protect links or set a custom expiry.
-            </p>
-          )}
-        </div>
+            {isPro ? (
+              <div className="space-y-1">
+                <label className="text-xs text-muted" htmlFor="linkPassword">
+                  Password-protect this link (optional)
+                </label>
+                <input
+                  id="linkPassword"
+                  type="text"
+                  value={linkPassword}
+                  onChange={(e) => setLinkPassword(e.target.value)}
+                  disabled={uploading}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+            ) : (
+              <p className="text-xs text-muted">
+                <Link href="/pricing" className="underline underline-offset-2">
+                  Upgrade to Pro
+                </Link>{" "}
+                to password-protect links or set a custom expiry.
+              </p>
+            )}
+          </div>
+        </details>
 
         {(uploading || zipping) && (
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
