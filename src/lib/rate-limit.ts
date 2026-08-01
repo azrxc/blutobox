@@ -26,3 +26,4 @@ export const checkLoginLimit = makeLimitChecker("login", 8, "15 m");
 export const checkRegisterLimit = makeLimitChecker("register", 5, "1 h");
 export const checkForgotPasswordLimit = makeLimitChecker("forgot-password", 5, "1 h");
 export const checkReportLimit = makeLimitChecker("report", 5, "1 h");
+export const checkUnlockLimit = makeLimitChecker("unlock", 10, "15 m");
