@@ -94,7 +94,7 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - **Have a lawyer review the ToS/Privacy Policy** — current versions are templates with placeholder contact emails (`legal@blutobox.com`, `privacy@blutobox.com`) and a `[DATE]` placeholder. Fine for testing, not for real users
 - **Register a DMCA agent** with the US Copyright Office (~$6) once you're operating publicly — strengthens your legal safe-harbor position
 - **Decide on ads for the free tier** (discussed earlier: standard AdSense conflicts with NSFW content policy — if you want ads, look at adult-friendly networks like ExoClick/JuicyAds instead, or skip ads and rely on Pro subscriptions only)
-- **Delete unused Vercel projects**: old `blutobox` and `blutobox-p594` if not already removed
+- ~~Delete unused Vercel projects~~ — **done.** Old `blutobox` and `blutobox-p594` removed
 - **Verify the Free/anonymous download throttle speed on production** — test a real download on `blutobox-14ks.vercel.app` and time it. Target is ~8 MB/s; adjust `THROTTLE_BYTES_PER_SEC` in `src/app/api/stream/route.ts` if the real Vercel Edge Function timing doesn't match (local dev testing wasn't representative — see note above)
 
 ## 💡 Ideas from competitor research (2026-08-01, not built — for consideration)
