@@ -5,6 +5,7 @@ import { FileViewer } from "./file-viewer";
 import { ReportForm } from "./report-form";
 import { PasswordGate } from "./password-gate";
 import { CopyButton } from "./copy-button";
+import { NsfwGate } from "./nsfw-gate";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 function formatBytes(bytes: bigint) {
@@ -62,12 +63,12 @@ export default async function FilePage({
           </p>
         </div>
 
-        <div className="flex justify-center rounded-2xl border border-border bg-surface p-6">
-          <FileViewer slug={slug} isNsfw={file.isNsfw} />
-        </div>
+        <NsfwGate isNsfw={file.isNsfw}>
+          <div className="flex justify-center rounded-2xl border border-border bg-surface p-6">
+            <FileViewer slug={slug} />
+          </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex gap-3">
+          <div className="mt-6 flex items-center gap-3">
             <a
               href={`/api/files/${slug}/download`}
               className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
@@ -76,6 +77,9 @@ export default async function FilePage({
             </a>
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
           </div>
+        </NsfwGate>
+
+        <div className="flex justify-end">
           <ReportForm slug={slug} />
         </div>
       </div>
