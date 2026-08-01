@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "./header";
+import { SupportButton } from "./support-button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-8 text-xs text-muted">
             <span>© {new Date().getFullYear()} Bluto Box</span>
             <div className="flex gap-6">
+              <SupportButton />
               <Link href="/changelog" className="transition-colors hover:text-foreground">
                 Changelog
               </Link>
