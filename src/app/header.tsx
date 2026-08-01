@@ -10,12 +10,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-10 border-b border-border/80 bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
           <Image
             src="/logo.png"
             alt=""
-            width={28}
-            height={28}
+            width={44}
+            height={44}
             className="shrink-0 dark:invert"
             priority
           />
