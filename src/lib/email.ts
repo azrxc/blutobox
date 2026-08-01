@@ -49,7 +49,7 @@ export async function sendDeletionWarningEmail(email: string, filename: string, 
 }
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const verifyUrl = `${process.env.NEXTAUTH_URL}/verify?token=${token}`;
+  const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
 
   const transporter = getTransporter();
   if (!transporter) {
