@@ -117,7 +117,7 @@ export default async function AccountPage() {
           <UpdateNameForm currentName={user.name} />
         </div>
 
-        <ChangePasswordForm />
+        <ChangePasswordForm hasPassword={Boolean(user.passwordHash)} />
       </div>
     </main>
   );

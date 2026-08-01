@@ -17,23 +17,20 @@ export function UsageBar({
   const percent = Math.round(usedFraction * 100);
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5">
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="text-2xl font-semibold tracking-tight">{percent}%</p>
-          <p className="mt-0.5 text-xs text-muted">{label}</p>
-        </div>
-        <p className="text-xs text-muted">
-          {formatGB(usedBytes)} GB of {formatGB(totalBytes)} GB
-        </p>
+    <div className="rounded-xl border border-border bg-surface px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 text-xs">
+        <span className="font-medium">{label}</span>
+        <span className="text-muted">
+          {percent}% · {formatGB(usedBytes)}/{formatGB(totalBytes)} GB
+          {resetLabel ? ` · ${resetLabel}` : ""}
+        </span>
       </div>
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-border">
+      <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-border">
         <div
           className={`h-full rounded-full ${usedFraction > 0.9 ? "bg-red-500" : "bg-accent"}`}
           style={{ width: `${usedFraction * 100}%` }}
         />
       </div>
-      {resetLabel && <p className="mt-2 text-xs text-muted">{resetLabel}</p>}
     </div>
   );
 }

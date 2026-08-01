@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { GoogleSignInButton } from "../google-signin-button";
 
 function LoginForm() {
   const router = useRouter();
@@ -88,6 +89,7 @@ function LoginForm() {
       >
         {loading ? "Logging in…" : "Log in"}
       </button>
+      <GoogleSignInButton />
       <p className="text-center text-sm text-muted">
         Need an account?{" "}
         <Link href="/register" className="text-foreground underline underline-offset-2">

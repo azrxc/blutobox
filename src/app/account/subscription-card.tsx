@@ -35,7 +35,7 @@ const LOSSES = [
   `Storage drops from ${gb(PRO_TOTAL_STORAGE_BYTES)} GB to ${gb(FREE_TOTAL_STORAGE_BYTES)} GB`,
   `Daily download limit drops from ${gb(PRO_DAILY_DOWNLOAD_BYTES)} GB to ${gb(FREE_DAILY_DOWNLOAD_BYTES)} GB`,
   "Downloads get speed-capped instead of running at full speed",
-  "You lose password-protected and expiring share links",
+  "You lose password-protected links and custom-duration expiry (still get 24h/7d presets free)",
 ];
 
 export function SubscriptionCard({ subscription }: { subscription: SubscriptionInfo | null }) {

@@ -1,11 +1,14 @@
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 class EmailNotVerifiedError extends CredentialsSignin {
   code = "email_not_verified";
 }
+
+const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -24,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || user.banned) return null;
+        if (!user || user.banned || !user.passwordHash) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
@@ -40,8 +43,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       },
     }),
+    ...(googleEnabled ? [Google] : []),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "google") return true;
+      const email = user.email;
+      if (!email) return false;
+
+      let dbUser = await prisma.user.findUnique({ where: { email } });
+      if (!dbUser) {
+        dbUser = await prisma.user.create({
+          data: { email, name: user.name ?? null, emailVerified: new Date() },
+        });
+      }
+      if (dbUser.banned) return false;
+
+      user.id = dbUser.id;
+      user.name = dbUser.name;
+      user.role = dbUser.role;
+      user.planTier = dbUser.planTier;
+      return true;
+    },
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;

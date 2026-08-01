@@ -7,6 +7,12 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-08-01",
+    title: "Multi-file uploads, QR codes, and free link expiry",
+    description:
+      "Select multiple files to bundle them into one link, generate a QR code for any share link, and Free accounts can now set a 24h or 7-day link expiry (Pro still gets any custom duration).",
+  },
+  {
+    date: "2026-08-01",
     title: "Storage usage indicator",
     description:
       "Your storage usage now shows up right on the upload and download pages, not just buried in Account.",

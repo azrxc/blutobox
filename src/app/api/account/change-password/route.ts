@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const schema = z.object({
-  currentPassword: z.string().min(1),
+  currentPassword: z.string().min(1).optional(),
   newPassword: z.string().min(8).max(200),
 });
 
@@ -26,9 +26,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Account not found" }, { status: 404 });
   }
 
-  const valid = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash);
-  if (!valid) {
-    return NextResponse.json({ error: "Current password is incorrect" }, { status: 403 });
+  if (user.passwordHash) {
+    if (!parsed.data.currentPassword) {
+      return NextResponse.json({ error: "Current password is required" }, { status: 400 });
+    }
+    const valid = await bcrypt.compare(parsed.data.currentPassword, user.passwordHash);
+    if (!valid) {
+      return NextResponse.json({ error: "Current password is incorrect" }, { status: 403 });
+    }
   }
 
   const newHash = await bcrypt.hash(parsed.data.newPassword, 12);

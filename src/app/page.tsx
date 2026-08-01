@@ -12,7 +12,7 @@ const features = [
   },
   {
     title: "Private by default",
-    description: "Password-protect links and set an expiry date on the Pro plan.",
+    description: "Set a link to expire in 24h or 7 days for free, or password-protect it on Pro.",
   },
   {
     title: "Built to last",

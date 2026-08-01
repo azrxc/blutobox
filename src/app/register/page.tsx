@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { GoogleSignInButton } from "../google-signin-button";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -130,6 +131,7 @@ export default function RegisterPage() {
         >
           {loading ? "Creating account…" : "Sign up"}
         </button>
+        <GoogleSignInButton />
         <p className="text-center text-sm text-muted">
           Already have an account?{" "}
           <Link href="/login" className="text-foreground underline underline-offset-2">
