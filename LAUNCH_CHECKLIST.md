@@ -26,6 +26,7 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - Minimalist design pass across every page (OpenAI-inspired: warm off-white/charcoal palette, rounded-2xl cards, pill buttons, consistent header/nav) — see `globals.css` for the color tokens (`--background`, `--surface`, `--foreground`, `--muted`, `--border`, `--accent`)
 - Copy-to-clipboard button on the upload-success screen and file view page
 - **Daily download bandwidth quota** (separate from upload limits): anonymous 3GB/day, Free account 5GB/day, Pro 25GB/day, tracked per-IP (anon) or per-account (logged in) via Upstash Redis, enforced in the download route before generating the link. Prevents someone using the service as unlimited free bandwidth for mass-distributing large files (e.g. pirated games) — matches how Mega/pixeldrain throttle free-tier downloads
+- **Stripe webhook — fully verified with a real live purchase (2026-08-01).** Completed an actual $4.99 checkout on production; confirmed in the database afterward that `checkout.session.completed` fired correctly, created a `Subscription` record (`status: active`), and flipped the account's `planTier` to `PRO`. This was the last untested piece of the payment system — the whole Pro-tier flow is now confirmed working end to end, not just theoretically wired up
 
 ## 🐛 Resolved issues (kept for history)
 
@@ -44,8 +45,9 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 ## ⚠️ Still needs doing regardless of domain
 
 - **Push local commits**: check GitHub Desktop for unpushed commits and push them — I can't push myself (blocked by permission settings), so this is on you each time
-- **Test the full Stripe webhook flow with one real purchase** — Checkout session creation is verified working, but the webhook that actually upgrades a user to Pro after payment hasn't been tested end-to-end yet. Needs a webhook endpoint configured in Stripe (Developers → Webhooks → Add endpoint → point at `https://blutobox-14ks.vercel.app/api/stripe/webhook`, select `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`) and the resulting signing secret added as `STRIPE_WEBHOOK_SECRET` in Vercel
-- **Rotate the Stripe live secret key** before calling this "production ready" — it ended up in this chat's history during setup. Stripe dashboard → API keys → roll key
+- **Rotate the Stripe live secret key AND the webhook signing secret** before calling this "production ready" — both ended up in this chat's history during setup. Stripe dashboard → API keys → roll key; Developers → Webhooks → your endpoint → roll signing secret (update `STRIPE_WEBHOOK_SECRET` in Vercel after)
+- **Update the Stripe public business name** — checkout currently shows your real/personal name to customers by default; fix in Stripe Dashboard → Settings → Business → Public details (already done for this account, showing "Aoinyx" — just noting for anyone else setting this up)
+- Consider refunding/canceling the test Pro subscription from the real purchase above if you don't want to keep paying for it (Stripe Dashboard → Customers → find the subscription → cancel, and refund the charge if desired)
 - **Have a lawyer review the ToS/Privacy Policy** — current versions are templates with placeholder contact emails (`legal@blutobox.com`, `privacy@blutobox.com`) and a `[DATE]` placeholder. Fine for testing, not for real users
 - **Register a DMCA agent** with the US Copyright Office (~$6) once you're operating publicly — strengthens your legal safe-harbor position
 - **Decide on ads for the free tier** (discussed earlier: standard AdSense conflicts with NSFW content policy — if you want ads, look at adult-friendly networks like ExoClick/JuicyAds instead, or skip ads and rely on Pro subscriptions only)
@@ -55,7 +57,7 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 
 - Neon (Postgres)
 - Backblaze B2 (storage)
-- Stripe (**live mode** — be careful testing)
+- Stripe (**live mode** — be careful testing). `STRIPE_WEBHOOK_SECRET` now set and verified working
 - Resend (installed but unused — sandbox mode only, see above)
 - Gmail SMTP (`aoinyx.dev@gmail.com` + app password) — active email sender
 - Upstash (rate limiting)
