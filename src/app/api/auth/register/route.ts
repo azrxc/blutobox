@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
 
 const registerSchema = z.object({
+  name: z.string().trim().min(1).max(100),
   email: z.string().email(),
   password: z.string().min(8).max(200),
 });
@@ -14,10 +15,10 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const parsed = registerSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid email or password (min 8 characters)" }, { status: 400 });
+    return NextResponse.json({ error: "Please enter your name, a valid email, and a password (min 8 characters)" }, { status: 400 });
   }
 
-  const { email, password } = parsed.data;
+  const { name, email, password } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
   const passwordHash = await bcrypt.hash(password, 12);
 
   const user = await prisma.user.create({
-    data: { email, passwordHash },
+    data: { name, email, passwordHash },
   });
 
   const token = randomBytes(32).toString("hex");

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ name, email, password }),
     });
 
     setLoading(false);
@@ -63,6 +64,20 @@ export default function RegisterPage() {
         {error && (
           <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium" htmlFor="name">
+            Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            required
+            maxLength={100}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-foreground/30"
+          />
+        </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium" htmlFor="email">
             Email

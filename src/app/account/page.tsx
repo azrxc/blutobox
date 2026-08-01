@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { INACTIVITY_DAYS } from "@/lib/cleanup";
 import { totalStorageBytesFor } from "@/lib/limits";
 import { ChangePasswordForm } from "./change-password-form";
+import { UpdateNameForm } from "./update-name-form";
 import { FileList, type AccountFile } from "./file-list";
 import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
 import { DownloadUsageBar } from "../download-usage-bar";
@@ -87,7 +88,9 @@ export default async function AccountPage() {
     <main className="flex flex-1 flex-col items-center px-6 py-16">
       <div className="w-full max-w-2xl space-y-10">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {user.name ? `Hi, ${user.name}` : "Account"}
+          </h1>
           <p className="mt-1 text-sm text-muted">
             {user.email} · {user.planTier} plan
           </p>
@@ -111,8 +114,10 @@ export default async function AccountPage() {
         </div>
 
         <div className="border-t border-border pt-8">
-          <ChangePasswordForm />
+          <UpdateNameForm currentName={user.name} />
         </div>
+
+        <ChangePasswordForm />
       </div>
     </main>
   );

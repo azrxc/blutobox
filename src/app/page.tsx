@@ -1,6 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
-import { getCurrentPlanTier } from "@/lib/plan";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { LogoutButton } from "./logout-button";
+import { WelcomeToast } from "./welcome-toast";
 
 const features = [
   {
@@ -19,10 +22,15 @@ const features = [
 
 export default async function Home() {
   const session = await auth();
-  const planTier = session?.user ? await getCurrentPlanTier(session.user.id) : null;
+  const user = session?.user
+    ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, planTier: true } })
+    : null;
 
   return (
     <main className="flex flex-1 flex-col">
+      <Suspense fallback={null}>
+        <WelcomeToast />
+      </Suspense>
       <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-24 text-center">
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
           Upload. Share. Done.
@@ -46,21 +54,12 @@ export default async function Home() {
           </Link>
         </div>
 
-        {session?.user && (
+        {session?.user && user && (
           <div className="mt-10 flex items-center gap-3 text-sm text-muted">
             <span>
-              Logged in as {session.user.email} · {planTier === "PRO" ? "Pro plan" : "Free plan"}
+              Signed in as {user.name || session.user.email} · {user.planTier === "PRO" ? "Pro plan" : "Free plan"}
             </span>
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/" });
-              }}
-            >
-              <button type="submit" className="underline transition-colors hover:text-foreground">
-                Log out
-              </button>
-            </form>
+            <LogoutButton />
           </div>
         )}
       </section>
