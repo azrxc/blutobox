@@ -5,6 +5,7 @@ import { INACTIVITY_DAYS } from "@/lib/cleanup";
 import { totalStorageBytesFor } from "@/lib/limits";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
+import { CreatorLinksForm } from "./creator-links-form";
 import { FileList, type AccountFile } from "./file-list";
 import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
 import { DownloadUsageBar } from "../download-usage-bar";
@@ -116,6 +117,17 @@ export default async function AccountPage() {
         <div className="border-t border-border pt-8">
           <UpdateNameForm currentName={user.name} />
         </div>
+
+        {isPro ? (
+          <CreatorLinksForm discordUrl={user.discordUrl} donationUrl={user.donationUrl} />
+        ) : (
+          <div className="max-w-sm space-y-1">
+            <h2 className="text-sm font-semibold">Creator links</h2>
+            <p className="text-xs text-muted">
+              Upgrade to Pro to show your Discord and support links on your file pages.
+            </p>
+          </div>
+        )}
 
         <ChangePasswordForm hasPassword={Boolean(user.passwordHash)} />
       </div>

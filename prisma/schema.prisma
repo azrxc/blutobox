@@ -39,6 +39,8 @@ model User {
   storageUsedBytes BigInt   @default(0)
   banned          Boolean   @default(false)
   createdAt       DateTime  @default(now())
+  discordUrl      String?
+  donationUrl     String?
 
   files           File[]
   subscription    Subscription?

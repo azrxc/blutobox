@@ -19,6 +19,7 @@ const rows: Row[] = [
   { label: "Password-protected links", free: false, pro: true },
   { label: "Multi-file bundling (.zip)", free: true, pro: true },
   { label: "Link expiry", free: "24h / 7d presets", pro: "Any custom duration" },
+  { label: "Creator Discord/support links on your files", free: false, pro: true },
   { label: "Inactive files auto-deleted", free: "After 30 days unused", pro: "Never" },
 ];
 

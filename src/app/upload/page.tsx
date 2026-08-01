@@ -119,7 +119,7 @@ export default function UploadPage() {
             <p className="mt-1 text-sm text-muted">Your link is ready to share.</p>
           </div>
           <CopyLinkField url={shareUrl} />
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             <Link
               href={`/f/${shareSlug}`}
               className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"

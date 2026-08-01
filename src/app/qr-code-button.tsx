@@ -11,7 +11,7 @@ export function QrCodeButton({ url }: { url: string }) {
   async function toggle() {
     if (!show && !svg) {
       try {
-        const generated = await QRCode.toString(url, { type: "svg", margin: 1, width: 200 });
+        const generated = await QRCode.toString(url, { type: "svg", margin: 1, width: 220 });
         setSvg(generated);
       } catch {
         setError(true);
@@ -21,7 +21,7 @@ export function QrCodeButton({ url }: { url: string }) {
   }
 
   return (
-    <div className="relative inline-block">
+    <>
       <button
         onClick={toggle}
         className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-background"
@@ -29,16 +29,16 @@ export function QrCodeButton({ url }: { url: string }) {
         {show ? "Hide QR" : "QR code"}
       </button>
       {show && svg && (
-        <div
-          className="absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-xl border border-border bg-white p-3 shadow-lg"
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
+        <div className="mt-4 flex w-full flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-6">
+          <div className="rounded-xl bg-white p-4" dangerouslySetInnerHTML={{ __html: svg }} />
+          <p className="text-xs text-muted">Scan to open this link</p>
+        </div>
       )}
       {show && error && (
-        <div className="absolute left-1/2 top-full z-10 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-surface p-3 text-xs text-red-500 shadow-lg">
+        <div className="mt-4 w-full rounded-2xl border border-border bg-surface p-6 text-center text-sm text-red-500">
           Failed to generate QR code.
         </div>
       )}
-    </div>
+    </>
   );
 }
