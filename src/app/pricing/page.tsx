@@ -20,6 +20,8 @@ const rows: Row[] = [
   { label: "Inactive files auto-deleted", free: "After 30 days unused", pro: "Never" },
 ];
 
+const gridCols = "grid-cols-[1fr_5.5rem_5.5rem] sm:grid-cols-[1fr_7rem_7rem]";
+
 function Cell({ value }: { value: string | boolean }) {
   if (typeof value === "boolean") {
     return (
@@ -61,7 +63,7 @@ export default function PricingPage() {
       </div>
 
       <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface">
-        <div className="grid grid-cols-[1fr_auto_auto] gap-x-6 gap-y-4 px-6 pt-6 text-sm">
+        <div className={`grid ${gridCols} items-end gap-x-3 px-6 pb-6 pt-6 text-sm`}>
           <div />
           <div className="text-center">
             <p className="text-xs font-medium text-muted">Free</p>
@@ -69,21 +71,30 @@ export default function PricingPage() {
           </div>
           <div className="text-center">
             <p className="text-xs font-medium text-muted">Pro</p>
-            <p className="text-2xl font-semibold">$4.99<span className="text-sm font-normal text-muted">/mo</span></p>
+            <p className="text-2xl font-semibold">
+              $4.99<span className="text-sm font-normal text-muted">/mo</span>
+            </p>
           </div>
         </div>
 
-        <div className="mt-6 divide-y divide-border border-t border-border">
+        <div className="divide-y divide-border border-t border-border">
           {rows.map((row) => (
-            <div key={row.label} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-6 px-6 py-3.5 text-sm">
+            <div
+              key={row.label}
+              className={`grid ${gridCols} items-center gap-x-3 px-6 py-3.5 text-sm`}
+            >
               <span className="text-muted">{row.label}</span>
-              <span className="text-center"><Cell value={row.free} /></span>
-              <span className="text-center"><Cell value={row.pro} /></span>
+              <span className="text-center">
+                <Cell value={row.free} />
+              </span>
+              <span className="text-center">
+                <Cell value={row.pro} />
+              </span>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-x-6 border-t border-border px-6 py-5">
+        <div className={`grid ${gridCols} items-center gap-x-3 border-t border-border px-6 py-5`}>
           <span />
           <span className="text-center">
             {!session?.user && (
@@ -98,7 +109,7 @@ export default function PricingPage() {
                 href="/login"
                 className="inline-block rounded-full bg-accent px-4 py-2 text-xs font-medium text-accent-foreground transition-opacity hover:opacity-85"
               >
-                Log in to upgrade
+                Log in
               </Link>
             ) : isPro ? (
               <button
@@ -106,7 +117,7 @@ export default function PricingPage() {
                 disabled={loading}
                 className="rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-background disabled:opacity-50"
               >
-                Manage subscription
+                Manage
               </button>
             ) : (
               <button
@@ -114,7 +125,7 @@ export default function PricingPage() {
                 disabled={loading}
                 className="rounded-full bg-accent px-4 py-2 text-xs font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-50"
               >
-                {loading ? "Redirecting…" : "Upgrade to Pro"}
+                {loading ? "…" : "Upgrade"}
               </button>
             )}
           </span>
