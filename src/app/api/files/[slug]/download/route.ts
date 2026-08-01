@@ -54,7 +54,7 @@ export async function GET(
 
   await prisma.file.update({
     where: { id: link.file.id },
-    data: { downloadCount: { increment: 1 }, lastAccessedAt: new Date() },
+    data: { downloadCount: { increment: 1 }, lastAccessedAt: new Date(), deletionWarningSentAt: null },
   });
 
   const url = await getSignedDownloadUrl(link.file.b2Key, {

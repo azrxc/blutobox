@@ -1,8 +1,46 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "@/lib/prisma";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
+import { sendDeletionWarningEmail } from "@/lib/email";
 
 export const INACTIVITY_DAYS = 30;
+export const WARNING_DAYS_BEFORE_DELETION = 3;
+
+export async function warnUsersOfUpcomingDeletion() {
+  const deletionCutoff = new Date(Date.now() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
+  const warningCutoff = new Date(
+    Date.now() - (INACTIVITY_DAYS - WARNING_DAYS_BEFORE_DELETION) * 24 * 60 * 60 * 1000
+  );
+
+  const filesToWarn = await prisma.file.findMany({
+    where: {
+      status: "ACTIVE",
+      deletionWarningSentAt: null,
+      lastAccessedAt: { lt: warningCutoff, gte: deletionCutoff },
+      owner: { planTier: "FREE" },
+    },
+    include: { owner: true, shareLinks: { take: 1 } },
+  });
+
+  let warned = 0;
+  for (const file of filesToWarn) {
+    const slug = file.shareLinks[0]?.slug;
+    if (!file.owner || !slug) continue;
+    try {
+      await sendDeletionWarningEmail(file.owner.email, file.filename, slug);
+    } catch (err) {
+      console.error(`[cleanup] Failed to send deletion warning for file ${file.id}:`, err);
+      continue;
+    }
+    await prisma.file.update({
+      where: { id: file.id },
+      data: { deletionWarningSentAt: new Date() },
+    });
+    warned++;
+  }
+
+  return { warned };
+}
 
 export async function deleteInactiveFreeFiles() {
   const cutoff = new Date(Date.now() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000);

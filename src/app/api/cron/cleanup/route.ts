@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { deleteInactiveFreeFiles } from "@/lib/cleanup";
+import { deleteInactiveFreeFiles, warnUsersOfUpcomingDeletion } from "@/lib/cleanup";
+
+export const maxDuration = 60;
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -7,6 +9,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await deleteInactiveFreeFiles();
-  return NextResponse.json({ ok: true, ...result });
+  const warnResult = await warnUsersOfUpcomingDeletion();
+  const deleteResult = await deleteInactiveFreeFiles();
+  return NextResponse.json({ ok: true, ...warnResult, ...deleteResult });
 }

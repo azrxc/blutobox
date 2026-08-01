@@ -68,6 +68,7 @@ model File {
   status        FileStatus @default(ACTIVE)
   createdAt     DateTime   @default(now())
   lastAccessedAt DateTime  @default(now())
+  deletionWarningSentAt DateTime?
 
   shareLinks    ShareLink[]
   reports       Report[]
