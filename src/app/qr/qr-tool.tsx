@@ -3,10 +3,42 @@
 import { useState } from "react";
 import QRCode from "qrcode";
 
+const DOWNLOAD_SIZE = 1024;
+
+function svgToPngDataUrl(svgString: string, size: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject(new Error("Canvas not supported"));
+        return;
+      }
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to rasterize QR code"));
+    };
+    img.src = url;
+  });
+}
+
 export function QrTool() {
   const [text, setText] = useState("");
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -21,17 +53,24 @@ export function QrTool() {
     }
   }
 
-  function handleDownload() {
-    if (!svg) return;
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "qr-code.svg";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+  async function handleDownload() {
+    if (!text.trim()) return;
+    setDownloading(true);
+    setError(null);
+    try {
+      const highRes = await QRCode.toString(text.trim(), { type: "svg", margin: 1, width: DOWNLOAD_SIZE });
+      const pngDataUrl = await svgToPngDataUrl(highRes, DOWNLOAD_SIZE);
+      const link = document.createElement("a");
+      link.href = pngDataUrl;
+      link.download = "qr-code.png";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      setError("Failed to generate PNG download.");
+    } finally {
+      setDownloading(false);
+    }
   }
 
   return (
@@ -67,9 +106,10 @@ export function QrTool() {
           <div className="rounded-xl bg-white p-4" dangerouslySetInnerHTML={{ __html: svg }} />
           <button
             onClick={handleDownload}
-            className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-background"
+            disabled={downloading}
+            className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-background disabled:opacity-50"
           >
-            Download SVG
+            {downloading ? "Preparing…" : "Download PNG"}
           </button>
         </div>
       )}
