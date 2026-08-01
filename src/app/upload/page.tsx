@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { uploadFile } from "@/lib/upload-client";
+import { uploadFile, UploadCancelledError } from "@/lib/upload-client";
 import { CopyLinkField } from "../copy-link-field";
 
 export default function UploadPage() {
@@ -18,12 +18,15 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   async function handleUpload() {
     if (!file) return;
     setError(null);
     setUploading(true);
     setProgress(0);
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     try {
       const { slug } = await uploadFile(
         file,
@@ -32,14 +35,24 @@ export default function UploadPage() {
           linkPassword: isPro ? linkPassword : undefined,
           expiresInHours: isPro && expiresInHours ? Number(expiresInHours) : undefined,
         },
-        setProgress
+        setProgress,
+        controller.signal
       );
       setShareSlug(slug);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed");
+      if (e instanceof UploadCancelledError) {
+        setProgress(0);
+      } else {
+        setError(e instanceof Error ? e.message : "Upload failed");
+      }
     } finally {
       setUploading(false);
+      abortControllerRef.current = null;
     }
+  }
+
+  function handleCancel() {
+    abortControllerRef.current?.abort();
   }
 
   if (shareSlug) {
@@ -159,13 +172,31 @@ export default function UploadPage() {
             />
           </div>
         )}
-        <button
-          onClick={handleUpload}
-          disabled={!file || uploading}
-          className="w-full rounded-full bg-accent py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
-        >
-          {uploading ? `Uploading… ${Math.round(progress * 100)}%` : "Upload"}
-        </button>
+
+        {uploading ? (
+          <div className="flex gap-3">
+            <button
+              disabled
+              className="flex-1 rounded-full bg-accent py-3 text-sm font-medium text-accent-foreground opacity-40"
+            >
+              Uploading… {Math.round(progress * 100)}%
+            </button>
+            <button
+              onClick={handleCancel}
+              className="rounded-full border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-surface"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleUpload}
+            disabled={!file}
+            className="w-full rounded-full bg-accent py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
+          >
+            Upload
+          </button>
+        )}
       </div>
     </main>
   );

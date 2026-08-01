@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 
 export function Header() {
@@ -9,7 +10,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-10 border-b border-border/80 bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
-        <Link href="/" className="text-[15px] font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={24}
+            height={24}
+            className="dark:invert"
+            priority
+          />
           Bluto Box
         </Link>
 
