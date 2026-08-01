@@ -14,6 +14,7 @@ export type SubscriptionInfo = {
   status: string;
   cancelAtPeriodEnd: boolean;
   currentPeriodEnd: string | null;
+  billingInterval: string | null;
   daysLeft: number | null;
 };
 
@@ -101,7 +102,14 @@ export function SubscriptionCard({ subscription }: { subscription: SubscriptionI
     <div className="rounded-2xl border border-border bg-surface p-5">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium">Pro plan</p>
+          <p className="text-sm font-medium">
+            Pro plan
+            {subscription.billingInterval && (
+              <span className="ml-1.5 font-normal text-muted">
+                ({subscription.billingInterval === "yearly" ? "Yearly" : "Monthly"})
+              </span>
+            )}
+          </p>
           {subscription.cancelAtPeriodEnd ? (
             <p className="mt-0.5 text-sm text-muted">
               Cancels{dateStr ? ` on ${dateStr}` : ""}

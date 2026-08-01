@@ -37,6 +37,7 @@ function Cell({ value }: { value: string | boolean }) {
 export default function PricingPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly");
 
   useEffect(() => {
     update();
@@ -45,7 +46,11 @@ export default function PricingPage() {
 
   async function upgrade() {
     setLoading(true);
-    const res = await fetch("/api/stripe/checkout", { method: "POST" });
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ interval: billingInterval }),
+    });
     const data = await res.json();
     setLoading(false);
     if (data.url) window.location.href = data.url;
@@ -68,6 +73,25 @@ export default function PricingPage() {
         <p className="mt-2 text-sm text-muted">Simple, honest pricing. No surprises.</p>
       </div>
 
+      <div className="inline-flex rounded-full border border-border p-1 text-xs">
+        <button
+          onClick={() => setBillingInterval("monthly")}
+          className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
+            billingInterval === "monthly" ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
+          }`}
+        >
+          Monthly
+        </button>
+        <button
+          onClick={() => setBillingInterval("yearly")}
+          className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
+            billingInterval === "yearly" ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
+          }`}
+        >
+          Yearly <span className="opacity-80">· Save 33%</span>
+        </button>
+      </div>
+
       <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface">
         <div className={`grid ${gridCols} items-end gap-x-3 px-6 pb-6 pt-6 text-sm`}>
           <div />
@@ -78,7 +102,15 @@ export default function PricingPage() {
           <div className="text-center">
             <p className="text-xs font-medium text-muted">Pro</p>
             <p className="text-2xl font-semibold">
-              $4.99<span className="text-sm font-normal text-muted">/mo</span>
+              {billingInterval === "yearly" ? (
+                <>
+                  $39.99<span className="text-sm font-normal text-muted">/yr</span>
+                </>
+              ) : (
+                <>
+                  $4.99<span className="text-sm font-normal text-muted">/mo</span>
+                </>
+              )}
             </p>
           </div>
         </div>

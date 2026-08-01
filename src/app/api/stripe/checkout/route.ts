@@ -1,13 +1,23 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+
+const checkoutSchema = z.object({
+  interval: z.enum(["monthly", "yearly"]).default("monthly"),
+});
 
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "You must be logged in" }, { status: 401 });
   }
+
+  const body = await req.json().catch(() => ({}));
+  const parsed = checkoutSchema.safeParse(body);
+  const interval = parsed.success ? parsed.data.interval : "monthly";
+  const priceId = interval === "yearly" ? process.env.STRIPE_PRO_YEARLY_PRICE_ID : process.env.STRIPE_PRO_PRICE_ID;
 
   const origin = new URL(req.url).origin;
 
@@ -17,7 +27,7 @@ export async function POST(req: Request) {
 
   const checkoutSession = await getStripe().checkout.sessions.create({
     mode: "subscription",
-    line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID as string, quantity: 1 }],
+    line_items: [{ price: priceId as string, quantity: 1 }],
     customer: existing?.stripeCustomerId,
     customer_email: existing ? undefined : session.user.email ?? undefined,
     client_reference_id: session.user.id,

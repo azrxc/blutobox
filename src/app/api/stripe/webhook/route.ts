@@ -3,6 +3,13 @@ import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
+function billingIntervalFrom(item: Stripe.SubscriptionItem | undefined): string | null {
+  const interval = item?.price?.recurring?.interval;
+  if (interval === "year") return "yearly";
+  if (interval === "month") return "monthly";
+  return null;
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
@@ -34,6 +41,7 @@ export async function POST(req: Request) {
           status: "active",
           cancelAtPeriodEnd: sub?.cancel_at_period_end ?? false,
           currentPeriodEnd: periodEndUnix ? new Date(periodEndUnix * 1000) : null,
+          billingInterval: billingIntervalFrom(sub?.items.data[0]),
         };
         await prisma.subscription.upsert({
           where: { userId },
@@ -59,6 +67,7 @@ export async function POST(req: Request) {
             tier: active ? "PRO" : "FREE",
             cancelAtPeriodEnd: sub.cancel_at_period_end,
             currentPeriodEnd: periodEndUnix ? new Date(periodEndUnix * 1000) : null,
+            billingInterval: billingIntervalFrom(sub.items.data[0]),
           },
         });
         await prisma.user.update({

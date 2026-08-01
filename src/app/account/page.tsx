@@ -11,7 +11,12 @@ import { UsageBar } from "../usage-bar";
 
 function buildSubscriptionInfo(
   isPro: boolean,
-  subscription: { status: string; cancelAtPeriodEnd: boolean; currentPeriodEnd: Date | null } | null
+  subscription: {
+    status: string;
+    cancelAtPeriodEnd: boolean;
+    currentPeriodEnd: Date | null;
+    billingInterval: string | null;
+  } | null
 ): SubscriptionInfo | null {
   if (!isPro || !subscription) return null;
   const now = Date.now();
@@ -19,6 +24,7 @@ function buildSubscriptionInfo(
     status: subscription.status,
     cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
     currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
+    billingInterval: subscription.billingInterval,
     daysLeft: subscription.currentPeriodEnd
       ? Math.ceil((subscription.currentPeriodEnd.getTime() - now) / (24 * 60 * 60 * 1000))
       : null,

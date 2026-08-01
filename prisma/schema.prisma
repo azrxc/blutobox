@@ -110,6 +110,7 @@ model Subscription {
   status               String
   cancelAtPeriodEnd    Boolean  @default(false)
   currentPeriodEnd     DateTime?
+  billingInterval      String?
   updatedAt            DateTime @updatedAt
 }
 
