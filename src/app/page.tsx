@@ -47,7 +47,7 @@ export default async function Home() {
         {session?.user && (
           <div className="mt-10 flex items-center gap-3 text-sm text-muted">
             <span>
-              Logged in as {session.user.email} · {session.user.planTier}
+              Logged in as {session.user.email} · {session.user.planTier === "PRO" ? "Pro plan" : "Free plan"}
             </span>
             <form
               action={async () => {

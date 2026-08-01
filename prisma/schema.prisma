@@ -42,6 +42,7 @@ model User {
   files           File[]
   subscription    Subscription?
   verificationTokens VerificationToken[]
+  cancellationFeedback CancellationFeedback[]
 }
 
 model VerificationToken {
@@ -109,6 +110,17 @@ model Subscription {
   cancelAtPeriodEnd    Boolean  @default(false)
   currentPeriodEnd     DateTime?
   updatedAt            DateTime @updatedAt
+}
+
+model CancellationFeedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason    String?
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model BannedIp {

@@ -1,13 +1,23 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 
-export async function POST() {
+const cancelSchema = z.object({
+  reason: z.string().max(100).optional(),
+  comment: z.string().max(2000).optional(),
+});
+
+export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "You must be logged in" }, { status: 401 });
   }
+
+  const body = await req.json().catch(() => ({}));
+  const parsed = cancelSchema.safeParse(body);
+  const { reason, comment } = parsed.success ? parsed.data : {};
 
   const subscription = await prisma.subscription.findUnique({
     where: { userId: session.user.id },
@@ -28,6 +38,12 @@ export async function POST() {
       currentPeriodEnd: periodEndUnix ? new Date(periodEndUnix * 1000) : null,
     },
   });
+
+  if (reason || comment) {
+    await prisma.cancellationFeedback.create({
+      data: { userId: session.user.id, reason, comment },
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }
