@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { uploadFile, UploadCancelledError } from "@/lib/upload-client";
 import { CopyLinkField } from "../copy-link-field";
+import { StorageUsageBar } from "../storage-usage-bar";
 
 export default function UploadPage() {
   const { data: session } = useSession();
@@ -97,6 +98,8 @@ export default function UploadPage() {
           <h1 className="text-xl font-semibold">Upload a file</h1>
           <p className="mt-1 text-sm text-muted">Get a shareable link in seconds.</p>
         </div>
+
+        <StorageUsageBar />
 
         {error && (
           <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
