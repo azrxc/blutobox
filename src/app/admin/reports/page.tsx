@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { ReportActions } from "./report-actions";
@@ -16,7 +17,12 @@ export default async function AdminReportsPage() {
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16">
       <div className="w-full max-w-2xl space-y-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Open reports ({reports.length})</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight">Open reports ({reports.length})</h1>
+          <Link href="/admin/feedback" className="text-sm text-muted underline underline-offset-2">
+            Feedback →
+          </Link>
+        </div>
         {reports.length === 0 && <p className="text-sm text-muted">No open reports.</p>}
         <div className="space-y-3">
           {reports.map((report) => (
