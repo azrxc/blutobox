@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { uploadFile } from "@/lib/upload-client";
+import { CopyLinkField } from "../copy-link-field";
 
 export default function UploadPage() {
   const { data: session } = useSession();
@@ -50,12 +51,7 @@ export default function UploadPage() {
             <h1 className="text-xl font-semibold">Upload complete</h1>
             <p className="mt-1 text-sm text-muted">Your link is ready to share.</p>
           </div>
-          <input
-            readOnly
-            value={shareUrl}
-            onFocus={(e) => e.currentTarget.select()}
-            className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-center text-sm"
-          />
+          <CopyLinkField url={shareUrl} />
           <div className="flex justify-center gap-3">
             <Link
               href={`/f/${shareSlug}`}

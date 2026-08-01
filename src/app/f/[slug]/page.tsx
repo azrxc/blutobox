@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { FileViewer } from "./file-viewer";
 import { ReportForm } from "./report-form";
 import { PasswordGate } from "./password-gate";
+import { CopyButton } from "./copy-button";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 function formatBytes(bytes: bigint) {
@@ -66,12 +67,15 @@ export default async function FilePage({
         </div>
 
         <div className="flex items-center justify-between">
-          <a
-            href={`/api/files/${slug}/download`}
-            className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
-          >
-            Download
-          </a>
+          <div className="flex gap-3">
+            <a
+              href={`/api/files/${slug}/download`}
+              className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+            >
+              Download
+            </a>
+            <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
+          </div>
           <ReportForm slug={slug} />
         </div>
       </div>
