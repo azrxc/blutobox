@@ -8,6 +8,7 @@ import { CopyButton } from "./copy-button";
 import { NsfwGate } from "./nsfw-gate";
 import { DownloadButton } from "./download-button";
 import { DownloadUsageBar } from "../../download-usage-bar";
+import { QrCodeButton } from "../../qr-code-button";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
 function formatBytes(bytes: bigint) {
@@ -73,6 +74,7 @@ export default async function FilePage({
           <div className="mt-6 flex items-center gap-3">
             <DownloadButton slug={slug} filename={file.filename} sizeBytes={Number(file.sizeBytes)} />
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
+            <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
           </div>
         </NsfwGate>
 

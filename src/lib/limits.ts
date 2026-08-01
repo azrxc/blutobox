@@ -27,3 +27,6 @@ export function dailyDownloadBytesFor(planTier: "FREE" | "PRO" | null) {
   if (planTier === "FREE") return FREE_DAILY_DOWNLOAD_BYTES;
   return ANON_DAILY_DOWNLOAD_BYTES;
 }
+
+// Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
+export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];

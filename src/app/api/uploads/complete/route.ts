@@ -9,6 +9,7 @@ import { generateSlug } from "@/lib/slug";
 import { getClientIp } from "@/lib/request-ip";
 import { isKnownMalicious } from "@/lib/virustotal";
 import { getCurrentPlanTier } from "@/lib/plan";
+import { FREE_ALLOWED_EXPIRY_HOURS } from "@/lib/limits";
 
 export const maxDuration = 60;
 
@@ -80,7 +81,8 @@ export async function POST(req: Request) {
 
   const isPro = (await getCurrentPlanTier(session?.user?.id)) === "PRO";
   const passwordHash = isPro && linkPassword ? await bcrypt.hash(linkPassword, 12) : null;
-  const expiresAt = isPro && expiresInHours
+  const expiryAllowed = isPro || (expiresInHours !== undefined && (FREE_ALLOWED_EXPIRY_HOURS as number[]).includes(expiresInHours));
+  const expiresAt = expiryAllowed && expiresInHours
     ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000)
     : null;
 

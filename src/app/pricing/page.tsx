@@ -17,7 +17,8 @@ const rows: Row[] = [
   { label: "Anonymous upload rate limit", free: "10/hour per IP", pro: "10/hour per IP" },
   { label: "Inline preview & streaming", free: true, pro: true },
   { label: "Password-protected links", free: false, pro: true },
-  { label: "Custom link expiry", free: false, pro: true },
+  { label: "Multi-file bundling (.zip)", free: true, pro: true },
+  { label: "Link expiry", free: "24h / 7d presets", pro: "Any custom duration" },
   { label: "Inactive files auto-deleted", free: "After 30 days unused", pro: "Never" },
 ];
 
