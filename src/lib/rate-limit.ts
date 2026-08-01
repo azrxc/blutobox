@@ -25,3 +25,24 @@ export async function checkAnonUploadLimit(ip: string) {
   const { success } = await getAnonUploadLimiter().limit(ip);
   return { success };
 }
+
+let _loginLimiter: Ratelimit | null = null;
+
+function getLoginLimiter(): Ratelimit {
+  if (!_loginLimiter) {
+    _loginLimiter = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(8, "15 m"),
+      prefix: "ratelimit:login",
+    });
+  }
+  return _loginLimiter;
+}
+
+export async function checkLoginLimit(ip: string) {
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    return { success: true };
+  }
+  const { success } = await getLoginLimiter().limit(ip);
+  return { success };
+}

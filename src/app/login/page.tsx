@@ -33,7 +33,9 @@ function LoginForm() {
       setError(
         res.error === "email_not_verified"
           ? "Please verify your email before logging in — check your inbox for the verification link."
-          : "Invalid email or password"
+          : res.error === "too_many_attempts"
+            ? "Too many login attempts from this network. Please try again in a few minutes."
+            : "Invalid email or password"
       );
       return;
     }

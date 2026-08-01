@@ -3,9 +3,15 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { checkLoginLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
 
 class EmailNotVerifiedError extends CredentialsSignin {
   code = "email_not_verified";
+}
+
+class TooManyAttemptsError extends CredentialsSignin {
+  code = "too_many_attempts";
 }
 
 const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
@@ -21,10 +27,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: {},
         password: {},
       },
-      authorize: async (credentials) => {
+      authorize: async (credentials, request) => {
         const email = credentials?.email as string | undefined;
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
+
+        const ip = getClientIp(request);
+        const { success } = await checkLoginLimit(ip);
+        if (!success) throw new TooManyAttemptsError();
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || user.banned || !user.passwordHash) return null;
