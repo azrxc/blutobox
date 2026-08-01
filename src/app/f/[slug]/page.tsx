@@ -7,7 +7,6 @@ import { PasswordGate } from "./password-gate";
 import { CopyButton } from "./copy-button";
 import { NsfwGate } from "./nsfw-gate";
 import { DownloadButton } from "./download-button";
-import { StorageUsageBar } from "../../storage-usage-bar";
 import { DownloadUsageBar } from "../../download-usage-bar";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 
@@ -77,13 +76,11 @@ export default async function FilePage({
           </div>
         </NsfwGate>
 
-        <DownloadUsageBar />
-
         <div className="flex justify-end">
           <ReportForm slug={slug} />
         </div>
 
-        <StorageUsageBar />
+        <DownloadUsageBar />
       </div>
     </main>
   );
