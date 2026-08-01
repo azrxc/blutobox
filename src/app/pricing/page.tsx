@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 type Row = {
@@ -34,6 +35,20 @@ function Cell({ value }: { value: string | boolean }) {
   return <span className="text-muted">{value}</span>;
 }
 
+function SuccessRefresh() {
+  const params = useSearchParams();
+  const { update } = useSession();
+
+  useEffect(() => {
+    if (params.get("success") === "1") {
+      update();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+
+  return null;
+}
+
 export default function PricingPage() {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
@@ -58,6 +73,9 @@ export default function PricingPage() {
 
   return (
     <main className="flex flex-1 flex-col items-center gap-10 px-6 py-16">
+      <Suspense fallback={null}>
+        <SuccessRefresh />
+      </Suspense>
       <div className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Pricing</h1>
         <p className="mt-2 text-sm text-muted">Simple, honest pricing. No surprises.</p>
@@ -118,7 +136,7 @@ export default function PricingPage() {
                 disabled={loading}
                 className="rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-background disabled:opacity-50"
               >
-                Manage
+                Billing
               </button>
             ) : (
               <button

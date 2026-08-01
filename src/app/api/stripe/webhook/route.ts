@@ -25,21 +25,20 @@ export async function POST(req: Request) {
       const customerId = checkoutSession.customer as string;
       const subscriptionId = checkoutSession.subscription as string;
       if (userId && customerId) {
+        const sub = subscriptionId ? await getStripe().subscriptions.retrieve(subscriptionId) : null;
+        const periodEndUnix = sub?.items.data[0]?.current_period_end;
+        const subFields = {
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscriptionId,
+          tier: "PRO" as const,
+          status: "active",
+          cancelAtPeriodEnd: sub?.cancel_at_period_end ?? false,
+          currentPeriodEnd: periodEndUnix ? new Date(periodEndUnix * 1000) : null,
+        };
         await prisma.subscription.upsert({
           where: { userId },
-          create: {
-            userId,
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            tier: "PRO",
-            status: "active",
-          },
-          update: {
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            tier: "PRO",
-            status: "active",
-          },
+          create: { userId, ...subFields },
+          update: subFields,
         });
         await prisma.user.update({ where: { id: userId }, data: { planTier: "PRO" } });
       }
@@ -51,10 +50,16 @@ export async function POST(req: Request) {
       const sub = event.data.object as Stripe.Subscription;
       const userId = sub.metadata?.userId;
       const active = sub.status === "active" || sub.status === "trialing";
+      const periodEndUnix = sub.items.data[0]?.current_period_end;
       if (userId) {
         await prisma.subscription.updateMany({
           where: { userId },
-          data: { status: sub.status, tier: active ? "PRO" : "FREE" },
+          data: {
+            status: sub.status,
+            tier: active ? "PRO" : "FREE",
+            cancelAtPeriodEnd: sub.cancel_at_period_end,
+            currentPeriodEnd: periodEndUnix ? new Date(periodEndUnix * 1000) : null,
+          },
         });
         await prisma.user.update({
           where: { id: userId },

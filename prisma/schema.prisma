@@ -106,6 +106,8 @@ model Subscription {
   stripeSubscriptionId String?  @unique
   tier                 PlanTier @default(FREE)
   status               String
+  cancelAtPeriodEnd    Boolean  @default(false)
+  currentPeriodEnd     DateTime?
   updatedAt            DateTime @updatedAt
 }
 

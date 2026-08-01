@@ -1,14 +1,30 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { INACTIVITY_DAYS } from "@/lib/cleanup";
 import { totalStorageBytesFor } from "@/lib/limits";
 import { ChangePasswordForm } from "./change-password-form";
 import { FileList, type AccountFile } from "./file-list";
+import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
 
 function formatGB(bytes: number) {
   return (bytes / (1024 * 1024 * 1024)).toFixed(2);
+}
+
+function buildSubscriptionInfo(
+  isPro: boolean,
+  subscription: { status: string; cancelAtPeriodEnd: boolean; currentPeriodEnd: Date | null } | null
+): SubscriptionInfo | null {
+  if (!isPro || !subscription) return null;
+  const now = Date.now();
+  return {
+    status: subscription.status,
+    cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+    currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
+    daysLeft: subscription.currentPeriodEnd
+      ? Math.ceil((subscription.currentPeriodEnd.getTime() - now) / (24 * 60 * 60 * 1000))
+      : null,
+  };
 }
 
 function buildAccountFiles(
@@ -43,13 +59,14 @@ export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const [user, files] = await Promise.all([
+  const [user, files, subscription] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id } }),
     prisma.file.findMany({
       where: { ownerId: session.user.id, status: "ACTIVE" },
       include: { shareLinks: { take: 1 } },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.subscription.findUnique({ where: { userId: session.user.id } }),
   ]);
 
   if (!user) redirect("/login");
@@ -61,18 +78,19 @@ export default async function AccountPage() {
 
   const accountFiles = buildAccountFiles(files, isPro);
 
+  const subscriptionInfo = buildSubscriptionInfo(isPro, subscription);
+
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16">
       <div className="w-full max-w-2xl space-y-10">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Account</h1>
           <p className="mt-1 text-sm text-muted">
-            {user.email} · {user.planTier} plan ·{" "}
-            <Link href="/pricing" className="text-foreground underline underline-offset-2">
-              {isPro ? "Manage subscription" : "Upgrade to Pro"}
-            </Link>
+            {user.email} · {user.planTier} plan
           </p>
         </div>
+
+        <SubscriptionCard subscription={subscriptionInfo} />
 
         <div className="rounded-2xl border border-border bg-surface p-5">
           <div className="mb-2 flex items-center justify-between text-sm">
