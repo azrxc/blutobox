@@ -74,6 +74,19 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - **Delete unused Vercel projects**: old `blutobox` and `blutobox-p594` if not already removed
 - **Verify the Free/anonymous download throttle speed on production** — test a real download on `blutobox-14ks.vercel.app` and time it. Target is ~8 MB/s; adjust `THROTTLE_BYTES_PER_SEC` in `src/app/api/stream/route.ts` if the real Vercel Edge Function timing doesn't match (local dev testing wasn't representative — see note above)
 
+## 💡 Ideas from competitor research (2026-08-01, not built — for consideration)
+
+Researched pixeldrain, Mega, WeTransfer, and general file-hosting industry practices to see what Bluto Box is missing. Not urgent, just logged so nothing gets lost:
+
+- **Multi-file / batch upload** — drop several files, get one link (or a zip). Biggest functional gap vs. both pixeldrain and WeTransfer; currently Bluto Box is strictly one-file-at-a-time. Likely the most-requested feature once there's real user volume.
+- **Some link expiry option for Free tier, not just Pro** — "ephemeral sharing" (links that auto-expire) is becoming the default expectation industry-wide, not just a premium perk. Could offer a few fixed expiry choices (e.g. 24h/7d) to Free users while keeping *custom* arbitrary expiry as the Pro perk, rather than zero expiry control on Free.
+- **Lightweight file-type awareness on upload** — right now there's no signal at all about high-risk executable types (.exe/.scr/.bat/etc.) beyond the VirusTotal hash check. A soft warning (not a hard block, which would conflict with being a genuine general-purpose host) could add another layer without hurting legitimate use cases.
+- **Filesystem/folder browsing for logged-in users** — pixeldrain's paid tier includes a proper folder view instead of a flat file list. Bigger effort, worth considering once the account page's file list feels cramped.
+- **Public API for programmatic upload** — pixeldrain has one; could be a Pro differentiator for power users/developers. Longer-term idea, not urgent.
+- **Native apps / browser extension** — Mega has full cross-platform apps. Large effort, not realistic pre-launch; only worth revisiting if the web product gains real traction.
+
+Sources: [pixeldrain 2026 review](https://speed-drain.com/blog/why-choose-pixeldrain-2026/), [pixeldrain API docs](https://pixeldrain.com/api), [Mega encryption/sharing review](https://cyberinsider.com/cloud-storage/reviews/mega/), [file-sharing industry trends 2026](https://msafe.co/blog/trends-in-secure-file-sharing-for-2026/), [file upload security best practices](https://www.opswat.com/blog/file-upload-protection-best-practices)
+
 ## Accounts/credentials already set up (in `.env.local`, not committed to git — also added to Vercel prod env vars)
 
 - Neon (Postgres)
