@@ -13,6 +13,7 @@ type Row = {
 const rows: Row[] = [
   { label: "Total storage", free: "5 GB", pro: "50 GB" },
   { label: "Max file size", free: "2 GB", pro: "10 GB" },
+  { label: "Daily download limit", free: "5 GB/day", pro: "25 GB/day" },
   { label: "Anonymous upload rate limit", free: "10/hour per IP", pro: "10/hour per IP" },
   { label: "Inline preview & streaming", free: true, pro: true },
   { label: "Password-protected links", free: false, pro: true },

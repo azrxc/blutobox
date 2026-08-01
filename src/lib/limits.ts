@@ -17,3 +17,13 @@ export function maxUploadBytesFor(planTier: "FREE" | "PRO" | null) {
   if (planTier === "FREE") return FREE_MAX_UPLOAD_BYTES;
   return ANON_MAX_UPLOAD_BYTES;
 }
+
+export const ANON_DAILY_DOWNLOAD_BYTES = 3 * 1024 * 1024 * 1024; // 3GB/day
+export const FREE_DAILY_DOWNLOAD_BYTES = 5 * 1024 * 1024 * 1024; // 5GB/day
+export const PRO_DAILY_DOWNLOAD_BYTES = 25 * 1024 * 1024 * 1024; // 25GB/day
+
+export function dailyDownloadBytesFor(planTier: "FREE" | "PRO" | null) {
+  if (planTier === "PRO") return PRO_DAILY_DOWNLOAD_BYTES;
+  if (planTier === "FREE") return FREE_DAILY_DOWNLOAD_BYTES;
+  return ANON_DAILY_DOWNLOAD_BYTES;
+}

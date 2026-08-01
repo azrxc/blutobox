@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
+import { auth } from "@/lib/auth";
+import { getClientIp } from "@/lib/request-ip";
+import { dailyDownloadBytesFor } from "@/lib/limits";
+import { checkDownloadQuota, consumeDownloadQuota } from "@/lib/download-quota";
 
 export async function GET(
   req: Request,
@@ -26,6 +30,26 @@ export async function GET(
       return NextResponse.json({ error: "Locked" }, { status: 401 });
     }
   }
+
+  const session = await auth();
+  const planTier = (session?.user?.planTier as "FREE" | "PRO" | undefined) ?? null;
+  const identifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
+  const dailyLimit = dailyDownloadBytesFor(planTier);
+  const fileBytes = Number(link.file.sizeBytes);
+
+  const quota = await checkDownloadQuota(identifier, fileBytes, dailyLimit);
+  if (!quota.allowed) {
+    const limitGb = Math.floor(dailyLimit / (1024 * 1024 * 1024));
+    return NextResponse.json(
+      {
+        error: session?.user
+          ? `You've hit your daily download limit (${limitGb}GB). ${planTier === "PRO" ? "" : "Upgrade to Pro for a higher limit, or "}try again tomorrow.`
+          : `You've hit the daily download limit for anonymous downloads (${limitGb}GB). Log in for a higher limit, or try again tomorrow.`,
+      },
+      { status: 429 }
+    );
+  }
+  await consumeDownloadQuota(identifier, fileBytes);
 
   await prisma.file.update({
     where: { id: link.file.id },

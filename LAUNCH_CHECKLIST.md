@@ -24,6 +24,8 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 - Storage quota (total per account, separate from per-file size limit): 5GB Free / 50GB Pro, enforced in the presign route; auto-cleanup now correctly decrements the quota counter too (was a bug — files deleted by the 30-day sweep weren't updating `storageUsedBytes`, now fixed)
 - **Verification emails now send via Gmail SMTP (`aoinyx.dev@gmail.com`), not Resend.** This means real strangers CAN complete signup now — no domain purchase needed for this. Resend is still installed/configured but unused; can be removed later or kept as a backup. Free tier: 500 emails/day via Gmail, plenty for now
 - Minimalist design pass across every page (OpenAI-inspired: warm off-white/charcoal palette, rounded-2xl cards, pill buttons, consistent header/nav) — see `globals.css` for the color tokens (`--background`, `--surface`, `--foreground`, `--muted`, `--border`, `--accent`)
+- Copy-to-clipboard button on the upload-success screen and file view page
+- **Daily download bandwidth quota** (separate from upload limits): anonymous 3GB/day, Free account 5GB/day, Pro 25GB/day, tracked per-IP (anon) or per-account (logged in) via Upstash Redis, enforced in the download route before generating the link. Prevents someone using the service as unlimited free bandwidth for mass-distributing large files (e.g. pirated games) — matches how Mega/pixeldrain throttle free-tier downloads
 
 ## 🐛 Resolved issues (kept for history)
 
