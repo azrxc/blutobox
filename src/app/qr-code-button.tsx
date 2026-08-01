@@ -4,13 +4,18 @@ import { useState } from "react";
 import QRCode from "qrcode";
 
 export function QrCodeButton({ url }: { url: string }) {
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const [svg, setSvg] = useState<string | null>(null);
   const [show, setShow] = useState(false);
+  const [error, setError] = useState(false);
 
   async function toggle() {
-    if (!show && !dataUrl) {
-      const generated = await QRCode.toDataURL(url, { margin: 1, width: 240 });
-      setDataUrl(generated);
+    if (!show && !svg) {
+      try {
+        const generated = await QRCode.toString(url, { type: "svg", margin: 1, width: 200 });
+        setSvg(generated);
+      } catch {
+        setError(true);
+      }
     }
     setShow((s) => !s);
   }
@@ -23,10 +28,15 @@ export function QrCodeButton({ url }: { url: string }) {
       >
         {show ? "Hide QR" : "QR code"}
       </button>
-      {show && dataUrl && (
-        <div className="absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-xl border border-border bg-surface p-3 shadow-lg">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={dataUrl} alt="QR code for this link" width={160} height={160} />
+      {show && svg && (
+        <div
+          className="absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 rounded-xl border border-border bg-white p-3 shadow-lg"
+          dangerouslySetInnerHTML={{ __html: svg }}
+        />
+      )}
+      {show && error && (
+        <div className="absolute left-1/2 top-full z-10 mt-2 w-48 -translate-x-1/2 rounded-xl border border-border bg-surface p-3 text-xs text-red-500 shadow-lg">
+          Failed to generate QR code.
         </div>
       )}
     </div>

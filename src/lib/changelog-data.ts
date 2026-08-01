@@ -1,44 +1,36 @@
 export type ChangelogEntry = {
   date: string;
   title: string;
-  description: string;
+  intro?: string;
+  highlights?: string[];
 };
 
 export const changelog: ChangelogEntry[] = [
   {
-    date: "2026-08-01",
-    title: "Multi-file uploads, QR codes, and free link expiry",
-    description:
-      "Select multiple files to bundle them into one link, generate a QR code for any share link, and Free accounts can now set a 24h or 7-day link expiry (Pro still gets any custom duration).",
-  },
-  {
-    date: "2026-08-01",
-    title: "Storage usage indicator",
-    description:
-      "Your storage usage now shows up right on the upload and download pages, not just buried in Account.",
-  },
-  {
-    date: "2026-08-01",
-    title: "Malware scanning on upload",
-    description:
-      "Every upload is now checked against VirusTotal's malware database before a share link is created.",
-  },
-  {
-    date: "2026-08-01",
-    title: "Live download progress",
-    description:
-      "Downloads now show a real progress bar instead of just handing off to your browser silently.",
-  },
-  {
-    date: "2026-08-01",
-    title: "Pro: password-protected & expiring links",
-    description:
-      "Pro subscribers can now lock a share link with a password or set it to expire automatically.",
+    date: "2026-08-02",
+    title: "Locking the doors properly",
+    intro:
+      "Mostly under-the-hood work today, but some of it matters a lot: I found (and fixed) a bug where every verification email pointed to a dead page, meaning no one who signed up could ever actually log in. Sorry about that.",
+    highlights: [
+      "Password reset — you can finally recover a forgotten password",
+      "Fixed the dead verification-email link, plus a way to resend it if you got stuck before",
+      "Login and signup are now rate-limited against brute-force/spam attempts",
+      "Sharing a link on Discord/Twitter/Slack now shows an actual preview card instead of a bare URL",
+      "New admin dashboard for cancellation feedback",
+    ],
   },
   {
     date: "2026-08-01",
     title: "Bluto Box launches",
-    description:
-      "Upload, share, and download files with no account required. Free and Pro plans available.",
+    intro:
+      "Upload, share, and download files with no account required. Free and Pro plans available, and a full day of polish on top of the core idea:",
+    highlights: [
+      "Password-protected & expiring share links for Pro",
+      "Malware scanning on every upload (VirusTotal)",
+      "Live download progress instead of a silent handoff to your browser",
+      "Storage usage indicator on the upload/download pages, not just buried in Account",
+      "Multi-file uploads (bundled into one .zip, one link) and QR codes for any share link",
+      "Free accounts can now set a basic 24h/7-day link expiry too",
+    ],
   },
 ];
