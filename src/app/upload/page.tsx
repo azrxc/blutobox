@@ -218,7 +218,7 @@ export default function UploadPage() {
             disabled={uploading}
             className="h-4 w-4 rounded border-border"
           />
-          This file contains NSFW / adult content
+          This file contains mature/sensitive content (18+)
         </label>
 
         <details className="group rounded-xl border border-border bg-surface">

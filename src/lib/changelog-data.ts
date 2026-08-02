@@ -17,6 +17,12 @@ export const changelog: ChangelogEntry[] = [
       "Login and signup are now rate-limited against brute-force/spam attempts",
       "Sharing a link on Discord/Twitter/Slack now shows an actual preview card instead of a bare URL",
       "New admin dashboard for cancellation feedback",
+      "New loading animation featuring Bluto (our three-headed mascot) instead of a generic spinner",
+      "Cancel an in-progress download anytime — and you're only charged download quota for what actually transferred, not the full file size if you cancel early",
+      "QR codes on file pages can now be downloaded as an image, not just viewed",
+      "Anonymous uploads (no account) now stay up for 7 days instead of sharing the same 30-day window as free accounts — create a free account if you want things to stick around longer",
+      "Pricing page now shows anonymous usage limits alongside Free and Pro so it's clear what each option gets you",
+      "Softened the wording around mature-content warnings so they read as a clear age restriction rather than an attention-grabbing label",
     ],
   },
   {
