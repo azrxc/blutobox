@@ -5,6 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { LogoutButton } from "./logout-button";
 import { WelcomeToast } from "./welcome-toast";
 
+// Don't show the trust-stats line until there's real traction to point to —
+// a tiny number undercuts trust more than showing nothing at all.
+const MIN_FILES_FOR_TRUST_STATS = 100;
+
 const features = [
   {
     title: "No account needed",
@@ -22,9 +26,15 @@ const features = [
 
 export default async function Home() {
   const session = await auth();
-  const user = session?.user
-    ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, planTier: true } })
-    : null;
+  const [user, totalFiles, downloadAgg] = await Promise.all([
+    session?.user
+      ? prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true, planTier: true } })
+      : Promise.resolve(null),
+    prisma.file.count(),
+    prisma.file.aggregate({ _sum: { downloadCount: true } }),
+  ]);
+  const totalDownloads = downloadAgg._sum.downloadCount ?? 0;
+  const showTrustStats = totalFiles >= MIN_FILES_FOR_TRUST_STATS;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -53,6 +63,12 @@ export default async function Home() {
             See pricing
           </Link>
         </div>
+
+        {showTrustStats && (
+          <p className="mt-6 text-xs text-muted">
+            {totalFiles.toLocaleString()} files shared · {totalDownloads.toLocaleString()} downloads served
+          </p>
+        )}
 
         {session?.user && user && (
           <div className="mt-10 flex items-center gap-3 text-sm text-muted">
