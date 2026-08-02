@@ -6,24 +6,26 @@ import Link from "next/link";
 
 type Row = {
   label: string;
+  anon: string | boolean;
   free: string | boolean;
   pro: string | boolean;
 };
 
 const rows: Row[] = [
-  { label: "Total storage", free: "5 GB", pro: "50 GB" },
-  { label: "Max file size", free: "2 GB", pro: "10 GB" },
-  { label: "Daily download limit", free: "5 GB/day", pro: "25 GB/day" },
-  { label: "Anonymous upload rate limit", free: "10/hour per IP", pro: "10/hour per IP" },
-  { label: "Inline preview & streaming", free: true, pro: true },
-  { label: "Password-protected links", free: false, pro: true },
-  { label: "Multi-file bundling (.zip)", free: true, pro: true },
-  { label: "Link expiry", free: "24h / 7d presets", pro: "Any custom duration" },
-  { label: "Creator Discord/support links on your files", free: false, pro: true },
-  { label: "Inactive files auto-deleted", free: "After 30 days unused", pro: "Never" },
+  { label: "Total storage", anon: "No account", free: "5 GB", pro: "50 GB" },
+  { label: "Max file size", anon: "200 MB", free: "2 GB", pro: "10 GB" },
+  { label: "Daily download limit", anon: "3 GB/day", free: "5 GB/day", pro: "25 GB/day" },
+  { label: "Upload rate limit", anon: "10/hour per IP", free: "—", pro: "—" },
+  { label: "Inline preview & streaming", anon: true, free: true, pro: true },
+  { label: "Password-protected links", anon: false, free: false, pro: true },
+  { label: "Multi-file bundling (.zip)", anon: true, free: true, pro: true },
+  { label: "Link expiry", anon: "24h / 7d presets", free: "24h / 7d presets", pro: "Any custom duration" },
+  { label: "Account & upload history", anon: false, free: true, pro: true },
+  { label: "Creator links on your files", anon: false, free: false, pro: true },
+  { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
 ];
 
-const gridCols = "grid-cols-[1fr_5.5rem_5.5rem] sm:grid-cols-[1fr_7rem_7rem]";
+const gridCols = "grid-cols-[1fr_4rem_4rem_4rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";
 
 function Cell({ value }: { value: string | boolean }) {
   if (typeof value === "boolean") {
@@ -94,9 +96,13 @@ export default function PricingPage() {
         </button>
       </div>
 
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface">
-        <div className={`grid ${gridCols} items-end gap-x-3 px-6 pb-6 pt-6 text-sm`}>
+      <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-border bg-surface">
+        <div className={`grid ${gridCols} items-end gap-x-2 px-4 pb-6 pt-6 text-sm sm:px-6`}>
           <div />
+          <div className="text-center">
+            <p className="text-xs font-medium text-muted">Anonymous</p>
+            <p className="mt-1 text-xs text-muted">No signup</p>
+          </div>
           <div className="text-center">
             <p className="text-xs font-medium text-muted">Free</p>
             <p className="text-2xl font-semibold">$0</p>
@@ -121,9 +127,12 @@ export default function PricingPage() {
           {rows.map((row) => (
             <div
               key={row.label}
-              className={`grid ${gridCols} items-center gap-x-3 px-6 py-3.5 text-sm`}
+              className={`grid ${gridCols} items-center gap-x-2 px-4 py-3.5 text-sm sm:px-6`}
             >
               <span className="text-muted">{row.label}</span>
+              <span className="text-center">
+                <Cell value={row.anon} />
+              </span>
               <span className="text-center">
                 <Cell value={row.free} />
               </span>
@@ -134,8 +143,13 @@ export default function PricingPage() {
           ))}
         </div>
 
-        <div className={`grid ${gridCols} items-center gap-x-3 border-t border-border px-6 py-5`}>
+        <div className={`grid ${gridCols} items-center gap-x-2 border-t border-border px-4 py-5 sm:px-6`}>
           <span />
+          <span className="text-center">
+            <Link href="/upload" className="text-xs text-muted underline underline-offset-2">
+              Upload
+            </Link>
+          </span>
           <span className="text-center">
             {!session?.user && (
               <Link href="/login" className="text-xs text-muted underline underline-offset-2">

@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
 import { sendDeletionWarningEmail } from "@/lib/email";
 
-export const INACTIVITY_DAYS = 30;
+export const FREE_INACTIVITY_DAYS = 30;
+export const ANON_INACTIVITY_DAYS = 7;
 export const WARNING_DAYS_BEFORE_DELETION = 3;
 
 export async function warnUsersOfUpcomingDeletion() {
-  const deletionCutoff = new Date(Date.now() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
+  const deletionCutoff = new Date(Date.now() - FREE_INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
   const warningCutoff = new Date(
-    Date.now() - (INACTIVITY_DAYS - WARNING_DAYS_BEFORE_DELETION) * 24 * 60 * 60 * 1000
+    Date.now() - (FREE_INACTIVITY_DAYS - WARNING_DAYS_BEFORE_DELETION) * 24 * 60 * 60 * 1000
   );
 
   const filesToWarn = await prisma.file.findMany({
@@ -43,13 +44,16 @@ export async function warnUsersOfUpcomingDeletion() {
 }
 
 export async function deleteInactiveFreeFiles() {
-  const cutoff = new Date(Date.now() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
+  const anonCutoff = new Date(Date.now() - ANON_INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
+  const freeCutoff = new Date(Date.now() - FREE_INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
 
   const staleFiles = await prisma.file.findMany({
     where: {
       status: "ACTIVE",
-      lastAccessedAt: { lt: cutoff },
-      OR: [{ owner: null }, { owner: { planTier: "FREE" } }],
+      OR: [
+        { ownerId: null, lastAccessedAt: { lt: anonCutoff } },
+        { owner: { planTier: "FREE" }, lastAccessedAt: { lt: freeCutoff } },
+      ],
     },
     select: { id: true, b2Key: true, ownerId: true, sizeBytes: true },
   });

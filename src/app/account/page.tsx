@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { INACTIVITY_DAYS } from "@/lib/cleanup";
+import { FREE_INACTIVITY_DAYS } from "@/lib/cleanup";
 import { totalStorageBytesFor } from "@/lib/limits";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
@@ -48,7 +48,7 @@ function buildAccountFiles(
 ): AccountFile[] {
   const now = Date.now();
   return files.map((f) => {
-    const deleteAt = new Date(f.lastAccessedAt.getTime() + INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
+    const deleteAt = new Date(f.lastAccessedAt.getTime() + FREE_INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
     const daysLeft = Math.ceil((deleteAt.getTime() - now) / (24 * 60 * 60 * 1000));
     return {
       id: f.id,

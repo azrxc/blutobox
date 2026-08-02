@@ -119,6 +119,18 @@ export default function UploadPage() {
             <p className="mt-1 text-sm text-muted">Your link is ready to share.</p>
           </div>
           <CopyLinkField url={shareUrl} />
+          {!session?.user && (
+            <div className="space-y-1.5 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-left text-xs text-yellow-800 dark:text-yellow-300">
+              <p className="font-medium">Save this link now — we can&apos;t show it to you again.</p>
+              <p>
+                You uploaded anonymously, so there&apos;s no account to find it later, and it&apos;ll auto-delete after 7 days unused.{" "}
+                <Link href="/register" className="underline underline-offset-2">
+                  Create a free account
+                </Link>{" "}
+                to keep every link you make and get 30-day retention.
+              </p>
+            </div>
+          )}
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href={`/f/${shareSlug}`}
