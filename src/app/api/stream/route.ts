@@ -1,8 +1,10 @@
 import { verifyStreamToken } from "@/lib/stream-token";
+import { consumeDownloadQuota } from "@/lib/download-quota";
 
 export const runtime = "edge";
 
 const THROTTLE_BYTES_PER_SEC = 8 * 1024 * 1024; // 8 MB/s for Free/anonymous downloads
+const QUOTA_FLUSH_BYTES = 4 * 1024 * 1024; // batch quota writes so we're not hitting Redis every chunk
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -21,19 +23,36 @@ export async function GET(req: Request) {
     return new Response("Failed to fetch file", { status: 502 });
   }
 
+  const identifier = payload.identifier;
   const reader = upstream.body.getReader();
   const startTime = Date.now();
   let bytesSent = 0;
+  let unflushed = 0;
+
+  async function flushQuota() {
+    if (unflushed === 0) return;
+    const amount = unflushed;
+    unflushed = 0;
+    await consumeDownloadQuota(identifier, amount).catch(() => {});
+  }
 
   const stream = new ReadableStream({
     async pull(controller) {
       const { done, value } = await reader.read();
       if (done) {
+        await flushQuota();
         controller.close();
         return;
       }
       controller.enqueue(value);
       bytesSent += value.byteLength;
+      unflushed += value.byteLength;
+
+      // Actual bytes sent count against quota as they go out, not upfront — so a
+      // cancelled download only ever charges for what was actually transferred.
+      if (unflushed >= QUOTA_FLUSH_BYTES) {
+        await flushQuota();
+      }
 
       const expectedElapsedMs = (bytesSent / THROTTLE_BYTES_PER_SEC) * 1000;
       const actualElapsedMs = Date.now() - startTime;
@@ -42,8 +61,9 @@ export async function GET(req: Request) {
         await new Promise((resolve) => setTimeout(resolve, waitMs));
       }
     },
-    cancel() {
+    async cancel() {
       reader.cancel();
+      await flushQuota();
     },
   });
 

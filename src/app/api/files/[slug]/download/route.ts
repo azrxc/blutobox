@@ -51,8 +51,6 @@ export async function GET(
       { status: 429 }
     );
   }
-  await consumeDownloadQuota(identifier, fileBytes);
-
   await prisma.file.update({
     where: { id: link.file.id },
     data: { downloadCount: { increment: 1 }, lastAccessedAt: new Date(), deletionWarningSentAt: null },
@@ -64,13 +62,20 @@ export async function GET(
   });
 
   if (planTier === "PRO") {
+    // Pro downloads redirect straight to B2 — the app never sees the bytes again after
+    // this response, so there's no way to meter actual usage. Charge the full size upfront.
+    await consumeDownloadQuota(identifier, fileBytes);
     return NextResponse.redirect(url);
   }
 
+  // Free/anonymous downloads are proxied through /api/stream, which can see real bytes
+  // as they're sent — quota is charged incrementally there instead of upfront here, so
+  // a cancelled/abandoned download only counts what actually transferred.
   const token = await createStreamToken({
     url,
     filename: link.file.filename,
     exp: Date.now() + 5 * 60 * 1000,
+    identifier,
   });
   const origin = new URL(req.url).origin;
   return NextResponse.redirect(`${origin}/api/stream?t=${encodeURIComponent(token)}`);

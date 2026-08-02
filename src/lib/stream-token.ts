@@ -1,4 +1,9 @@
-type StreamPayload = { url: string; filename: string; exp: number };
+type StreamPayload = {
+  url: string;
+  filename: string;
+  exp: number;
+  identifier: string;
+};
 
 function base64UrlEncode(bytes: Uint8Array): string {
   let str = "";
