@@ -61,7 +61,7 @@ export function DownloadButton({
       )}
       {downloading && (
         <div className="flex items-center gap-3">
-          <LoadingIcon size={32} />
+          <LoadingIcon size={48} />
           <div className="h-1.5 w-48 overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-accent transition-all"
