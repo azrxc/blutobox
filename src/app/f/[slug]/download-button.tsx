@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { LoadingIcon } from "../../loading-icon";
+import { useRef, useState } from "react";
 
 export function DownloadButton({
   slug,
@@ -15,13 +14,16 @@ export function DownloadButton({
   const [progress, setProgress] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   async function handleDownload() {
     setError(null);
     setDownloading(true);
     setProgress(0);
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const res = await fetch(`/api/files/${slug}/download`);
+      const res = await fetch(`/api/files/${slug}/download`, { signal: controller.signal });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? `Download failed (status ${res.status})`);
@@ -48,10 +50,17 @@ export function DownloadButton({
       link.remove();
       URL.revokeObjectURL(objectUrl);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Download failed");
+      if (!(e instanceof DOMException && e.name === "AbortError")) {
+        setError(e instanceof Error ? e.message : "Download failed");
+      }
     } finally {
       setDownloading(false);
+      abortRef.current = null;
     }
+  }
+
+  function handleCancel() {
+    abortRef.current?.abort();
   }
 
   return (
@@ -61,13 +70,18 @@ export function DownloadButton({
       )}
       {downloading && (
         <div className="flex items-center gap-3">
-          <LoadingIcon size={48} />
           <div className="h-1.5 w-48 overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-accent transition-all"
               style={{ width: `${Math.round(progress * 100)}%` }}
             />
           </div>
+          <button
+            onClick={handleCancel}
+            className="text-xs text-muted underline underline-offset-2 hover:text-foreground"
+          >
+            Cancel
+          </button>
         </div>
       )}
       <button
