@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export function ReportForm({ slug }: { slug: string }) {
+  const { data: session } = useSession();
+  const accountEmail = session?.user?.email ?? null;
+
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [reason, setReason] = useState("");
@@ -14,7 +18,7 @@ export function ReportForm({ slug }: { slug: string }) {
     const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, reason, reporterEmail: email }),
+      body: JSON.stringify({ slug, reason, reporterEmail: accountEmail ?? email }),
     });
     setStatus(res.ok ? "sent" : "error");
   }
@@ -35,14 +39,20 @@ export function ReportForm({ slug }: { slug: string }) {
     <form onSubmit={submit} className="space-y-2.5 rounded-xl border border-border bg-surface p-4 text-left text-xs">
       <p className="font-medium">Report this file</p>
       {status === "error" && <p className="text-red-500">Something went wrong, try again.</p>}
-      <input
-        type="email"
-        required
-        placeholder="Your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full rounded-lg border border-border bg-background px-3 py-2"
-      />
+      {accountEmail ? (
+        <p className="rounded-lg border border-border bg-background px-3 py-2 text-muted">
+          Reporting as <span className="text-foreground">{accountEmail}</span>
+        </p>
+      ) : (
+        <input
+          type="email"
+          required
+          placeholder="Your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full rounded-lg border border-border bg-background px-3 py-2"
+        />
+      )}
       <textarea
         required
         minLength={10}
