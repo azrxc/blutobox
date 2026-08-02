@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LoadingIcon } from "../../loading-icon";
 
 type PreviewData = {
   url: string;
@@ -64,7 +65,14 @@ export function FileViewer({ slug }: { slug: string }) {
   }, [slug]);
 
   if (error) return <p className="text-sm text-red-500">{error}</p>;
-  if (!data) return <p className="text-sm text-muted">Loading preview…</p>;
+  if (!data) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <LoadingIcon size={56} />
+        <p className="text-sm text-muted">Loading preview…</p>
+      </div>
+    );
+  }
 
   return <PreviewMedia data={data} />;
 }
