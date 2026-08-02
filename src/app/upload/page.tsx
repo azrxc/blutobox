@@ -36,7 +36,8 @@ export default function UploadPage() {
   }, []);
 
   const [files, setFiles] = useState<File[]>([]);
-  const [isNsfw, setIsNsfw] = useState(false);
+  const [showMatureCheck, setShowMatureCheck] = useState(false);
+  const [showMatureInfo, setShowMatureInfo] = useState(false);
   const [linkPassword, setLinkPassword] = useState("");
   const [expiryChoice, setExpiryChoice] = useState("");
   const [customHours, setCustomHours] = useState("");
@@ -54,8 +55,9 @@ export default function UploadPage() {
     return expiryChoice ? Number(expiryChoice) : undefined;
   }
 
-  async function handleUpload() {
+  async function handleUpload(isNsfw: boolean) {
     if (files.length === 0) return;
+    setShowMatureCheck(false);
     setError(null);
     setUploading(true);
     setProgress(0);
@@ -210,17 +212,6 @@ export default function UploadPage() {
           </p>
         )}
 
-        <label className="flex items-center gap-2 text-sm text-muted">
-          <input
-            type="checkbox"
-            checked={isNsfw}
-            onChange={(e) => setIsNsfw(e.target.checked)}
-            disabled={uploading}
-            className="h-4 w-4 rounded border-border"
-          />
-          This file contains mature/sensitive content (18+)
-        </label>
-
         <details className="group rounded-xl border border-border bg-surface">
           <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium marker:content-none">
             <span>Options</span>
@@ -295,7 +286,46 @@ export default function UploadPage() {
           </div>
         )}
 
-        {uploading ? (
+        {showMatureCheck ? (
+          <div className="space-y-3 rounded-xl border border-border bg-surface p-4">
+            <p className="text-sm font-medium">Does this file contain sensitive content?</p>
+            <p className="text-xs text-muted">
+              We&apos;ll apply an age restriction so it&apos;s not shown to everyone by default.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowMatureInfo((v) => !v)}
+              className="text-xs text-muted underline underline-offset-2 hover:text-foreground"
+            >
+              What counts as sensitive content?
+            </button>
+            {showMatureInfo && (
+              <p className="rounded-lg bg-background px-3 py-2 text-xs text-muted">
+                Nudity, sexual content, graphic violence, or other content not suitable for all audiences.
+              </p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleUpload(false)}
+                className="flex-1 rounded-full bg-accent py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
+              >
+                No
+              </button>
+              <button
+                onClick={() => handleUpload(true)}
+                className="flex-1 rounded-full border border-border py-2.5 text-sm font-medium transition-colors hover:bg-background"
+              >
+                Yes
+              </button>
+            </div>
+            <button
+              onClick={() => setShowMatureCheck(false)}
+              className="w-full text-center text-xs text-muted underline underline-offset-2"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : uploading ? (
           <div className="flex gap-3">
             <button
               disabled
@@ -312,7 +342,7 @@ export default function UploadPage() {
           </div>
         ) : (
           <button
-            onClick={handleUpload}
+            onClick={() => setShowMatureCheck(true)}
             disabled={files.length === 0}
             className="w-full rounded-full bg-accent py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
           >
