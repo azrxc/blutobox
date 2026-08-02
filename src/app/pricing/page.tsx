@@ -41,7 +41,7 @@ function Cell({ value }: { value: string | boolean }) {
 export default function PricingPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(false);
-  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly");
+  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("yearly");
 
   useEffect(() => {
     update();
@@ -88,11 +88,14 @@ export default function PricingPage() {
         </button>
         <button
           onClick={() => setBillingInterval("yearly")}
-          className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
+          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium transition-colors ${
             billingInterval === "yearly" ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
           }`}
         >
-          Yearly <span className="opacity-80">· Save 33%</span>
+          Yearly
+          <span className="rounded-full bg-green-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-green-700 dark:text-green-400">
+            Save 33%
+          </span>
         </button>
       </div>
 
