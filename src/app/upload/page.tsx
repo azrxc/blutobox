@@ -318,6 +318,10 @@ export default function UploadPage() {
                 Yes
               </button>
             </div>
+            <p className="text-[11px] leading-relaxed text-muted">
+              You&apos;re responsible for answering accurately. Files found to contain sensitive content that
+              wasn&apos;t declared here may be removed, and repeated violations can get your account suspended.
+            </p>
             <button
               onClick={() => setShowMatureCheck(false)}
               className="w-full text-center text-xs text-muted underline underline-offset-2"
