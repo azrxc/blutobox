@@ -7,7 +7,8 @@ import { WelcomeToast } from "./welcome-toast";
 
 // Don't show the trust-stats line until there's real traction to point to —
 // a tiny number undercuts trust more than showing nothing at all.
-const MIN_FILES_FOR_TRUST_STATS = 100;
+// TEMP: set to 0 so it's visible for a live position check — revert to 100 after.
+const MIN_FILES_FOR_TRUST_STATS = 0;
 
 const features = [
   {
