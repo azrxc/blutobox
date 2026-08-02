@@ -81,7 +81,7 @@ export function QrTool() {
             disabled={downloading}
             className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-background disabled:opacity-50"
           >
-            {downloading ? "Preparing…" : "Download PNG"}
+            {downloading ? "Preparing…" : "Download QR"}
           </button>
         </div>
       )}
