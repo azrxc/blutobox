@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LoadingIcon } from "../../loading-icon";
 
 export function DownloadButton({
   slug,
@@ -59,11 +60,14 @@ export function DownloadButton({
         <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
       {downloading && (
-        <div className="h-1.5 w-48 overflow-hidden rounded-full bg-border">
-          <div
-            className="h-full rounded-full bg-accent transition-all"
-            style={{ width: `${Math.round(progress * 100)}%` }}
-          />
+        <div className="flex items-center gap-3">
+          <LoadingIcon size={32} />
+          <div className="h-1.5 w-48 overflow-hidden rounded-full bg-border">
+            <div
+              className="h-full rounded-full bg-accent transition-all"
+              style={{ width: `${Math.round(progress * 100)}%` }}
+            />
+          </div>
         </div>
       )}
       <button
