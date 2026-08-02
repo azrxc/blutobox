@@ -6,6 +6,7 @@ import { totalStorageBytesFor } from "@/lib/limits";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
 import { CreatorLinksForm } from "./creator-links-form";
+import { LogoutButton } from "../logout-button";
 import { FileList, type AccountFile } from "./file-list";
 import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
 import { DownloadUsageBar } from "../download-usage-bar";
@@ -90,13 +91,18 @@ export default async function AccountPage() {
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16">
       <div className="w-full max-w-2xl space-y-10">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {user.name ? `Hi, ${user.name}` : "Account"}
-          </h1>
-          <p className="mt-1 text-sm text-muted">
-            {user.email} · {user.planTier} plan
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {user.name ? `Hi, ${user.name}` : "Account"}
+            </h1>
+            <p className="mt-1 text-sm text-muted">
+              {user.email} · {user.planTier} plan
+            </p>
+          </div>
+          <div className="shrink-0 pt-1 text-sm">
+            <LogoutButton />
+          </div>
         </div>
 
         <AccountTabs
