@@ -22,7 +22,7 @@ export const changelog: ChangelogEntry[] = [
       "QR codes on file pages can now be downloaded as an image, not just viewed",
       "Anonymous uploads (no account) now stay up for 7 days instead of sharing the same 30-day window as free accounts — create a free account if you want things to stick around longer",
       "Pricing page now shows anonymous usage limits alongside Free and Pro so it's clear what each option gets you",
-      "Softened the wording around mature-content warnings so they read as a clear age restriction rather than an attention-grabbing label, and moved the sensitive-content question to a quick Yes/No step after you hit Upload instead of a checkbox sitting on the page by default",
+      "Softened the wording around mature-content warnings so they read as a clear age restriction rather than an attention-grabbing label, moved the sensitive-content question to a quick Yes/No step after you hit Upload instead of a checkbox sitting on the page by default, and made clear that misrepresenting it can lead to content removal or an account suspension",
     ],
   },
   {
