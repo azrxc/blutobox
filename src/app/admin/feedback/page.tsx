@@ -18,9 +18,14 @@ export default async function AdminFeedbackPage() {
       <div className="w-full max-w-2xl space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Cancellation feedback ({feedback.length})</h1>
-          <Link href="/admin/reports" className="text-sm text-muted underline underline-offset-2">
-            Reports →
-          </Link>
+          <div className="flex gap-4 text-sm">
+            <Link href="/admin" className="text-muted underline underline-offset-2">
+              Overview →
+            </Link>
+            <Link href="/admin/reports" className="text-muted underline underline-offset-2">
+              Reports →
+            </Link>
+          </div>
         </div>
         {feedback.length === 0 && <p className="text-sm text-muted">No feedback yet.</p>}
         <div className="space-y-3">

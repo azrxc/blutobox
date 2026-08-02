@@ -32,7 +32,7 @@ export function Header() {
             Pricing
           </Link>
           {session?.user?.role === "ADMIN" && (
-            <Link href="/admin/reports" className="transition-colors hover:text-foreground">
+            <Link href="/admin" className="transition-colors hover:text-foreground">
               Admin
             </Link>
           )}
@@ -96,7 +96,7 @@ export function Header() {
             QR code
           </Link>
           {session?.user?.role === "ADMIN" && (
-            <Link href="/admin/reports" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
+            <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
               Admin
             </Link>
           )}
