@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { grantReferralBonus } from "@/lib/referral";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -13,13 +14,17 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid or expired token" }, { status: 400 });
   }
 
-  await prisma.$transaction([
+  const [verifiedUser] = await prisma.$transaction([
     prisma.user.update({
       where: { id: record.userId },
       data: { emailVerified: new Date() },
     }),
     prisma.verificationToken.delete({ where: { token } }),
   ]);
+
+  if (verifiedUser.referredById) {
+    await grantReferralBonus(verifiedUser.referredById, verifiedUser.id).catch(() => {});
+  }
 
   return NextResponse.redirect(new URL("/login?verified=1", req.url));
 }

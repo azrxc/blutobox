@@ -11,6 +11,7 @@ const registerSchema = z.object({
   name: z.string().trim().min(1).max(100),
   email: z.string().email(),
   password: z.string().min(8).max(200),
+  ref: z.string().optional(),
 });
 
 export async function POST(req: Request) {
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Please enter your name, a valid email, and a password (min 8 characters)" }, { status: 400 });
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, password, ref } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -38,8 +39,10 @@ export async function POST(req: Request) {
 
   const passwordHash = await bcrypt.hash(password, 12);
 
+  const referrer = ref ? await prisma.user.findUnique({ where: { id: ref }, select: { id: true } }) : null;
+
   const user = await prisma.user.create({
-    data: { name, email, passwordHash },
+    data: { name, email, passwordHash, referredById: referrer?.id },
   });
 
   const token = randomBytes(32).toString("hex");

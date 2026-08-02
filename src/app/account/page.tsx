@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FREE_INACTIVITY_DAYS } from "@/lib/cleanup";
-import { totalStorageBytesFor } from "@/lib/limits";
+import { totalStorageBytesFor, MAX_REFERRAL_BONUS_BYTES } from "@/lib/limits";
+import { ReferralCard } from "./referral-card";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
 import { CreatorLinksForm } from "./creator-links-form";
@@ -81,7 +82,7 @@ export default async function AccountPage() {
   if (!user) redirect("/login");
 
   const isPro = user.planTier === "PRO";
-  const totalBytes = totalStorageBytesFor(user.planTier);
+  const totalBytes = totalStorageBytesFor(user.planTier, user.bonusStorageBytes);
   const usedBytes = Number(user.storageUsedBytes);
 
   const accountFiles = buildAccountFiles(files, isPro);
@@ -116,6 +117,11 @@ export default async function AccountPage() {
                   <DownloadUsageBar />
                 </div>
               </div>
+              <ReferralCard
+                url={`${process.env.NEXTAUTH_URL}/register?ref=${user.id}`}
+                bonusGb={Number(user.bonusStorageBytes) / (1024 * 1024 * 1024)}
+                maxBonusGb={MAX_REFERRAL_BONUS_BYTES / (1024 * 1024 * 1024)}
+              />
             </div>
           }
           files={

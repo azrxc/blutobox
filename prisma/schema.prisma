@@ -40,6 +40,11 @@ model User {
   banned          Boolean   @default(false)
   createdAt       DateTime  @default(now())
 
+  referredById      String?
+  referredBy        User?    @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals         User[]   @relation("Referrals")
+  bonusStorageBytes BigInt   @default(0)
+
   files           File[]
   subscription    Subscription?
   verificationTokens VerificationToken[]

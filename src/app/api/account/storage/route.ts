@@ -16,7 +16,7 @@ export async function GET() {
 
   return NextResponse.json({
     usedBytes: Number(user.storageUsedBytes),
-    totalBytes: totalStorageBytesFor(user.planTier),
+    totalBytes: totalStorageBytesFor(user.planTier, user.bonusStorageBytes),
     planTier: user.planTier,
   });
 }

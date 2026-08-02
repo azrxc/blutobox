@@ -5,9 +5,14 @@ export const PRO_MAX_UPLOAD_BYTES = 10 * 1024 * 1024 * 1024; // 10GB
 export const FREE_TOTAL_STORAGE_BYTES = 5 * 1024 * 1024 * 1024; // 5GB
 export const PRO_TOTAL_STORAGE_BYTES = 50 * 1024 * 1024 * 1024; // 50GB
 
-export function totalStorageBytesFor(planTier: "FREE" | "PRO") {
-  return planTier === "PRO" ? PRO_TOTAL_STORAGE_BYTES : FREE_TOTAL_STORAGE_BYTES;
+export function totalStorageBytesFor(planTier: "FREE" | "PRO", bonusBytes: number | bigint = 0) {
+  const base = planTier === "PRO" ? PRO_TOTAL_STORAGE_BYTES : FREE_TOTAL_STORAGE_BYTES;
+  return base + Number(bonusBytes);
 }
+
+// Referral program: both sides get a storage bonus once the referred account verifies its email.
+export const REFERRAL_BONUS_BYTES = 1 * 1024 * 1024 * 1024; // 1GB per successful referral
+export const MAX_REFERRAL_BONUS_BYTES = 10 * 1024 * 1024 * 1024; // cap: 10 referrals worth
 
 export const MULTIPART_THRESHOLD_BYTES = 50 * 1024 * 1024; // 50MB
 export const MULTIPART_PART_SIZE_BYTES = 25 * 1024 * 1024; // 25MB

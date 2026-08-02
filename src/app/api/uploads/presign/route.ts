@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   const currentUser = session?.user?.id
     ? await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { planTier: true, storageUsedBytes: true },
+        select: { planTier: true, storageUsedBytes: true, bonusStorageBytes: true },
       })
     : null;
   const planTier = currentUser?.planTier ?? null;
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
   }
 
   if (session?.user) {
-    const totalBytes = totalStorageBytesFor((planTier as "FREE" | "PRO") ?? "FREE");
+    const totalBytes = totalStorageBytesFor((planTier as "FREE" | "PRO") ?? "FREE", currentUser?.bonusStorageBytes ?? 0);
     const used = Number(currentUser?.storageUsedBytes ?? 0);
     if (used + size > totalBytes) {
       return NextResponse.json(
