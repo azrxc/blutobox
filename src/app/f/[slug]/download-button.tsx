@@ -69,8 +69,8 @@ export function DownloadButton({
         <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
       {downloading && (
-        <div className="flex items-center gap-3">
-          <div className="h-1.5 w-48 overflow-hidden rounded-full bg-border">
+        <div className="flex items-center gap-2">
+          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-accent transition-all"
               style={{ width: `${Math.round(progress * 100)}%` }}
@@ -87,7 +87,7 @@ export function DownloadButton({
       <button
         onClick={handleDownload}
         disabled={downloading}
-        className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
+        className="w-44 rounded-full bg-accent py-2.5 text-center text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
       >
         {downloading ? `Downloading… ${Math.round(progress * 100)}%` : "Download"}
       </button>
