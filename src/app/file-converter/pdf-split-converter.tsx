@@ -48,7 +48,7 @@ export function PdfSplitConverter() {
         downloadBlob(zipped, `${baseName}-split.zip`);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Split failed — make sure the file is a valid PDF");
+      setError(e instanceof Error ? e.message : "Split failed. Make sure the file is a valid PDF");
     } finally {
       setConverting(false);
     }

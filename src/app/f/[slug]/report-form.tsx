@@ -32,7 +32,7 @@ export function ReportForm({ slug }: { slug: string }) {
   }
 
   if (status === "sent") {
-    return <p className="text-xs text-muted">Report submitted. Thank you — we&apos;ll review it.</p>;
+    return <p className="text-xs text-muted">Report submitted. Thank you, we&apos;ll review it.</p>;
   }
 
   return (

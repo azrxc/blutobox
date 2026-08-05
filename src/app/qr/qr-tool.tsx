@@ -87,7 +87,7 @@ export function QrTool() {
       )}
 
       <p className="text-center text-xs text-muted">
-        Generated entirely in your browser — nothing you enter here is ever sent to a server.
+        Generated entirely in your browser. Nothing you enter here is ever sent to a server.
       </p>
     </div>
   );

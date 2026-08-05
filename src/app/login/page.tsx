@@ -36,7 +36,7 @@ function LoginForm() {
 
     if (res?.error) {
       if (res.error === "email_not_verified") {
-        setError("Please verify your email before logging in — check your inbox for the verification link.");
+        setError("Please verify your email before logging in. Check your inbox for the verification link.");
         setUnverified(true);
       } else if (res.error === "too_many_attempts") {
         setError("Too many login attempts from this network. Please try again in a few minutes.");
@@ -68,12 +68,12 @@ function LoginForm() {
       </div>
       {verified && (
         <p className="rounded-lg bg-green-500/10 px-3 py-2 text-sm text-green-700 dark:text-green-400">
-          Email verified — you can log in now.
+          Email verified. You can log in now.
         </p>
       )}
       {justReset && (
         <p className="rounded-lg bg-green-500/10 px-3 py-2 text-sm text-green-700 dark:text-green-400">
-          Password reset — you can log in with your new password now.
+          Password reset. You can log in with your new password now.
         </p>
       )}
       {error && (

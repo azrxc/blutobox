@@ -27,7 +27,7 @@ export function FileConverterTool() {
       <div>
         <h1 className="text-xl font-semibold">File converter</h1>
         <p className="mt-1 text-sm text-muted">
-          Convert files right in your browser — nothing is ever uploaded to a server.
+          Convert files right in your browser. Nothing is ever uploaded to a server.
         </p>
       </div>
 
@@ -53,7 +53,7 @@ export function FileConverterTool() {
       {mode === "pdf-to-images" && <PdfToImagesConverter />}
 
       <p className="text-center text-xs text-muted">
-        Everything happens locally in your browser — your files are never sent anywhere.
+        Everything happens locally in your browser. Your files are never sent anywhere.
       </p>
     </div>
   );

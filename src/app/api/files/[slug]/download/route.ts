@@ -69,14 +69,14 @@ export async function GET(
   });
 
   if (planTier === "PRO") {
-    // Pro downloads redirect straight to B2 — the app never sees the bytes again after
+    // Pro downloads redirect straight to B2. The app never sees the bytes again after
     // this response, so there's no way to meter actual usage. Charge the full size upfront.
     await consumeDownloadQuota(identifier, fileBytes);
     return NextResponse.redirect(url);
   }
 
   // Free/anonymous downloads are proxied through /api/stream, which can see real bytes
-  // as they're sent — quota is charged incrementally there instead of upfront here, so
+  // as they're sent. Quota is charged incrementally there instead of upfront here, so
   // a cancelled/abandoned download only counts what actually transferred.
   const token = await createStreamToken({
     url,

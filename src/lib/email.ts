@@ -41,7 +41,7 @@ export async function sendDeletionWarningEmail(email: string, filename: string, 
     from: FROM,
     to: email,
     subject: `Your file "${filename}" will be deleted in 3 days`,
-    html: `<p>Your file <strong>${safeFilename}</strong> hasn't been downloaded in a while and is scheduled to be automatically deleted in 3 days due to inactivity (Free plan files are removed after 30 days with no downloads).</p><p><a href="${fileUrl}">${fileUrl}</a></p><p>Download it now to keep a copy, or <a href="${pricingUrl}">upgrade to Pro</a> to keep your files permanently — Pro-owned files are never auto-deleted.</p>`,
+    html: `<p>Your file <strong>${safeFilename}</strong> hasn't been downloaded in a while and is scheduled to be automatically deleted in 3 days due to inactivity (Free plan files are removed after 30 days with no downloads).</p><p><a href="${fileUrl}">${fileUrl}</a></p><p>Download it now to keep a copy, or <a href="${pricingUrl}">upgrade to Pro</a> to keep your files permanently. Pro-owned files are never auto-deleted.</p>`,
   });
   if (error) {
     console.error(`[email] Failed to send deletion warning to ${email}:`, error);

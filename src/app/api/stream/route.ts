@@ -48,7 +48,7 @@ export async function GET(req: Request) {
       bytesSent += value.byteLength;
       unflushed += value.byteLength;
 
-      // Actual bytes sent count against quota as they go out, not upfront — so a
+      // Actual bytes sent count against quota as they go out, not upfront. So a
       // cancelled download only ever charges for what was actually transferred.
       if (unflushed >= QUOTA_FLUSH_BYTES) {
         await flushQuota();

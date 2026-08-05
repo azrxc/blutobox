@@ -48,7 +48,7 @@ export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
       <div>
         <h2 className="text-sm font-semibold">Creator links</h2>
         <p className="mt-1 text-xs text-muted">
-          Add up to {MAX_LINKS} links — your Discord, socials, a Ko-fi/Patreon, your store, whatever. Shown on your
+          Add up to {MAX_LINKS} links: your Discord, socials, a Ko-fi/Patreon, your store, whatever. Shown on your
           file pages so downloaders can find you.
         </p>
       </div>

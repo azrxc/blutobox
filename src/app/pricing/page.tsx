@@ -15,7 +15,7 @@ const rows: Row[] = [
   { label: "Total storage", anon: "No account", free: "5 GB", pro: "50 GB" },
   { label: "Max file size", anon: "200 MB", free: "2 GB", pro: "10 GB" },
   { label: "Daily download limit", anon: "3 GB/day", free: "5 GB/day", pro: "25 GB/day" },
-  { label: "Upload rate limit", anon: "10/hour per IP", free: "—", pro: "—" },
+  { label: "Upload rate limit", anon: "10/hour per IP", free: "-", pro: "-" },
   { label: "Inline preview & streaming", anon: true, free: true, pro: true },
   { label: "Password-protected links", anon: false, free: false, pro: true },
   { label: "Multi-file bundling (.zip)", anon: true, free: true, pro: true },
@@ -31,7 +31,7 @@ function Cell({ value }: { value: string | boolean }) {
   if (typeof value === "boolean") {
     return (
       <span className={value ? "text-foreground" : "text-muted/50"}>
-        {value ? "✓" : "—"}
+        {value ? "✓" : "-"}
       </span>
     );
   }

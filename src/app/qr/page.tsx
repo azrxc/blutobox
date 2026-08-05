@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { QrTool } from "./qr-tool";
 
 export const metadata: Metadata = {
-  title: "Free QR Code Generator — Bluto Box",
+  title: "Free QR Code Generator | Bluto Box",
   description: "Turn any link or text into a scannable QR code, free, no sign-up required.",
 };
 

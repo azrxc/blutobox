@@ -97,7 +97,7 @@ export default async function AdminOverviewPage() {
             <StatCard label="Yearly plans" value={yearlySubs.toLocaleString()} />
           </div>
           <p className="mt-2 text-xs text-muted">
-            Estimated from active/trialing subscriptions at current list price — doesn&apos;t account for Stripe fees,
+            Estimated from active/trialing subscriptions at current list price. Doesn&apos;t account for Stripe fees,
             refunds, or price changes. Check Stripe Dashboard for exact figures.
           </p>
         </div>

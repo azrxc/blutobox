@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { LogoutButton } from "./logout-button";
 import { WelcomeToast } from "./welcome-toast";
 
-// Don't show the trust-stats line until there's real traction to point to —
-// a tiny number undercuts trust more than showing nothing at all.
+// Don't show the trust-stats line until there's real traction to point to.
+// A tiny number undercuts trust more than showing nothing at all.
 const MIN_FILES_FOR_TRUST_STATS = 100;
 
 const features = [
@@ -20,7 +20,7 @@ const features = [
   },
   {
     title: "Built to last",
-    description: "Files stay up as long as they're used — no surprise deletions.",
+    description: "Files stay up as long as they're used. No surprise deletions.",
   },
 ];
 
@@ -46,7 +46,7 @@ export default async function Home() {
           Upload. Share. Done.
         </h1>
         <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">
-          A fast, simple file host. No clutter, no bloat — just a link you can send anywhere.
+          A fast, simple file host. No clutter, no bloat, just a link you can send anywhere.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

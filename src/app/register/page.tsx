@@ -59,7 +59,7 @@ function RegisterForm() {
       <div>
         <h1 className="text-xl font-semibold">Create an account</h1>
         <p className="mt-1 text-sm text-muted">
-          {ref ? "You were invited — sign up to both get a storage bonus." : "Free to start."}
+          {ref ? "You were invited. Sign up to both get a storage bonus." : "Free to start."}
         </p>
       </div>
       {error && (

@@ -35,11 +35,11 @@ export async function generateMetadata({
   const link = await prisma.shareLink.findUnique({ where: { slug }, include: { file: true } });
 
   if (!link || link.file.status !== "ACTIVE" || (link.expiresAt && link.expiresAt < new Date())) {
-    return { title: "File not found — Bluto Box" };
+    return { title: "File not found | Bluto Box" };
   }
 
   if (link.passwordHash) {
-    const title = "Password-protected file — Bluto Box";
+    const title = "Password-protected file | Bluto Box";
     const description = "This file is protected. Enter the password to view it.";
     return {
       title,
@@ -50,7 +50,7 @@ export async function generateMetadata({
   }
 
   const { file } = link;
-  const title = file.isNsfw ? "Age-restricted file — Bluto Box" : file.filename;
+  const title = file.isNsfw ? "Age-restricted file | Bluto Box" : file.filename;
   const description = file.isNsfw
     ? "This link may contain age-restricted content (18+)."
     : `${formatBytes(file.sizeBytes)} · Shared via Bluto Box`;

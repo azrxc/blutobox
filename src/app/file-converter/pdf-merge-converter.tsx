@@ -40,7 +40,7 @@ export function PdfMergeConverter() {
       const mergedBytes = await merged.save();
       downloadBlob(new Blob([new Uint8Array(mergedBytes)], { type: "application/pdf" }), "merged.pdf");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Merge failed — make sure all files are valid PDFs");
+      setError(e instanceof Error ? e.message : "Merge failed. Make sure all files are valid PDFs");
     } finally {
       setConverting(false);
     }
