@@ -8,6 +8,7 @@ import { dailyDownloadBytesFor } from "@/lib/limits";
 import { checkDownloadQuota, consumeDownloadQuota } from "@/lib/download-quota";
 import { createStreamToken } from "@/lib/stream-token";
 import { getCurrentPlanTier } from "@/lib/plan";
+import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 
 export async function GET(
   req: Request,
@@ -24,6 +25,12 @@ export async function GET(
   }
   if (link.expiresAt && link.expiresAt < new Date()) {
     return NextResponse.json({ error: "This link has expired" }, { status: 410 });
+  }
+  if (link.file.isNsfw && isAgeVerificationRestrictedRegion(req.headers)) {
+    return NextResponse.json(
+      { error: "This content isn't available in your region due to local age-verification requirements." },
+      { status: 451 }
+    );
   }
   if (link.passwordHash) {
     const cookieHeader = req.headers.get("cookie") ?? "";

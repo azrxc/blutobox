@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { FileViewer } from "./file-viewer";
@@ -11,6 +11,7 @@ import { DownloadButton } from "./download-button";
 import { DownloadUsageBar } from "../../download-usage-bar";
 import { QrCodeButton } from "../../qr-code-button";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
+import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 
 function formatBytes(bytes: bigint) {
   const n = Number(bytes);
@@ -95,6 +96,19 @@ export default async function FilePage({
   }
 
   const { file } = link;
+
+  if (file.isNsfw) {
+    const headersList = await headers();
+    if (isAgeVerificationRestrictedRegion(headersList)) {
+      return (
+        <main className="flex flex-1 items-center justify-center px-6 py-16">
+          <p className="max-w-sm text-center text-sm text-muted">
+            This content isn&apos;t available in your region due to local age-verification requirements.
+          </p>
+        </main>
+      );
+    }
+  }
 
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16">
