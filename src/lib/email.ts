@@ -3,7 +3,15 @@ import { Resend } from "resend";
 let _resend: Resend | null = null;
 
 function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
+  if (!process.env.RESEND_API_KEY) {
+    if (process.env.VERCEL) {
+      // Don't silently no-op on a real deployment - that looks identical to a
+      // successful send from the caller's perspective, which is exactly how the
+      // earlier Gmail-SMTP deliverability bug went unnoticed for so long.
+      throw new Error("RESEND_API_KEY is not set in this Vercel environment - emails cannot be sent");
+    }
+    return null;
+  }
   if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
   return _resend;
 }
