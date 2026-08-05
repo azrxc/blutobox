@@ -7,6 +7,7 @@ import { PdfToImagesConverter } from "./pdf-to-images-converter";
 import { PdfMergeConverter } from "./pdf-merge-converter";
 import { PdfSplitConverter } from "./pdf-split-converter";
 import { DocToPdfConverter } from "./doc-to-pdf-converter";
+import { HashCalculator } from "./hash-calculator";
 
 const MODES = [
   { id: "image", label: "Image format" },
@@ -15,6 +16,7 @@ const MODES = [
   { id: "doc-to-pdf", label: "DOCX → PDF" },
   { id: "images-to-pdf", label: "Images → PDF" },
   { id: "pdf-to-images", label: "PDF → Images" },
+  { id: "hash", label: "File hash" },
 ] as const;
 
 type Mode = (typeof MODES)[number]["id"];
@@ -51,6 +53,7 @@ export function FileConverterTool() {
       {mode === "doc-to-pdf" && <DocToPdfConverter />}
       {mode === "images-to-pdf" && <ImagesToPdfConverter />}
       {mode === "pdf-to-images" && <PdfToImagesConverter />}
+      {mode === "hash" && <HashCalculator />}
 
       <p className="text-center text-xs text-muted">
         Everything happens locally in your browser. Your files are never sent anywhere.
