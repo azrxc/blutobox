@@ -162,8 +162,8 @@ export default async function FilePage({
             <DownloadButton slug={slug} filename={file.filename} sizeBytes={Number(file.sizeBytes)} />
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
-            <EmailShareForm slug={slug} />
             {session?.user && <BookmarkButton slug={slug} initialBookmarked={isBookmarked} />}
+            <EmailShareForm slug={slug} />
           </div>
         </NsfwGate>
 

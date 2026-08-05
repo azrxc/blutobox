@@ -142,13 +142,13 @@ export default function UploadPage() {
               View file
             </Link>
             <QrCodeButton url={shareUrl} />
-            <EmailShareForm slug={shareSlug} />
             <button
               onClick={resetForm}
               className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-surface"
             >
               Upload another
             </button>
+            <EmailShareForm slug={shareSlug} />
           </div>
         </div>
       </main>
