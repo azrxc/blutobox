@@ -131,6 +131,26 @@ export default async function FilePage({
           <p className="mt-1 text-xs text-muted">
             {formatBytes(file.sizeBytes)} · {file.downloadCount} downloads
           </p>
+          {file.owner && file.owner.creatorLinks.length > 0 && (
+            <p className="mt-1 text-xs text-muted">
+              From the creator:{" "}
+              {file.owner.creatorLinks
+                .slice(0, maxCreatorLinksFor(file.owner.planTier))
+                .map((cl, i, arr) => (
+                  <span key={cl.id}>
+                    <a
+                      href={cl.url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="text-foreground underline underline-offset-2 transition-colors hover:text-accent"
+                    >
+                      {cl.label}
+                    </a>
+                    {i < arr.length - 1 ? " · " : ""}
+                  </span>
+                ))}
+            </p>
+          )}
         </div>
 
         <NsfwGate isNsfw={file.isNsfw}>
@@ -145,23 +165,6 @@ export default async function FilePage({
             <EmailShareForm slug={slug} />
             {session?.user && <BookmarkButton slug={slug} initialBookmarked={isBookmarked} />}
           </div>
-
-          {file.owner && file.owner.creatorLinks.length > 0 && (
-            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
-              <span className="text-muted">From the creator:</span>
-              {file.owner.creatorLinks.slice(0, maxCreatorLinksFor(file.owner.planTier)).map((cl) => (
-                <a
-                  key={cl.id}
-                  href={cl.url}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="underline underline-offset-2 transition-colors hover:text-accent"
-                >
-                  {cl.label}
-                </a>
-              ))}
-            </div>
-          )}
         </NsfwGate>
 
         <div className="flex justify-end">

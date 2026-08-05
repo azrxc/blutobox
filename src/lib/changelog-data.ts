@@ -17,6 +17,8 @@ export const changelog: ChangelogEntry[] = [
       "Simplified the report button on file pages",
       "New tool in the File converter: compute a file's SHA-256/SHA-1/SHA-512 hash right in your browser, with an optional compare-against field to check it matches what you expected",
       "You can now save files other people shared with you to your own account (look for the star on any file page). Free accounts can save up to 10, Pro is unlimited",
+      "Creator links now show right under the filename instead of near the bottom, easier to notice",
+      "The 'Email this link' button is now a compact icon, matching the other share buttons",
     ],
   },
   {

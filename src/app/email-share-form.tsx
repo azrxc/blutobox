@@ -31,9 +31,14 @@ export function EmailShareForm({ slug }: { slug: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-background"
+        title="Email this link"
+        aria-label="Email this link"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-background hover:text-foreground"
       >
-        Email this link
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m22 7-10 5L2 7" />
+        </svg>
       </button>
     );
   }
