@@ -2,22 +2,30 @@
 
 import { useState, type ReactNode } from "react";
 
-const TABS = ["Overview", "Files", "Profile", "Creator"] as const;
+const TABS = ["Overview", "Files", "Bookmarks", "Profile", "Creator"] as const;
 type Tab = (typeof TABS)[number];
 
 export function AccountTabs({
   overview,
   files,
+  bookmarks,
   profile,
   creator,
 }: {
   overview: ReactNode;
   files: ReactNode;
+  bookmarks: ReactNode;
   profile: ReactNode;
   creator: ReactNode;
 }) {
   const [active, setActive] = useState<Tab>("Overview");
-  const panels: Record<Tab, ReactNode> = { Overview: overview, Files: files, Profile: profile, Creator: creator };
+  const panels: Record<Tab, ReactNode> = {
+    Overview: overview,
+    Files: files,
+    Bookmarks: bookmarks,
+    Profile: profile,
+    Creator: creator,
+  };
 
   return (
     <div>

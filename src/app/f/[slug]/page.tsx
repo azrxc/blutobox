@@ -14,6 +14,8 @@ import { EmailShareForm } from "../../email-share-form";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 import { maxCreatorLinksFor } from "@/lib/limits";
+import { auth } from "@/lib/auth";
+import { BookmarkButton } from "./bookmark-button";
 
 function formatBytes(bytes: bigint) {
   const n = Number(bytes);
@@ -99,6 +101,15 @@ export default async function FilePage({
 
   const { file } = link;
 
+  const session = await auth();
+  const isBookmarked = session?.user
+    ? Boolean(
+        await prisma.bookmark.findUnique({
+          where: { userId_shareLinkId: { userId: session.user.id, shareLinkId: link.id } },
+        })
+      )
+    : false;
+
   if (file.isNsfw) {
     const headersList = await headers();
     if (isAgeVerificationRestrictedRegion(headersList)) {
@@ -132,6 +143,7 @@ export default async function FilePage({
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <EmailShareForm slug={slug} />
+            {session?.user && <BookmarkButton slug={slug} initialBookmarked={isBookmarked} />}
           </div>
 
           {file.owner && file.owner.creatorLinks.length > 0 && (

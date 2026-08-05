@@ -43,6 +43,12 @@ export function maxCreatorLinksFor(planTier: "FREE" | "PRO") {
   return planTier === "PRO" ? PRO_MAX_CREATOR_LINKS : FREE_MAX_CREATOR_LINKS;
 }
 
+export const FREE_MAX_BOOKMARKS = 10;
+
+export function maxBookmarksFor(planTier: "FREE" | "PRO") {
+  return planTier === "PRO" ? Infinity : FREE_MAX_BOOKMARKS;
+}
+
 // B2's account-wide "Caps & Alerts" limits (set 2026-08-06). Not exposed via any API B2
 // offers, only visible/editable in B2's own dashboard - if you change them there, update
 // these two numbers to match, they're only used to render the admin usage graph.

@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FREE_INACTIVITY_DAYS } from "@/lib/cleanup";
-import { totalStorageBytesFor, maxCreatorLinksFor, MAX_REFERRAL_BONUS_BYTES } from "@/lib/limits";
+import { totalStorageBytesFor, maxCreatorLinksFor, maxBookmarksFor, MAX_REFERRAL_BONUS_BYTES } from "@/lib/limits";
+import { BookmarkList } from "./bookmark-list";
 import { ReferralCard } from "./referral-card";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
@@ -69,7 +70,7 @@ export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const [user, files, subscription, creatorLinks] = await Promise.all([
+  const [user, files, subscription, creatorLinks, bookmarks] = await Promise.all([
     prisma.user.findUnique({ where: { id: session.user.id } }),
     prisma.file.findMany({
       where: { ownerId: session.user.id, status: "ACTIVE" },
@@ -78,6 +79,11 @@ export default async function AccountPage() {
     }),
     prisma.subscription.findUnique({ where: { userId: session.user.id } }),
     prisma.creatorLink.findMany({ where: { userId: session.user.id }, orderBy: { order: "asc" } }),
+    prisma.bookmark.findMany({
+      where: { userId: session.user.id },
+      include: { shareLink: { include: { file: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   if (!user) redirect("/login");
@@ -87,6 +93,14 @@ export default async function AccountPage() {
   const usedBytes = Number(user.storageUsedBytes);
 
   const accountFiles = buildAccountFiles(files, isPro);
+  const accountBookmarks = bookmarks
+    .filter((b) => b.shareLink.file.status === "ACTIVE")
+    .map((b) => ({
+      slug: b.shareLink.slug,
+      filename: b.shareLink.file.filename,
+      sizeBytes: b.shareLink.file.sizeBytes.toString(),
+    }));
+  const bookmarkLimit = maxBookmarksFor(user.planTier);
 
   const subscriptionInfo = buildSubscriptionInfo(isPro, subscription);
 
@@ -137,6 +151,22 @@ export default async function AccountPage() {
             <div className="space-y-10">
               <UpdateNameForm currentName={user.name} />
               <ChangePasswordForm hasPassword={Boolean(user.passwordHash)} />
+            </div>
+          }
+          bookmarks={
+            <div>
+              <h2 className="mb-3 text-sm font-semibold">
+                Saved files ({accountBookmarks.length}
+                {Number.isFinite(bookmarkLimit) ? `/${bookmarkLimit}` : ""})
+              </h2>
+              <div className="rounded-2xl border border-border bg-surface px-5">
+                <BookmarkList bookmarks={accountBookmarks} />
+              </div>
+              {!isPro && (
+                <p className="mt-2 text-xs text-muted">
+                  Free accounts can save up to {bookmarkLimit} files. Upgrade to Pro for unlimited.
+                </p>
+              )}
             </div>
           }
           creator={

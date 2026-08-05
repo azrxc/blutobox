@@ -51,6 +51,7 @@ model User {
   passwordResetTokens PasswordResetToken[]
   cancellationFeedback CancellationFeedback[]
   creatorLinks    CreatorLink[]
+  bookmarks       Bookmark[]
 }
 
 model CreatorLink {
@@ -114,6 +115,23 @@ model ShareLink {
   expiresAt    DateTime?
   passwordHash String?
   createdAt    DateTime  @default(now())
+
+  bookmarks    Bookmark[]
+}
+
+// A pure bookmark: saving someone else's share link to your own account for easy
+// access later. Doesn't protect the underlying file from expiry/cleanup in any way -
+// cascades away automatically if the link or file it points to is ever deleted.
+model Bookmark {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shareLinkId String
+  shareLink   ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, shareLinkId])
+  @@index([userId])
 }
 
 model Report {
