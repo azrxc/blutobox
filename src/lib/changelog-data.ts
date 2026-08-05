@@ -26,7 +26,15 @@ export const changelog: ChangelogEntry[] = [
       "New referral program — find your link on your account page, share it, and both you and whoever signs up get +1GB of storage once they verify their email (stacks up to +10GB)",
       "New free file converter tool — convert images between PNG/JPG/WebP, combine images into a PDF, split a PDF into images, merge multiple PDFs, split a PDF into individual pages, and convert Word (.docx) files to PDF, all done in your browser with nothing uploaded anywhere",
       "New 'Email this link' option on the upload-success and file pages — send a download link straight to someone's inbox instead of having to copy/paste it yourself",
-      "Bluto Box is now live at its real domain, blutobox.com",
+    ],
+  },
+  {
+    date: "2026-08-05",
+    title: "Bluto Box has a real home now",
+    intro: "The big one: Bluto Box is live at its own domain instead of a Vercel subdomain. A few things behind the scenes got more reliable along the way too.",
+    highlights: [
+      "Bluto Box is now live at blutobox.com",
+      "Improved email reliability — verification, password reset, and notification emails now go out through a proper email service instead of a consumer email account, so they're less likely to get lost along the way",
     ],
   },
   {
