@@ -13,6 +13,10 @@ function todayKey(identifier: string) {
   return `dl-quota:${identifier}:${day}`;
 }
 
+function siteKey(day: string) {
+  return `dl-quota:site:${day}`;
+}
+
 export async function checkDownloadQuota(identifier: string, fileBytes: number, limitBytes: number) {
   const redis = getRedis();
   if (!redis) return { allowed: true, usedBytes: 0 };
@@ -30,4 +34,20 @@ export async function consumeDownloadQuota(identifier: string, fileBytes: number
   if (newTotal === fileBytes) {
     await redis.expire(key, 26 * 60 * 60); // ~1 day + buffer
   }
+
+  // Site-wide total, kept long enough (48h) that the daily cron job can always read a
+  // full day's number before it expires, regardless of what time that day's first
+  // download happened. Powers the admin usage graph, doesn't gate anything.
+  const today = new Date().toISOString().slice(0, 10);
+  const sKey = siteKey(today);
+  const siteTotal = await redis.incrby(sKey, fileBytes);
+  if (siteTotal === fileBytes) {
+    await redis.expire(sKey, 48 * 60 * 60);
+  }
+}
+
+export async function getSiteDownloadBytes(day: string): Promise<number> {
+  const redis = getRedis();
+  if (!redis) return 0;
+  return Number((await redis.get<number>(siteKey(day))) ?? 0);
 }

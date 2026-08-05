@@ -11,8 +11,16 @@ export type AccountFile = {
   downloadCount: number;
   createdAt: string;
   daysUntilDeletion: number | null;
+  linkExpiresAt: string | null;
   slug: string | null;
 };
+
+function formatLinkExpiry(iso: string | null) {
+  if (!iso) return "Link never expires";
+  const date = new Date(iso);
+  if (date.getTime() <= Date.now()) return "Link expired";
+  return `Link expires ${date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+}
 
 function formatBytes(bytesStr: string) {
   const n = Number(bytesStr);
@@ -62,6 +70,8 @@ function FileRow({ file }: { file: AccountFile }) {
             : file.daysUntilDeletion <= 0
               ? "Pending deletion"
               : `Auto-deletes in ${file.daysUntilDeletion} day${file.daysUntilDeletion === 1 ? "" : "s"} if unused`}
+          {" · "}
+          {formatLinkExpiry(file.linkExpiresAt)}
         </p>
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
       </div>

@@ -35,9 +35,9 @@ export default function TermsPage() {
           <li>Spam, or content whose primary purpose is phishing or fraud</li>
         </ul>
         <p>
-          Content flagged as NSFW/adult (consensual, legal adult content) must be accurately labeled as such at
-          upload time. Users must be 18 or older to view NSFW-flagged content. This is separate from the graphic
-          violence prohibition above. Flagging adult content correctly does not make otherwise-prohibited content
+          Sensitive content (consensual, legal adult content) must be accurately labeled as such at upload time.
+          Users must be 18 or older to view content labeled as sensitive. This is separate from the graphic
+          violence prohibition above. Labeling adult content correctly does not make otherwise-prohibited content
           allowed. Misrepresenting content&apos;s classification may result in removal and account suspension.
         </p>
       </section>

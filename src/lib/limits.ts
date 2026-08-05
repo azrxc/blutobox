@@ -42,3 +42,9 @@ export const PRO_MAX_CREATOR_LINKS = 5;
 export function maxCreatorLinksFor(planTier: "FREE" | "PRO") {
   return planTier === "PRO" ? PRO_MAX_CREATOR_LINKS : FREE_MAX_CREATOR_LINKS;
 }
+
+// B2's account-wide "Caps & Alerts" limits (set 2026-08-06). Not exposed via any API B2
+// offers, only visible/editable in B2's own dashboard - if you change them there, update
+// these two numbers to match, they're only used to render the admin usage graph.
+export const B2_DAILY_STORAGE_CAP_BYTES = 1003 * 1024 * 1024 * 1024; // $0.23/day
+export const B2_DAILY_DOWNLOAD_CAP_BYTES = 501 * 1024 * 1024 * 1024; // $5.00/day

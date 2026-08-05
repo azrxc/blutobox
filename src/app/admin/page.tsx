@@ -2,6 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import { getUsageSeries } from "@/lib/site-stats";
+import { B2_DAILY_STORAGE_CAP_BYTES, B2_DAILY_DOWNLOAD_CAP_BYTES } from "@/lib/limits";
+import { UsageBar } from "../usage-bar";
+import { UsageChart } from "./usage-chart";
 
 function formatBytes(bytes: number) {
   const units = ["B", "KB", "MB", "GB", "TB"];
@@ -43,6 +47,7 @@ export default async function AdminOverviewPage() {
     openReportsCount,
     bannedIpCount,
     bannedUserCount,
+    usageSeries,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { planTier: "PRO" } }),
@@ -59,7 +64,11 @@ export default async function AdminOverviewPage() {
     prisma.report.count({ where: { status: "OPEN" } }),
     prisma.bannedIp.count(),
     prisma.user.count({ where: { banned: true } }),
+    getUsageSeries(30),
   ]);
+
+  const totalStorageBytes = Number(fileStats._sum.sizeBytes ?? 0);
+  const todayDownloadBytes = usageSeries[usageSeries.length - 1]?.downloadBytes ?? 0;
 
   const monthlySubs = activeSubs.filter((s) => s.billingInterval !== "yearly").length;
   const yearlySubs = activeSubs.filter((s) => s.billingInterval === "yearly").length;
@@ -108,6 +117,22 @@ export default async function AdminOverviewPage() {
             <StatCard label="Active files" value={(fileStats._count._all ?? 0).toLocaleString()} />
             <StatCard label="Total storage used" value={formatBytes(Number(fileStats._sum.sizeBytes ?? 0))} />
             <StatCard label="Total downloads" value={(fileStats._sum.downloadCount ?? 0).toLocaleString()} />
+          </div>
+        </div>
+
+        <div>
+          <h2 className="mb-3 text-sm font-semibold text-muted">Usage vs. B2 account caps</h2>
+          <div className="space-y-2">
+            <UsageBar label="Total storage" usedBytes={totalStorageBytes} totalBytes={B2_DAILY_STORAGE_CAP_BYTES} />
+            <UsageBar label="Downloaded today" usedBytes={todayDownloadBytes} totalBytes={B2_DAILY_DOWNLOAD_CAP_BYTES} />
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            These are B2&apos;s account-wide &quot;Caps &amp; Alerts&quot; limits (set manually in B2&apos;s own
+            dashboard, not visible via any API) — update the two constants in{" "}
+            <code className="rounded bg-surface px-1 py-0.5">src/lib/limits.ts</code> if you change them there.
+          </p>
+          <div className="mt-4">
+            <UsageChart points={usageSeries} />
           </div>
         </div>
 

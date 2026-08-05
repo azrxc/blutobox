@@ -51,9 +51,9 @@ export async function generateMetadata({
   }
 
   const { file } = link;
-  const title = file.isNsfw ? "Age-restricted file | Bluto Box" : file.filename;
+  const title = file.isNsfw ? "Sensitive file | Bluto Box" : file.filename;
   const description = file.isNsfw
-    ? "This link may contain age-restricted content (18+)."
+    ? "This link was flagged as sensitive content by the person who shared it."
     : `${formatBytes(file.sizeBytes)} · Shared via Bluto Box`;
 
   return {

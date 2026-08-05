@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteInactiveFreeFiles, warnUsersOfUpcomingDeletion } from "@/lib/cleanup";
+import { snapshotYesterdaySiteDownloadBytes } from "@/lib/site-stats";
 
 export const maxDuration = 60;
 
@@ -11,5 +12,6 @@ export async function GET(req: Request) {
 
   const warnResult = await warnUsersOfUpcomingDeletion();
   const deleteResult = await deleteInactiveFreeFiles();
+  await snapshotYesterdaySiteDownloadBytes().catch(() => {});
   return NextResponse.json({ ok: true, ...warnResult, ...deleteResult });
 }

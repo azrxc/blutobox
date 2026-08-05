@@ -44,7 +44,7 @@ function buildAccountFiles(
     downloadCount: number;
     createdAt: Date;
     lastAccessedAt: Date;
-    shareLinks: { slug: string }[];
+    shareLinks: { slug: string; expiresAt: Date | null }[];
   }[],
   isPro: boolean
 ): AccountFile[] {
@@ -59,6 +59,7 @@ function buildAccountFiles(
       downloadCount: f.downloadCount,
       createdAt: f.createdAt.toISOString(),
       daysUntilDeletion: isPro ? null : daysLeft,
+      linkExpiresAt: f.shareLinks[0]?.expiresAt?.toISOString() ?? null,
       slug: f.shareLinks[0]?.slug ?? null,
     };
   });
