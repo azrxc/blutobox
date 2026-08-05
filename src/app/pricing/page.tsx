@@ -26,7 +26,7 @@ const rows: Row[] = [
   { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
 ];
 
-const gridCols = "grid-cols-[1fr_4rem_4rem_4rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";
+const gridCols = "grid-cols-[1fr_4.5rem_4.5rem_4.5rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";
 
 function Cell({ value }: { value: string | boolean }) {
   if (typeof value === "boolean") {
@@ -109,18 +109,18 @@ export default function PricingPage() {
           </div>
           <div className="text-center">
             <p className="text-xs font-medium text-muted">Free</p>
-            <p className="text-2xl font-semibold">$0</p>
+            <p className="text-lg font-semibold sm:text-2xl">$0</p>
           </div>
           <div className="text-center">
             <p className="text-xs font-medium text-muted">Pro</p>
-            <p className="text-2xl font-semibold">
+            <p className="text-lg font-semibold sm:text-2xl">
               {billingInterval === "yearly" ? (
                 <>
-                  $39.99<span className="text-sm font-normal text-muted">/yr</span>
+                  $39.99<span className="text-xs font-normal text-muted sm:text-sm">/yr</span>
                 </>
               ) : (
                 <>
-                  $4.99<span className="text-sm font-normal text-muted">/mo</span>
+                  $4.99<span className="text-xs font-normal text-muted sm:text-sm">/mo</span>
                 </>
               )}
             </p>
@@ -131,7 +131,7 @@ export default function PricingPage() {
           {rows.map((row) => (
             <div
               key={row.label}
-              className={`grid ${gridCols} items-center gap-x-2 px-4 py-3.5 text-sm sm:px-6`}
+              className={`grid ${gridCols} items-center gap-x-2 px-4 py-3.5 text-xs sm:px-6 sm:text-sm`}
             >
               <span className="text-muted">{row.label}</span>
               <span className="text-center">
