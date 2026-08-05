@@ -70,6 +70,43 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   }
 }
 
+export async function sendShareLinkEmail(params: {
+  recipientEmail: string;
+  fileUrl: string;
+  filename: string;
+  senderName?: string;
+  message?: string;
+}) {
+  const { recipientEmail, fileUrl, filename, senderName, message } = params;
+  const safeFilename = escapeHtml(filename);
+  const safeSender = senderName ? escapeHtml(senderName) : null;
+  const safeMessage = message ? escapeHtml(message) : null;
+
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log(`[dev] Share link for ${recipientEmail}: "${filename}" (${fileUrl})`);
+    return;
+  }
+
+  const intro = safeSender
+    ? `<strong>${safeSender}</strong> shared a file with you via Bluto Box:`
+    : `Someone shared a file with you via Bluto Box:`;
+
+  try {
+    await transporter.sendMail({
+      from: `Bluto Box <${process.env.GMAIL_USER}>`,
+      to: recipientEmail,
+      subject: safeSender ? `${safeSender} sent you a file via Bluto Box` : "You've got a file on Bluto Box",
+      html: `<p>${intro}</p><p><strong>${safeFilename}</strong></p>${
+        safeMessage ? `<p>&quot;${safeMessage}&quot;</p>` : ""
+      }<p><a href="${fileUrl}">${fileUrl}</a></p>`,
+    });
+  } catch (error) {
+    console.error(`[email] Failed to send share link to ${recipientEmail}:`, error);
+    throw new Error("Failed to send email");
+  }
+}
+
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
 

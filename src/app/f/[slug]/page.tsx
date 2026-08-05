@@ -10,6 +10,7 @@ import { NsfwGate } from "./nsfw-gate";
 import { DownloadButton } from "./download-button";
 import { DownloadUsageBar } from "../../download-usage-bar";
 import { QrCodeButton } from "../../qr-code-button";
+import { EmailShareForm } from "../../email-share-form";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 
@@ -129,6 +130,7 @@ export default async function FilePage({
             <DownloadButton slug={slug} filename={file.filename} sizeBytes={Number(file.sizeBytes)} />
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
+            <EmailShareForm slug={slug} />
           </div>
 
           {file.owner?.planTier === "PRO" && file.owner.creatorLinks.length > 0 && (

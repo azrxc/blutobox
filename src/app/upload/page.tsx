@@ -8,6 +8,7 @@ import { zipFiles } from "@/lib/zip-files";
 import { CopyLinkField } from "../copy-link-field";
 import { StorageUsageBar } from "../storage-usage-bar";
 import { QrCodeButton } from "../qr-code-button";
+import { EmailShareForm } from "../email-share-form";
 
 const RISKY_EXTENSIONS = [".exe", ".scr", ".bat", ".cmd", ".com", ".msi", ".vbs", ".ps1"];
 
@@ -141,6 +142,7 @@ export default function UploadPage() {
               View file
             </Link>
             <QrCodeButton url={shareUrl} />
+            <EmailShareForm slug={shareSlug} />
             <button
               onClick={resetForm}
               className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-surface"
