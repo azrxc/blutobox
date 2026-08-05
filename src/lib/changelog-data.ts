@@ -7,6 +7,15 @@ export type ChangelogEntry = {
 
 export const changelog: ChangelogEntry[] = [
   {
+    date: "2026-08-06",
+    title: "Clearer wording for sensitive content",
+    intro: "Small but overdue wording pass on how sensitive content is presented, plus a couple of small account-page additions.",
+    highlights: [
+      "Sensitive-content warnings now read as a plain content notice ('flagged as sensitive content by the person who shared it') instead of an age-check prompt, since that category always covered more than just adult content, things like graphic imagery too",
+      "Your account page now shows each file's link expiry date, not just the inactivity auto-delete countdown",
+    ],
+  },
+  {
     date: "2026-08-05",
     title: "Bluto Box has a real home now",
     intro: "The big one: Bluto Box is live at its own domain instead of a Vercel subdomain. A few things behind the scenes got more reliable along the way too.",
