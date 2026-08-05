@@ -9,12 +9,12 @@ export const changelog: ChangelogEntry[] = [
   {
     date: "2026-08-06",
     title: "Clearer wording for sensitive content",
-    intro: "Small but overdue wording pass on how sensitive content is presented, plus a couple of small account-page additions.",
+    intro: "A wording pass on how sensitive content is presented, plus a couple of small account-page additions.",
     highlights: [
-      "Sensitive-content warnings now read as a plain content notice ('flagged as sensitive content by the person who shared it') instead of an age-check prompt, since that category always covered more than just adult content, things like graphic imagery too",
+      "Sensitive-content warnings now read as a plain notice instead of an age-check prompt",
       "Your account page now shows each file's link expiry date, not just the inactivity auto-delete countdown",
-      "New About page (linked at the bottom of every page) with what Bluto Box is and how to reach us",
-      "The report button on file pages now just says 'Report' instead of spelling out DMCA/abuse",
+      "New About page (linked at the bottom of every page)",
+      "Simplified the report button on file pages",
     ],
   },
   {
@@ -30,11 +30,10 @@ export const changelog: ChangelogEntry[] = [
   {
     date: "2026-08-02",
     title: "Locking the doors properly",
-    intro:
-      "Mostly under-the-hood work today, but some of it matters a lot: I found (and fixed) a bug where every verification email pointed to a dead page, meaning no one who signed up could ever actually log in. Sorry about that.",
+    intro: "A batch of reliability and quality-of-life improvements:",
     highlights: [
       "Password reset: you can finally recover a forgotten password",
-      "Fixed the dead verification-email link, plus a way to resend it if you got stuck before",
+      "Fixed an issue with email verification links, and added a way to resend a verification email if you need one",
       "Login and signup are now rate-limited against brute-force/spam attempts",
       "Sharing a link on Discord/Twitter/Slack now shows an actual preview card instead of a bare URL",
       "New admin dashboard for cancellation feedback",
@@ -43,7 +42,7 @@ export const changelog: ChangelogEntry[] = [
       "QR codes on file pages can now be downloaded as an image, not just viewed",
       "Anonymous uploads (no account) now stay up for 7 days instead of sharing the same 30-day window as free accounts. Create a free account if you want things to stick around longer",
       "Pricing page now shows anonymous usage limits alongside Free and Pro so it's clear what each option gets you",
-      "Softened the wording around mature-content warnings so they read as a clear age restriction rather than an attention-grabbing label, moved the sensitive-content question to a quick Yes/No step after you hit Upload instead of a checkbox sitting on the page by default, and made clear that misrepresenting it can lead to content removal or an account suspension",
+      "Simplified how you flag sensitive content when uploading: a quick Yes/No step after you hit Upload instead of a checkbox on the page",
       "New referral program: find your link on your account page, share it, and both you and whoever signs up get +1GB of storage once they verify their email (stacks up to +10GB)",
       "New free file converter tool: convert images between PNG/JPG/WebP, combine images into a PDF, split a PDF into images, merge multiple PDFs, split a PDF into individual pages, and convert Word (.docx) files to PDF, all done in your browser with nothing uploaded anywhere",
       "New 'Email this link' option on the upload-success and file pages: send a download link straight to someone's inbox instead of having to copy/paste it yourself",
