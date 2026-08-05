@@ -13,6 +13,8 @@ export const changelog: ChangelogEntry[] = [
     highlights: [
       "Sensitive-content warnings now read as a plain content notice ('flagged as sensitive content by the person who shared it') instead of an age-check prompt, since that category always covered more than just adult content, things like graphic imagery too",
       "Your account page now shows each file's link expiry date, not just the inactivity auto-delete countdown",
+      "New About page (linked at the bottom of every page) with what Bluto Box is and how to reach us",
+      "The report button on file pages now just says 'Report' instead of spelling out DMCA/abuse",
     ],
   },
   {
