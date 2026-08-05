@@ -57,6 +57,9 @@ export default function RootLayout({
               <Link href="/qr" className="transition-colors hover:text-foreground">
                 QR code
               </Link>
+              <Link href="/file-converter" className="transition-colors hover:text-foreground">
+                File converter
+              </Link>
               <Link href="/changelog" className="transition-colors hover:text-foreground">
                 Changelog
               </Link>

@@ -95,6 +95,9 @@ export function Header() {
           <Link href="/qr" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             QR code
           </Link>
+          <Link href="/file-converter" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
+            File converter
+          </Link>
           {session?.user?.role === "ADMIN" && (
             <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
               Admin
