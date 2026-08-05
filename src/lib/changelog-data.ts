@@ -9,7 +9,7 @@ export const changelog: ChangelogEntry[] = [
   {
     date: "2026-08-06",
     title: "Clearer wording for sensitive content",
-    intro: "A wording pass on how sensitive content is presented, plus a couple of small account-page additions.",
+    intro: "Small stuff today, but stuff I'd been meaning to get right for a while:",
     highlights: [
       "Sensitive-content warnings now read as a plain notice instead of an age-check prompt",
       "Your account page now shows each file's link expiry date, not just the inactivity auto-delete countdown",
@@ -30,7 +30,7 @@ export const changelog: ChangelogEntry[] = [
   {
     date: "2026-08-02",
     title: "Locking the doors properly",
-    intro: "A batch of reliability and quality-of-life improvements:",
+    intro: "A big batch today, a mix of fixes and new stuff. Highlights:",
     highlights: [
       "Password reset: you can finally recover a forgotten password",
       "Fixed an issue with email verification links, and added a way to resend a verification email if you need one",
