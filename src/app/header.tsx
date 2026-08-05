@@ -98,6 +98,9 @@ export function Header() {
           <Link href="/file-converter" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             File converter
           </Link>
+          <Link href="/text-diff" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
+            Text diff
+          </Link>
           {session?.user?.role === "ADMIN" && (
             <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
               Admin

@@ -19,6 +19,9 @@ export const changelog: ChangelogEntry[] = [
       "You can now save files other people shared with you to your own account (look for the star on any file page). Free accounts can save up to 10, Pro is unlimited",
       "Creator links now show right under the filename instead of near the bottom, easier to notice",
       "The 'Email this link' button is now a compact icon, matching the other share buttons",
+      "Fixed a layout bug where opening the Email button pushed the save/bookmark icon onto its own line",
+      "Three new tools in the File converter: image compressor, video-to-GIF converter, and a duplicate-file finder",
+      "New standalone Text diff tool: paste two blocks of text and see exactly what changed",
     ],
   },
   {

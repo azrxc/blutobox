@@ -8,15 +8,21 @@ import { PdfMergeConverter } from "./pdf-merge-converter";
 import { PdfSplitConverter } from "./pdf-split-converter";
 import { DocToPdfConverter } from "./doc-to-pdf-converter";
 import { HashCalculator } from "./hash-calculator";
+import { ImageCompressor } from "./image-compressor";
+import { DuplicateFinder } from "./duplicate-finder";
+import { VideoToGifConverter } from "./video-to-gif-converter";
 
 const MODES = [
   { id: "image", label: "Image format" },
+  { id: "compress", label: "Compress image" },
   { id: "pdf-merge", label: "Merge PDFs" },
   { id: "pdf-split", label: "Split PDF" },
   { id: "doc-to-pdf", label: "DOCX → PDF" },
   { id: "images-to-pdf", label: "Images → PDF" },
   { id: "pdf-to-images", label: "PDF → Images" },
+  { id: "video-to-gif", label: "Video → GIF" },
   { id: "hash", label: "File hash" },
+  { id: "duplicates", label: "Find duplicates" },
 ] as const;
 
 type Mode = (typeof MODES)[number]["id"];
@@ -48,12 +54,15 @@ export function FileConverterTool() {
       </div>
 
       {mode === "image" && <ImageFormatConverter />}
+      {mode === "compress" && <ImageCompressor />}
       {mode === "pdf-merge" && <PdfMergeConverter />}
       {mode === "pdf-split" && <PdfSplitConverter />}
       {mode === "doc-to-pdf" && <DocToPdfConverter />}
       {mode === "images-to-pdf" && <ImagesToPdfConverter />}
       {mode === "pdf-to-images" && <PdfToImagesConverter />}
+      {mode === "video-to-gif" && <VideoToGifConverter />}
       {mode === "hash" && <HashCalculator />}
+      {mode === "duplicates" && <DuplicateFinder />}
 
       <p className="text-center text-xs text-muted">
         Everything happens locally in your browser. Your files are never sent anywhere.

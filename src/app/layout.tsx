@@ -67,6 +67,9 @@ export default function RootLayout({
                   <Link href="/file-converter" className="transition-colors hover:text-foreground">
                     File converter
                   </Link>
+                  <Link href="/text-diff" className="transition-colors hover:text-foreground">
+                    Text diff
+                  </Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Company</span>
