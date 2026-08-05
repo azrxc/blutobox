@@ -25,6 +25,8 @@ export const changelog: ChangelogEntry[] = [
       "Softened the wording around mature-content warnings so they read as a clear age restriction rather than an attention-grabbing label, moved the sensitive-content question to a quick Yes/No step after you hit Upload instead of a checkbox sitting on the page by default, and made clear that misrepresenting it can lead to content removal or an account suspension",
       "New referral program — find your link on your account page, share it, and both you and whoever signs up get +1GB of storage once they verify their email (stacks up to +10GB)",
       "New free file converter tool — convert images between PNG/JPG/WebP, combine images into a PDF, split a PDF into images, merge multiple PDFs, split a PDF into individual pages, and convert Word (.docx) files to PDF, all done in your browser with nothing uploaded anywhere",
+      "New 'Email this link' option on the upload-success and file pages — send a download link straight to someone's inbox instead of having to copy/paste it yourself",
+      "Bluto Box is now live at its real domain, blutobox.com",
     ],
   },
   {
