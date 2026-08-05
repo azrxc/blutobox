@@ -4,9 +4,15 @@ import { useState } from "react";
 import { ImageFormatConverter } from "./image-format-converter";
 import { ImagesToPdfConverter } from "./images-to-pdf-converter";
 import { PdfToImagesConverter } from "./pdf-to-images-converter";
+import { PdfMergeConverter } from "./pdf-merge-converter";
+import { PdfSplitConverter } from "./pdf-split-converter";
+import { DocToPdfConverter } from "./doc-to-pdf-converter";
 
 const MODES = [
   { id: "image", label: "Image format" },
+  { id: "pdf-merge", label: "Merge PDFs" },
+  { id: "pdf-split", label: "Split PDF" },
+  { id: "doc-to-pdf", label: "DOCX → PDF" },
   { id: "images-to-pdf", label: "Images → PDF" },
   { id: "pdf-to-images", label: "PDF → Images" },
 ] as const;
@@ -25,7 +31,7 @@ export function FileConverterTool() {
         </p>
       </div>
 
-      <div className="inline-flex flex-wrap rounded-full border border-border p-1 text-xs">
+      <div className="inline-flex flex-wrap gap-1 rounded-2xl border border-border p-1 text-xs">
         {MODES.map((m) => (
           <button
             key={m.id}
@@ -40,6 +46,9 @@ export function FileConverterTool() {
       </div>
 
       {mode === "image" && <ImageFormatConverter />}
+      {mode === "pdf-merge" && <PdfMergeConverter />}
+      {mode === "pdf-split" && <PdfSplitConverter />}
+      {mode === "doc-to-pdf" && <DocToPdfConverter />}
       {mode === "images-to-pdf" && <ImagesToPdfConverter />}
       {mode === "pdf-to-images" && <PdfToImagesConverter />}
 
