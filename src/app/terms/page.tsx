@@ -22,12 +22,19 @@ export default function TermsPage() {
         <ul className="list-disc space-y-1 pl-5">
           <li>Content that infringes someone else&apos;s copyright or other intellectual property rights</li>
           <li>Child sexual abuse material (CSAM) — zero tolerance, reported to NCMEC/law enforcement immediately</li>
+          <li>
+            Real, graphic depictions of death, severe injury, or violence against people or animals (e.g. war
+            casualties, executions, torture) — this is prohibited outright, not an age-gated category
+          </li>
+          <li>Content that promotes or glorifies terrorism or acts of mass violence</li>
           <li>Content that is illegal in the jurisdiction where it is uploaded or accessed</li>
           <li>Malware or content intended to harm systems or users</li>
         </ul>
         <p>
-          Content flagged as NSFW/adult must be accurately labeled as such at upload time.
-          Users must be 18 or older to view NSFW-flagged content.
+          Content flagged as NSFW/adult (consensual, legal adult content) must be accurately labeled as such at
+          upload time. Users must be 18 or older to view NSFW-flagged content. This is separate from the graphic
+          violence prohibition above — flagging adult content correctly does not make otherwise-prohibited content
+          allowed.
         </p>
       </section>
 
