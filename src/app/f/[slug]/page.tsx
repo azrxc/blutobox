@@ -13,6 +13,7 @@ import { QrCodeButton } from "../../qr-code-button";
 import { EmailShareForm } from "../../email-share-form";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
+import { maxCreatorLinksFor } from "@/lib/limits";
 
 function formatBytes(bytes: bigint) {
   const n = Number(bytes);
@@ -133,10 +134,10 @@ export default async function FilePage({
             <EmailShareForm slug={slug} />
           </div>
 
-          {file.owner?.planTier === "PRO" && file.owner.creatorLinks.length > 0 && (
+          {file.owner && file.owner.creatorLinks.length > 0 && (
             <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
               <span className="text-muted">From the creator:</span>
-              {file.owner.creatorLinks.map((cl) => (
+              {file.owner.creatorLinks.slice(0, maxCreatorLinksFor(file.owner.planTier)).map((cl) => (
                 <a
                   key={cl.id}
                   href={cl.url}

@@ -21,7 +21,7 @@ const rows: Row[] = [
   { label: "Multi-file bundling (.zip)", anon: true, free: true, pro: true },
   { label: "Link expiry", anon: "24h / 7d presets", free: "24h / 7d presets", pro: "Any custom duration" },
   { label: "Account & upload history", anon: false, free: true, pro: true },
-  { label: "Creator links on your files", anon: false, free: false, pro: true },
+  { label: "Creator links on your files", anon: false, free: "1 link", pro: "Up to 5 links" },
   { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
 ];
 

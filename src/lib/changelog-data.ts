@@ -13,6 +13,7 @@ export const changelog: ChangelogEntry[] = [
     highlights: [
       "Bluto Box is now live at blutobox.com",
       "Improved email reliability: verification, password reset, and notification emails now go out through a proper email service instead of a consumer email account, so they're less likely to get lost along the way",
+      "Free accounts can now add 1 creator link (Discord, socials, etc.) to their file pages. Pro accounts still get up to 5",
     ],
   },
   {

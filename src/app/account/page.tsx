@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FREE_INACTIVITY_DAYS } from "@/lib/cleanup";
-import { totalStorageBytesFor, MAX_REFERRAL_BONUS_BYTES } from "@/lib/limits";
+import { totalStorageBytesFor, maxCreatorLinksFor, MAX_REFERRAL_BONUS_BYTES } from "@/lib/limits";
 import { ReferralCard } from "./referral-card";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
@@ -139,16 +139,10 @@ export default async function AccountPage() {
             </div>
           }
           creator={
-            isPro ? (
-              <CreatorLinksForm initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))} />
-            ) : (
-              <div className="max-w-sm space-y-1">
-                <h2 className="text-sm font-semibold">Creator links</h2>
-                <p className="text-xs text-muted">
-                  Upgrade to Pro to show your Discord, socials, and support links on your file pages.
-                </p>
-              </div>
-            )
+            <CreatorLinksForm
+              initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))}
+              maxLinks={maxCreatorLinksFor(user.planTier)}
+            />
           }
         />
       </div>

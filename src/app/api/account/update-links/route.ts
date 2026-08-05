@@ -3,18 +3,11 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCurrentPlanTier } from "@/lib/plan";
+import { maxCreatorLinksFor } from "@/lib/limits";
 
-const MAX_LINKS = 5;
-
-const schema = z.object({
-  links: z
-    .array(
-      z.object({
-        label: z.string().trim().min(1).max(50),
-        url: z.string().trim().url().max(300),
-      })
-    )
-    .max(MAX_LINKS),
+const linkSchema = z.object({
+  label: z.string().trim().min(1).max(50),
+  url: z.string().trim().url().max(300),
 });
 
 export async function POST(req: Request) {
@@ -23,16 +16,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "You must be logged in" }, { status: 401 });
   }
 
-  const isPro = (await getCurrentPlanTier(session.user.id)) === "PRO";
-  if (!isPro) {
-    return NextResponse.json({ error: "This is a Pro feature" }, { status: 403 });
-  }
+  const planTier = (await getCurrentPlanTier(session.user.id)) ?? "FREE";
+  const maxLinks = maxCreatorLinksFor(planTier);
 
   const body = await req.json().catch(() => null);
-  const parsed = schema.safeParse(body);
+  const parsed = z.object({ links: z.array(linkSchema).max(maxLinks) }).safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: `Each link needs a name and a valid URL (max ${MAX_LINKS} links)` },
+      { error: `Each link needs a name and a valid URL (max ${maxLinks} link${maxLinks === 1 ? "" : "s"})` },
       { status: 400 }
     );
   }

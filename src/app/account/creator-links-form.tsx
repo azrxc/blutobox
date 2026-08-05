@@ -4,9 +4,7 @@ import { useState } from "react";
 
 type Link = { label: string; url: string };
 
-const MAX_LINKS = 5;
-
-export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
+export function CreatorLinksForm({ initialLinks, maxLinks }: { initialLinks: Link[]; maxLinks: number }) {
   const [links, setLinks] = useState<Link[]>(initialLinks.length > 0 ? initialLinks : [{ label: "", url: "" }]);
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -16,7 +14,7 @@ export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
   }
 
   function addLink() {
-    if (links.length >= MAX_LINKS) return;
+    if (links.length >= maxLinks) return;
     setLinks((prev) => [...prev, { label: "", url: "" }]);
   }
 
@@ -48,8 +46,9 @@ export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
       <div>
         <h2 className="text-sm font-semibold">Creator links</h2>
         <p className="mt-1 text-xs text-muted">
-          Add up to {MAX_LINKS} links: your Discord, socials, a Ko-fi/Patreon, your store, whatever. Shown on your
-          file pages so downloaders can find you.
+          Add up to {maxLinks} link{maxLinks === 1 ? "" : "s"}: your Discord, socials, a Ko-fi/Patreon, your store,
+          whatever. Shown on your file pages so downloaders can find you.
+          {maxLinks === 1 && " Upgrade to Pro for up to 5."}
         </p>
       </div>
       {status === "done" && (
@@ -90,7 +89,7 @@ export function CreatorLinksForm({ initialLinks }: { initialLinks: Link[] }) {
           </div>
         ))}
       </div>
-      {links.length < MAX_LINKS && (
+      {links.length < maxLinks && (
         <button
           type="button"
           onClick={addLink}

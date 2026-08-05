@@ -35,3 +35,10 @@ export function dailyDownloadBytesFor(planTier: "FREE" | "PRO" | null) {
 
 // Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
 export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
+
+export const FREE_MAX_CREATOR_LINKS = 1;
+export const PRO_MAX_CREATOR_LINKS = 5;
+
+export function maxCreatorLinksFor(planTier: "FREE" | "PRO") {
+  return planTier === "PRO" ? PRO_MAX_CREATOR_LINKS : FREE_MAX_CREATOR_LINKS;
+}
