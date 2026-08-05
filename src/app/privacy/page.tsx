@@ -1,11 +1,6 @@
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-2xl flex-1 space-y-6 px-6 py-16 text-sm leading-relaxed">
-      <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3.5 text-xs text-yellow-800 dark:text-yellow-300">
-        Have this reviewed by a lawyer before treating it as final. This covers the real mechanics of the
-        service but hasn&apos;t had professional legal review yet.
-      </div>
-
       <h1 className="text-2xl font-semibold tracking-tight">Privacy Policy</h1>
       <p className="text-muted">Last updated: August 5, 2026</p>
 
@@ -37,8 +32,12 @@ export default function PrivacyPage() {
         <h2 className="text-lg font-medium">3. Cookies</h2>
         <p>
           We use a small number of strictly necessary cookies: to keep you signed in, and to remember that
-          you&apos;ve entered the correct password for a protected link. We don&apos;t use advertising or
-          tracking cookies, and we don&apos;t sell your data to anyone.
+          you&apos;ve entered the correct password for a protected link. We may also show ads through Google
+          AdSense. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to
+          this site or other sites on the internet. You can opt out of personalized advertising by visiting{" "}
+          <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="underline">
+            Google Ads Settings
+          </a>. We don&apos;t sell your data to anyone.
         </p>
       </section>
 
@@ -53,6 +52,7 @@ export default function PrivacyPage() {
           <li>Upstash: rate limiting infrastructure</li>
           <li>Cloudflare: DNS, domain, and email routing</li>
           <li>VirusTotal: malware hash-reputation checks on uploaded files (only a hash is sent, not the file)</li>
+          <li>Google AdSense: displays ads on some pages and uses cookies for ad personalization</li>
         </ul>
       </section>
 

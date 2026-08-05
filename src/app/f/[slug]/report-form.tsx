@@ -26,7 +26,7 @@ export function ReportForm({ slug }: { slug: string }) {
   if (!open) {
     return (
       <button onClick={() => setOpen(true)} className="text-xs text-muted underline underline-offset-2">
-        Report this file (DMCA / abuse)
+        Report
       </button>
     );
   }

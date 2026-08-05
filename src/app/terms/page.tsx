@@ -1,11 +1,6 @@
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-2xl flex-1 space-y-6 px-6 py-16 text-sm leading-relaxed">
-      <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3.5 text-xs text-yellow-800 dark:text-yellow-300">
-        Have this reviewed by a lawyer before treating it as final. This covers the real mechanics of the
-        service but hasn&apos;t had professional legal review yet.
-      </div>
-
       <h1 className="text-2xl font-semibold tracking-tight">Terms of Service</h1>
       <p className="text-muted">Last updated: August 5, 2026</p>
 
@@ -64,12 +59,12 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-lg font-medium">5. Copyright / DMCA policy</h2>
+        <h2 className="text-lg font-medium">5. Copyright policy</h2>
         <p>
           If you believe content hosted on this service infringes your copyright, use the &quot;Report&quot; button
           on the file&apos;s page, or send a written notice to our designated agent at{" "}
           <a href="mailto:legal@blutobox.com" className="underline">legal@blutobox.com</a>. To be a valid notice
-          under the DMCA, it must include:
+          under U.S. copyright law, it must include:
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li>A physical or electronic signature of the copyright owner or their authorized representative</li>
