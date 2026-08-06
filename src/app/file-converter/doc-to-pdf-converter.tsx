@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
+import { ProBadge } from "../pro-badge";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -93,24 +94,27 @@ export function DocToPdfConverter() {
         engine. Only modern .docx files are supported, not the older .doc format.
       </p>
 
-      {isPro ? (
-        <div className="space-y-1.5">
-          <label className="flex justify-between text-xs text-muted" htmlFor="margin">
-            <span>Page margin</span>
-            <span>{margin}mm</span>
-          </label>
-          <input
-            id="margin"
-            type="range"
-            min={0}
-            max={40}
-            step={2}
-            value={margin}
-            onChange={(e) => setMargin(Number(e.target.value))}
-            className="w-full"
-          />
-        </div>
-      ) : (
+      <div className="space-y-1.5">
+        <label className="flex items-center justify-between text-xs text-muted" htmlFor="margin">
+          <span className="flex items-center gap-1.5">
+            Page margin
+            <ProBadge />
+          </span>
+          <span>{margin}mm</span>
+        </label>
+        <input
+          id="margin"
+          type="range"
+          min={0}
+          max={40}
+          step={2}
+          value={margin}
+          onChange={(e) => setMargin(Number(e.target.value))}
+          disabled={!isPro}
+          className="w-full disabled:opacity-50"
+        />
+      </div>
+      {!isPro && (
         <p className="text-xs text-muted">
           <Link href="/pricing" className="underline underline-offset-2">
             Upgrade to Pro

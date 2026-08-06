@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
+import { ProBadge } from "../pro-badge";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -108,17 +109,18 @@ export function PdfMergeConverter() {
         </ul>
       )}
 
-      {isPro ? (
-        <label className="flex items-center gap-2 text-xs text-muted">
-          <input
-            type="checkbox"
-            checked={addPageNumbers}
-            onChange={(e) => setAddPageNumbers(e.target.checked)}
-            className="h-3.5 w-3.5 rounded border-border"
-          />
-          Add page numbers to the footer
-        </label>
-      ) : (
+      <label className="flex items-center gap-2 text-xs text-muted">
+        <input
+          type="checkbox"
+          checked={addPageNumbers}
+          onChange={(e) => setAddPageNumbers(e.target.checked)}
+          disabled={!isPro}
+          className="h-3.5 w-3.5 rounded border-border disabled:opacity-50"
+        />
+        Add page numbers to the footer
+        <ProBadge />
+      </label>
+      {!isPro && (
         <p className="text-xs text-muted">
           <Link href="/pricing" className="underline underline-offset-2">
             Upgrade to Pro

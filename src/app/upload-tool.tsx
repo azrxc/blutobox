@@ -11,6 +11,7 @@ import { QrCodeButton } from "./qr-code-button";
 import { EmailShareForm } from "./email-share-form";
 import { SocialShareButtons } from "./social-share-buttons";
 import { takePendingUpload } from "@/lib/pending-upload";
+import { ProBadge } from "./pro-badge";
 
 const RISKY_EXTENSIONS = [".exe", ".scr", ".bat", ".cmd", ".com", ".msi", ".vbs", ".ps1"];
 
@@ -251,13 +252,14 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
               <option value="">Never</option>
               <option value="24">24 hours</option>
               <option value="168">7 days</option>
-              {isPro && <option value="custom">Custom…</option>}
+              <option value="custom">Custom… (Pro)</option>
             </select>
           </div>
-          {isPro && expiryChoice === "custom" && (
+          {expiryChoice === "custom" && (
             <div className="space-y-1">
-              <label className="text-xs text-muted" htmlFor="customHours">
+              <label className="flex items-center gap-1.5 text-xs text-muted" htmlFor="customHours">
                 Custom expiry (hours)
+                <ProBadge />
               </label>
               <input
                 id="customHours"
@@ -265,67 +267,67 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
                 min={1}
                 value={customHours}
                 onChange={(e) => setCustomHours(e.target.value)}
-                disabled={uploading}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                disabled={uploading || !isPro}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
               />
             </div>
           )}
 
-          {isPro ? (
-            <>
-              <div className="space-y-1">
-                <label className="text-xs text-muted" htmlFor="customSlug">
-                  Custom link (optional)
-                </label>
-                <div className="flex items-center overflow-hidden rounded-lg border border-border bg-background text-sm">
-                  <span className="shrink-0 pl-3 text-muted">blutobox.com/f/</span>
-                  <input
-                    id="customSlug"
-                    type="text"
-                    placeholder="your-link-name"
-                    value={customSlug}
-                    onChange={(e) => setCustomSlug(e.target.value.replace(/[^a-zA-Z0-9-]/g, ""))}
-                    disabled={uploading}
-                    maxLength={50}
-                    className="w-full bg-transparent px-1 py-2 outline-none"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted" htmlFor="linkPassword">
-                  Password-protect this link (optional)
-                </label>
-                <input
-                  id="linkPassword"
-                  type="text"
-                  value={linkPassword}
-                  onChange={(e) => setLinkPassword(e.target.value)}
-                  disabled={uploading}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted" htmlFor="maxDownloads">
-                  Limit total downloads (optional)
-                </label>
-                <input
-                  id="maxDownloads"
-                  type="number"
-                  min={1}
-                  placeholder="No limit"
-                  value={maxDownloads}
-                  onChange={(e) => setMaxDownloads(e.target.value)}
-                  disabled={uploading}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                />
-              </div>
-            </>
-          ) : (
+          <div className="space-y-1">
+            <label className="flex items-center gap-1.5 text-xs text-muted" htmlFor="customSlug">
+              Custom link (optional)
+              <ProBadge />
+            </label>
+            <div className="flex items-center overflow-hidden rounded-lg border border-border bg-background text-sm has-[:disabled]:opacity-50">
+              <span className="shrink-0 pl-3 text-muted">blutobox.com/f/</span>
+              <input
+                id="customSlug"
+                type="text"
+                placeholder="your-link-name"
+                value={customSlug}
+                onChange={(e) => setCustomSlug(e.target.value.replace(/[^a-zA-Z0-9-]/g, ""))}
+                disabled={uploading || !isPro}
+                maxLength={50}
+                className="w-full bg-transparent px-1 py-2 outline-none"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="flex items-center gap-1.5 text-xs text-muted" htmlFor="linkPassword">
+              Password-protect this link (optional)
+              <ProBadge />
+            </label>
+            <input
+              id="linkPassword"
+              type="text"
+              value={linkPassword}
+              onChange={(e) => setLinkPassword(e.target.value)}
+              disabled={uploading || !isPro}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="flex items-center gap-1.5 text-xs text-muted" htmlFor="maxDownloads">
+              Limit total downloads (optional)
+              <ProBadge />
+            </label>
+            <input
+              id="maxDownloads"
+              type="number"
+              min={1}
+              placeholder="No limit"
+              value={maxDownloads}
+              onChange={(e) => setMaxDownloads(e.target.value)}
+              disabled={uploading || !isPro}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
+            />
+          </div>
+          {!isPro && (
             <p className="text-xs text-muted">
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro
               </Link>{" "}
-              to password-protect links, set a custom expiry, limit total downloads, or pick a custom link name.
+              to unlock the options above.
             </p>
           )}
 

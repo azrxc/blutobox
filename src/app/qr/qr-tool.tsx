@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import QRCode from "qrcode";
 import { svgToPngDataUrl } from "../qr-to-png";
+import { ProBadge } from "../pro-badge";
 
 const DOWNLOAD_SIZE = 1024;
 
@@ -105,52 +106,54 @@ export function QrTool() {
 
       <details className="group rounded-xl border border-border bg-surface">
         <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium marker:content-none">
-          <span>Customize {!isPro && <span className="text-muted">(Pro)</span>}</span>
+          <span className="flex items-center gap-1.5">
+            Customize {!isPro && <ProBadge />}
+          </span>
           <span className="text-muted transition-transform group-open:rotate-180">⌄</span>
         </summary>
         <div className="space-y-3 border-t border-border p-4">
-          {isPro ? (
-            <>
-              <div className="flex gap-3">
-                <div className="flex-1 space-y-1">
-                  <label className="text-xs text-muted" htmlFor="darkColor">
-                    Foreground
-                  </label>
-                  <input
-                    id="darkColor"
-                    type="color"
-                    value={darkColor}
-                    onChange={(e) => setDarkColor(e.target.value)}
-                    className="h-9 w-full rounded-lg border border-border bg-background"
-                  />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <label className="text-xs text-muted" htmlFor="lightColor">
-                    Background
-                  </label>
-                  <input
-                    id="lightColor"
-                    type="color"
-                    value={lightColor}
-                    onChange={(e) => setLightColor(e.target.value)}
-                    className="h-9 w-full rounded-lg border border-border bg-background"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted" htmlFor="logo">
-                  Center logo (optional)
-                </label>
-                <input
-                  id="logo"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleLogoChange(e.target.files?.[0] ?? null)}
-                  className="w-full text-xs text-muted"
-                />
-              </div>
-            </>
-          ) : (
+          <div className="flex gap-3">
+            <div className="flex-1 space-y-1">
+              <label className="text-xs text-muted" htmlFor="darkColor">
+                Foreground
+              </label>
+              <input
+                id="darkColor"
+                type="color"
+                value={darkColor}
+                onChange={(e) => setDarkColor(e.target.value)}
+                disabled={!isPro}
+                className="h-9 w-full rounded-lg border border-border bg-background disabled:opacity-50"
+              />
+            </div>
+            <div className="flex-1 space-y-1">
+              <label className="text-xs text-muted" htmlFor="lightColor">
+                Background
+              </label>
+              <input
+                id="lightColor"
+                type="color"
+                value={lightColor}
+                onChange={(e) => setLightColor(e.target.value)}
+                disabled={!isPro}
+                className="h-9 w-full rounded-lg border border-border bg-background disabled:opacity-50"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-muted" htmlFor="logo">
+              Center logo (optional)
+            </label>
+            <input
+              id="logo"
+              type="file"
+              accept="image/*"
+              disabled={!isPro}
+              onChange={(e) => handleLogoChange(e.target.files?.[0] ?? null)}
+              className="w-full text-xs text-muted disabled:opacity-50"
+            />
+          </div>
+          {!isPro && (
             <p className="text-xs text-muted">
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro

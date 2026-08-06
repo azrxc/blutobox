@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
+import { ProBadge } from "../pro-badge";
 
 const FREE_MAX_DURATION_SECONDS = 10;
 const PRO_MAX_DURATION_SECONDS = 60;
@@ -158,12 +159,11 @@ export function VideoToGifConverter() {
           className="w-full"
         />
         {!isPro && (
-          <p className="text-xs text-muted">
-            Free is capped at {FREE_MAX_DURATION_SECONDS}s.{" "}
+          <p className="flex items-center gap-1.5 text-xs text-muted">
+            <ProBadge /> up to {PRO_MAX_DURATION_SECONDS}s at {PRO_MAX_FPS}fps.{" "}
             <Link href="/pricing" className="underline underline-offset-2">
-              Upgrade to Pro
-            </Link>{" "}
-            for up to {PRO_MAX_DURATION_SECONDS}s and {PRO_MAX_FPS}fps.
+              Upgrade
+            </Link>
           </p>
         )}
       </div>

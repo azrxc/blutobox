@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { zipFiles } from "@/lib/zip-files";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
+import { ProBadge } from "../pro-badge";
 
 const FREE_MAX_BATCH = 5;
 const PRO_MAX_BATCH = 30;
@@ -131,22 +132,23 @@ export function ImageCompressor() {
         />
       </div>
 
-      {isPro ? (
-        <div className="space-y-1">
-          <label className="text-xs text-muted" htmlFor="exactDimension">
-            Max width/height in pixels (optional)
-          </label>
-          <input
-            id="exactDimension"
-            type="number"
-            min={1}
-            placeholder="No resize"
-            value={exactDimension}
-            onChange={(e) => setExactDimension(e.target.value)}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-          />
-        </div>
-      ) : (
+      <div className="space-y-1">
+        <label className="flex items-center gap-1.5 text-xs text-muted" htmlFor="exactDimension">
+          Max width/height in pixels (optional)
+          <ProBadge />
+        </label>
+        <input
+          id="exactDimension"
+          type="number"
+          min={1}
+          placeholder="No resize"
+          value={exactDimension}
+          onChange={(e) => setExactDimension(e.target.value)}
+          disabled={!isPro}
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:opacity-50"
+        />
+      </div>
+      {!isPro && (
         <p className="text-xs text-muted">
           <Link href="/pricing" className="underline underline-offset-2">
             Upgrade to Pro

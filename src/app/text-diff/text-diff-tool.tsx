@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { diffWords, diffLines, type Change } from "diff";
 import { UploadToBlutoButton } from "../file-converter/upload-to-bluto-button";
+import { ProBadge } from "../pro-badge";
 
 type Mode = "words" | "lines";
 
@@ -148,14 +149,15 @@ export function TextDiffTool() {
             )}
           </div>
 
-          {isPro ? (
-            <button
-              onClick={handleExport}
-              className="w-full rounded-full border border-border py-2.5 text-sm font-medium transition-colors hover:bg-background"
-            >
-              Export as HTML
-            </button>
-          ) : (
+          <button
+            onClick={handleExport}
+            disabled={!isPro}
+            className="flex w-full items-center justify-center gap-1.5 rounded-full border border-border py-2.5 text-sm font-medium transition-colors hover:bg-background disabled:opacity-50 disabled:hover:bg-transparent"
+          >
+            Export as HTML
+            {!isPro && <ProBadge />}
+          </button>
+          {!isPro && (
             <p className="text-center text-xs text-muted">
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro
