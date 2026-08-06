@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { zipFiles } from "@/lib/zip-files";
 
-type Format = "png" | "jpeg" | "webp";
+export type Format = "png" | "jpeg" | "webp";
 
 const FORMAT_EXT: Record<Format, string> = { png: "png", jpeg: "jpg", webp: "webp" };
 
@@ -62,9 +62,9 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function ImageFormatConverter() {
+export function ImageFormatConverter({ initialFormat = "png" }: { initialFormat?: Format }) {
   const [files, setFiles] = useState<File[]>([]);
-  const [format, setFormat] = useState<Format>("png");
+  const [format, setFormat] = useState<Format>(initialFormat);
   const [quality, setQuality] = useState(0.9);
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
