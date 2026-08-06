@@ -99,6 +99,9 @@ model File {
   createdAt     DateTime   @default(now())
   lastAccessedAt DateTime  @default(now())
   deletionWarningSentAt DateTime?
+  notifyOnDownload   Boolean   @default(false)
+  downloadNotifiedAt DateTime?
+  maxDownloads       Int?
 
   shareLinks    ShareLink[]
   reports       Report[]

@@ -9,6 +9,7 @@ import { checkDownloadQuota, consumeDownloadQuota } from "@/lib/download-quota";
 import { createStreamToken } from "@/lib/stream-token";
 import { getCurrentPlanTier } from "@/lib/plan";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
+import { sendDownloadNotificationEmail } from "@/lib/email";
 
 export async function GET(
   req: Request,
@@ -17,7 +18,7 @@ export async function GET(
   const { slug } = await params;
   const link = await prisma.shareLink.findUnique({
     where: { slug },
-    include: { file: true },
+    include: { file: { include: { owner: { select: { email: true } } } } },
   });
 
   if (!link || link.file.status !== "ACTIVE") {
@@ -25,6 +26,9 @@ export async function GET(
   }
   if (link.expiresAt && link.expiresAt < new Date()) {
     return NextResponse.json({ error: "This link has expired" }, { status: 410 });
+  }
+  if (link.file.maxDownloads !== null && link.file.downloadCount >= link.file.maxDownloads) {
+    return NextResponse.json({ error: "This link has reached its download limit" }, { status: 410 });
   }
   if (link.file.isNsfw && isAgeVerificationRestrictedRegion(req.headers)) {
     return NextResponse.json(
@@ -62,6 +66,18 @@ export async function GET(
     where: { id: link.file.id },
     data: { downloadCount: { increment: 1 }, lastAccessedAt: new Date(), deletionWarningSentAt: null },
   });
+
+  if (link.file.notifyOnDownload && link.file.owner?.email) {
+    // Atomically claim the right to send - only the first request that flips
+    // downloadNotifiedAt from null wins, so concurrent downloads can't double-send.
+    const claimed = await prisma.file.updateMany({
+      where: { id: link.file.id, downloadNotifiedAt: null },
+      data: { downloadNotifiedAt: new Date() },
+    });
+    if (claimed.count === 1) {
+      sendDownloadNotificationEmail(link.file.owner.email, link.file.filename, slug).catch(() => {});
+    }
+  }
 
   const url = await getSignedDownloadUrl(link.file.b2Key, {
     filename: link.file.filename,

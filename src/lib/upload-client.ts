@@ -4,6 +4,8 @@ export type UploadOptions = {
   isNsfw: boolean;
   linkPassword?: string;
   expiresInHours?: number;
+  notifyOnDownload?: boolean;
+  maxDownloads?: number;
 };
 
 export class UploadCancelledError extends Error {
@@ -134,6 +136,8 @@ export async function uploadFile(
     isNsfw: options.isNsfw,
     linkPassword: options.linkPassword || undefined,
     expiresInHours: options.expiresInHours,
+    notifyOnDownload: options.notifyOnDownload ?? false,
+    maxDownloads: options.maxDownloads,
   };
 
   try {

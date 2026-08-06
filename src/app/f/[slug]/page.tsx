@@ -91,6 +91,14 @@ export default async function FilePage({
     );
   }
 
+  if (link.file.maxDownloads !== null && link.file.downloadCount >= link.file.maxDownloads) {
+    return (
+      <main className="flex flex-1 items-center justify-center px-6 py-16">
+        <p className="text-sm text-muted">This link has reached its download limit.</p>
+      </main>
+    );
+  }
+
   if (link.passwordHash) {
     const cookieStore = await cookies();
     const token = cookieStore.get(unlockCookieName(slug))?.value;

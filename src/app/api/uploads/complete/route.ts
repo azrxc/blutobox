@@ -26,6 +26,8 @@ const completeSchema = z.object({
   linkPassword: z.string().min(1).max(100).optional(),
   expiresInHours: z.number().int().positive().max(24 * 365).optional(),
   sha256: z.string().regex(/^[a-f0-9]{64}$/i).optional(),
+  notifyOnDownload: z.boolean().default(false),
+  maxDownloads: z.number().int().positive().max(1_000_000).optional(),
 });
 
 export async function POST(req: Request) {
@@ -34,7 +36,20 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid completion request" }, { status: 400 });
   }
-  const { key, filename, size, mimeType, isNsfw, uploadId, parts, linkPassword, expiresInHours, sha256 } = parsed.data;
+  const {
+    key,
+    filename,
+    size,
+    mimeType,
+    isNsfw,
+    uploadId,
+    parts,
+    linkPassword,
+    expiresInHours,
+    sha256,
+    notifyOnDownload,
+    maxDownloads,
+  } = parsed.data;
 
   if (sha256 && (await isKnownMalicious(sha256))) {
     const s3 = getS3Client();
@@ -66,6 +81,7 @@ export async function POST(req: Request) {
 
   const session = await auth();
   const ip = getClientIp(req);
+  const isPro = (await getCurrentPlanTier(session?.user?.id)) === "PRO";
 
   const file = await prisma.file.create({
     data: {
@@ -76,10 +92,11 @@ export async function POST(req: Request) {
       mimeType,
       b2Key: key,
       isNsfw,
+      // Only meaningful with an account to notify - anonymous uploads have no email to send to.
+      notifyOnDownload: notifyOnDownload && Boolean(session?.user?.id),
+      maxDownloads: isPro ? maxDownloads : undefined,
     },
   });
-
-  const isPro = (await getCurrentPlanTier(session?.user?.id)) === "PRO";
   const passwordHash = isPro && linkPassword ? await bcrypt.hash(linkPassword, 12) : null;
   const expiryAllowed = isPro || (expiresInHours !== undefined && (FREE_ALLOWED_EXPIRY_HOURS as number[]).includes(expiresInHours));
   const expiresAt = expiryAllowed && expiresInHours

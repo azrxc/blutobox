@@ -49,6 +49,28 @@ export async function sendDeletionWarningEmail(email: string, filename: string, 
   }
 }
 
+export async function sendDownloadNotificationEmail(email: string, filename: string, slug: string) {
+  const fileUrl = `${process.env.NEXTAUTH_URL}/f/${slug}`;
+  const safeFilename = escapeHtml(filename);
+
+  const resend = getResend();
+  if (!resend) {
+    console.log(`[dev] Download notification for ${email}: "${filename}" (${fileUrl})`);
+    return;
+  }
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: `Your file "${filename}" was just downloaded`,
+    html: `<p>Someone just downloaded <strong>${safeFilename}</strong>.</p><p><a href="${fileUrl}">${fileUrl}</a></p><p>You'll only get this once per file, for the first download.</p>`,
+  });
+  if (error) {
+    console.error(`[email] Failed to send download notification to ${email}:`, error);
+    throw new Error("Failed to send download notification email");
+  }
+}
+
 export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`;
 

@@ -45,6 +45,8 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
   const [linkPassword, setLinkPassword] = useState("");
   const [expiryChoice, setExpiryChoice] = useState("");
   const [customHours, setCustomHours] = useState("");
+  const [notifyOnDownload, setNotifyOnDownload] = useState(false);
+  const [maxDownloads, setMaxDownloads] = useState("");
   const [zipping, setZipping] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -80,6 +82,8 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
           isNsfw,
           linkPassword: isPro ? linkPassword : undefined,
           expiresInHours: resolveExpiryHours(),
+          notifyOnDownload: Boolean(session?.user) && notifyOnDownload,
+          maxDownloads: isPro && maxDownloads ? Number(maxDownloads) : undefined,
         },
         setProgress,
         controller.signal
@@ -113,6 +117,8 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
     setLinkPassword("");
     setExpiryChoice("");
     setCustomHours("");
+    setNotifyOnDownload(false);
+    setMaxDownloads("");
   }
 
   if (shareSlug) {
@@ -257,26 +263,56 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
           )}
 
           {isPro ? (
-            <div className="space-y-1">
-              <label className="text-xs text-muted" htmlFor="linkPassword">
-                Password-protect this link (optional)
-              </label>
-              <input
-                id="linkPassword"
-                type="text"
-                value={linkPassword}
-                onChange={(e) => setLinkPassword(e.target.value)}
-                disabled={uploading}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              />
-            </div>
+            <>
+              <div className="space-y-1">
+                <label className="text-xs text-muted" htmlFor="linkPassword">
+                  Password-protect this link (optional)
+                </label>
+                <input
+                  id="linkPassword"
+                  type="text"
+                  value={linkPassword}
+                  onChange={(e) => setLinkPassword(e.target.value)}
+                  disabled={uploading}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted" htmlFor="maxDownloads">
+                  Limit total downloads (optional)
+                </label>
+                <input
+                  id="maxDownloads"
+                  type="number"
+                  min={1}
+                  placeholder="No limit"
+                  value={maxDownloads}
+                  onChange={(e) => setMaxDownloads(e.target.value)}
+                  disabled={uploading}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+            </>
           ) : (
             <p className="text-xs text-muted">
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro
               </Link>{" "}
-              to password-protect links or set a custom expiry.
+              to password-protect links, set a custom expiry, or limit total downloads.
             </p>
+          )}
+
+          {session?.user && (
+            <label className="flex items-center gap-2 text-xs text-muted">
+              <input
+                type="checkbox"
+                checked={notifyOnDownload}
+                onChange={(e) => setNotifyOnDownload(e.target.checked)}
+                disabled={uploading}
+                className="h-3.5 w-3.5 rounded border-border"
+              />
+              Email me when this file is first downloaded
+            </label>
           )}
         </div>
       </details>

@@ -18,6 +18,8 @@ const rows: Row[] = [
   { label: "Upload rate limit", anon: "10/hour per IP", free: "-", pro: "-" },
   { label: "Inline preview & streaming", anon: true, free: true, pro: true },
   { label: "Password-protected links", anon: false, free: false, pro: true },
+  { label: "Limit total downloads per link", anon: false, free: false, pro: true },
+  { label: "Email me on first download", anon: false, free: true, pro: true },
   { label: "Multi-file bundling (.zip)", anon: true, free: true, pro: true },
   { label: "Link expiry", anon: "24h / 7d presets", free: "24h / 7d presets", pro: "Any custom duration" },
   { label: "Account & upload history", anon: false, free: true, pro: true },

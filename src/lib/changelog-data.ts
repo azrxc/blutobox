@@ -23,6 +23,8 @@ export const changelog: ChangelogEntry[] = [
       "Three new tools in the File converter: image compressor, video-to-GIF converter, and a duplicate-file finder",
       "New standalone Text diff tool: paste two blocks of text and see exactly what changed",
       "You can now upload directly from the homepage instead of having to click through to a separate page first",
+      "New upload option: get an email the first time someone downloads your file",
+      "New Pro upload option: limit a link to a set number of total downloads, then it stops working",
     ],
   },
   {
