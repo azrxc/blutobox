@@ -16,6 +16,7 @@ import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 import { maxCreatorLinksFor } from "@/lib/limits";
 import { auth } from "@/lib/auth";
 import { BookmarkButton } from "./bookmark-button";
+import { SocialShareButtons } from "../../social-share-buttons";
 
 function formatBytes(bytes: bigint) {
   const n = Number(bytes);
@@ -170,6 +171,7 @@ export default async function FilePage({
             <DownloadButton slug={slug} filename={file.filename} sizeBytes={Number(file.sizeBytes)} />
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
+            <SocialShareButtons url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             {session?.user && <BookmarkButton slug={slug} initialBookmarked={isBookmarked} />}
             <EmailShareForm slug={slug} />
           </div>

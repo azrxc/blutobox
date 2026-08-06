@@ -27,6 +27,7 @@ export const changelog: ChangelogEntry[] = [
       "New Pro upload option: limit a link to a set number of total downloads, then it stops working",
       "New Pro upload option: pick your own custom link name instead of a random one",
       "Dedicated pages for popular conversions (PNG to WebP, merge PDF, video to GIF, and more), linked from the File converter",
+      "New one-click share buttons for WhatsApp and Telegram on file pages",
     ],
   },
   {

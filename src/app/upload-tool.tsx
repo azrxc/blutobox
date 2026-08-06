@@ -9,6 +9,7 @@ import { CopyLinkField } from "./copy-link-field";
 import { StorageUsageBar } from "./storage-usage-bar";
 import { QrCodeButton } from "./qr-code-button";
 import { EmailShareForm } from "./email-share-form";
+import { SocialShareButtons } from "./social-share-buttons";
 
 const RISKY_EXTENSIONS = [".exe", ".scr", ".bat", ".cmd", ".com", ".msi", ".vbs", ".ps1"];
 
@@ -153,6 +154,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
             View file
           </Link>
           <QrCodeButton url={shareUrl} />
+          <SocialShareButtons url={shareUrl} />
           <button
             onClick={resetForm}
             className="rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-surface"
