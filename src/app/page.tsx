@@ -4,6 +4,13 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LogoutButton } from "./logout-button";
 import { WelcomeToast } from "./welcome-toast";
+import { UploadTool } from "./upload-tool";
+import { ANON_MAX_UPLOAD_BYTES, FREE_MAX_UPLOAD_BYTES } from "@/lib/limits";
+
+function formatGB(bytes: number) {
+  const gb = bytes / (1024 * 1024 * 1024);
+  return gb >= 1 ? `${gb.toFixed(0)}GB` : `${Math.round(bytes / (1024 * 1024))}MB`;
+}
 
 // Don't show the trust-stats line until there's real traction to point to.
 // A tiny number undercuts trust more than showing nothing at all.
@@ -48,21 +55,20 @@ export default async function Home() {
         <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">
           A fast, simple file host. No clutter, no bloat, just a link you can send anywhere.
         </p>
+        <p className="mt-2 text-xs text-muted">
+          Up to {formatGB(ANON_MAX_UPLOAD_BYTES)} with no account, {formatGB(FREE_MAX_UPLOAD_BYTES)} with a free one
+        </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/upload"
-            className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
-          >
-            Upload a file
-          </Link>
-          <Link
-            href="/pricing"
-            className="rounded-full border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-surface"
-          >
-            See pricing
-          </Link>
+        <div className="mt-8 flex w-full justify-center">
+          <UploadTool compact />
         </div>
+
+        <Link
+          href="/pricing"
+          className="mt-4 text-xs text-muted underline underline-offset-2 transition-colors hover:text-foreground"
+        >
+          See pricing
+        </Link>
 
         {showTrustStats && (
           <p className="mt-6 text-xs text-muted">
