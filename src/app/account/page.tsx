@@ -172,7 +172,7 @@ export default async function AccountPage() {
           creator={
             <CreatorLinksForm
               initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))}
-              maxLinks={maxCreatorLinksFor(user.planTier)}
+              maxLinks={maxCreatorLinksFor(user.planTier, user.bonusCreatorLinks)}
             />
           }
         />

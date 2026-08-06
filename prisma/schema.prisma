@@ -44,6 +44,7 @@ model User {
   referredBy        User?    @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
   referrals         User[]   @relation("Referrals")
   bonusStorageBytes BigInt   @default(0)
+  bonusCreatorLinks Int      @default(0)
 
   files           File[]
   subscription    Subscription?

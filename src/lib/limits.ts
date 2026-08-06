@@ -14,6 +14,12 @@ export function totalStorageBytesFor(planTier: "FREE" | "PRO", bonusBytes: numbe
 export const REFERRAL_BONUS_BYTES = 1 * 1024 * 1024 * 1024; // 1GB per successful referral
 export const MAX_REFERRAL_BONUS_BYTES = 10 * 1024 * 1024 * 1024; // cap: 10 referrals worth
 
+// Both sides also get +1 creator link slot per referral, permanent, no subscription or
+// trial involved (deliberately not a temporary Pro grant - see the earlier reasoning
+// about trial abuse and planTier being a single source of truth driven by Stripe).
+// Capped at Pro's own limit, referrals let Free reach Pro's level here, not exceed it.
+export const MAX_REFERRAL_CREATOR_LINK_BONUS = 4;
+
 export const MULTIPART_THRESHOLD_BYTES = 50 * 1024 * 1024; // 50MB
 export const MULTIPART_PART_SIZE_BYTES = 25 * 1024 * 1024; // 25MB
 
@@ -39,8 +45,9 @@ export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
 export const FREE_MAX_CREATOR_LINKS = 1;
 export const PRO_MAX_CREATOR_LINKS = 5;
 
-export function maxCreatorLinksFor(planTier: "FREE" | "PRO") {
-  return planTier === "PRO" ? PRO_MAX_CREATOR_LINKS : FREE_MAX_CREATOR_LINKS;
+export function maxCreatorLinksFor(planTier: "FREE" | "PRO", bonusCreatorLinks = 0) {
+  if (planTier === "PRO") return PRO_MAX_CREATOR_LINKS;
+  return Math.min(FREE_MAX_CREATOR_LINKS + bonusCreatorLinks, PRO_MAX_CREATOR_LINKS);
 }
 
 export const FREE_MAX_BOOKMARKS = 10;

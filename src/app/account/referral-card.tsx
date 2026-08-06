@@ -25,10 +25,11 @@ export function ReferralCard({
 
   return (
     <div>
-      <h2 className="mb-3 text-sm font-semibold">Invite friends, get free storage</h2>
+      <h2 className="mb-3 text-sm font-semibold">Invite friends, get free perks</h2>
       <div className="space-y-3 rounded-2xl border border-border bg-surface p-5 text-sm">
         <p className="text-muted">
-          Share your link. When someone signs up and verifies their email, you both get +1GB of storage.
+          Share your link. When someone signs up and verifies their email, you both get +1GB of storage and +1
+          creator link slot, permanently, no subscription needed.
         </p>
         <div className="flex items-center gap-2">
           <input

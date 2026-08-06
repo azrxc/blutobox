@@ -1,26 +1,32 @@
 import { prisma } from "@/lib/prisma";
-import { REFERRAL_BONUS_BYTES, MAX_REFERRAL_BONUS_BYTES } from "@/lib/limits";
+import { REFERRAL_BONUS_BYTES, MAX_REFERRAL_BONUS_BYTES, MAX_REFERRAL_CREATOR_LINK_BONUS } from "@/lib/limits";
 
 export async function grantReferralBonus(referrerId: string, newUserId: string) {
   const [referrer, newUser] = await Promise.all([
-    prisma.user.findUnique({ where: { id: referrerId }, select: { bonusStorageBytes: true } }),
-    prisma.user.findUnique({ where: { id: newUserId }, select: { bonusStorageBytes: true } }),
+    prisma.user.findUnique({ where: { id: referrerId }, select: { bonusStorageBytes: true, bonusCreatorLinks: true } }),
+    prisma.user.findUnique({ where: { id: newUserId }, select: { bonusStorageBytes: true, bonusCreatorLinks: true } }),
   ]);
   if (!referrer || !newUser) return;
 
-  const cap = BigInt(MAX_REFERRAL_BONUS_BYTES);
-  const bonus = BigInt(REFERRAL_BONUS_BYTES);
-  const referrerNew = referrer.bonusStorageBytes + bonus;
-  const newUserNew = newUser.bonusStorageBytes + bonus;
+  const storageCap = BigInt(MAX_REFERRAL_BONUS_BYTES);
+  const storageBonus = BigInt(REFERRAL_BONUS_BYTES);
+  const referrerNewStorage = referrer.bonusStorageBytes + storageBonus;
+  const newUserNewStorage = newUser.bonusStorageBytes + storageBonus;
 
   await prisma.$transaction([
     prisma.user.update({
       where: { id: referrerId },
-      data: { bonusStorageBytes: referrerNew > cap ? cap : referrerNew },
+      data: {
+        bonusStorageBytes: referrerNewStorage > storageCap ? storageCap : referrerNewStorage,
+        bonusCreatorLinks: Math.min(referrer.bonusCreatorLinks + 1, MAX_REFERRAL_CREATOR_LINK_BONUS),
+      },
     }),
     prisma.user.update({
       where: { id: newUserId },
-      data: { bonusStorageBytes: newUserNew > cap ? cap : newUserNew },
+      data: {
+        bonusStorageBytes: newUserNewStorage > storageCap ? storageCap : newUserNewStorage,
+        bonusCreatorLinks: Math.min(newUser.bonusCreatorLinks + 1, MAX_REFERRAL_CREATOR_LINK_BONUS),
+      },
     }),
   ]);
 }

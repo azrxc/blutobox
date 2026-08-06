@@ -16,8 +16,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "You must be logged in" }, { status: 401 });
   }
 
-  const planTier = (await getCurrentPlanTier(session.user.id)) ?? "FREE";
-  const maxLinks = maxCreatorLinksFor(planTier);
+  const [planTier, user] = await Promise.all([
+    getCurrentPlanTier(session.user.id).then((t) => t ?? "FREE"),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { bonusCreatorLinks: true } }),
+  ]);
+  const maxLinks = maxCreatorLinksFor(planTier, user?.bonusCreatorLinks ?? 0);
 
   const body = await req.json().catch(() => null);
   const parsed = z.object({ links: z.array(linkSchema).max(maxLinks) }).safeParse(body);

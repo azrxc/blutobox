@@ -33,6 +33,7 @@ const rows: Row[] = [
   { label: "Exact image resize", anon: false, free: false, pro: true },
   { label: "PDF merge page numbers", anon: false, free: false, pro: true },
   { label: "DOCX to PDF custom margins", anon: false, free: false, pro: true },
+  { label: "Text diff HTML export", anon: false, free: false, pro: true },
 ];
 
 const gridCols = "grid-cols-[1fr_4.5rem_4.5rem_4.5rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";

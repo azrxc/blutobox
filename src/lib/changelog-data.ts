@@ -37,6 +37,8 @@ export const changelog: ChangelogEntry[] = [
       "PDF merge: Pro can now add page numbers to the footer",
       "DOCX to PDF: Pro can now set a custom page margin",
       "New daily download-count limit for anonymous downloads (50/day per network) to match the upload-side limits",
+      "Text diff tool: Pro can now export a comparison as an HTML file",
+      "Referrals now also give both sides +1 creator link slot (on top of the existing +1GB storage), permanently, no subscription needed",
     ],
   },
   {

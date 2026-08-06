@@ -144,7 +144,7 @@ export default async function FilePage({
             <p className="mt-1 text-xs text-muted">
               From the creator:{" "}
               {file.owner.creatorLinks
-                .slice(0, maxCreatorLinksFor(file.owner.planTier))
+                .slice(0, maxCreatorLinksFor(file.owner.planTier, file.owner.bonusCreatorLinks))
                 .map((cl, i, arr) => (
                   <span key={cl.id}>
                     <a
