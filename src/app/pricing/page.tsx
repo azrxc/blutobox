@@ -27,6 +27,7 @@ const rows: Row[] = [
   { label: "Creator links on your files", anon: false, free: "1 link", pro: "Up to 5 links" },
   { label: "Save other people's files to your account", anon: false, free: "Up to 10", pro: "Unlimited" },
   { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
+  { label: "QR code colors & logo", anon: false, free: false, pro: true },
 ];
 
 const gridCols = "grid-cols-[1fr_4.5rem_4.5rem_4.5rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";

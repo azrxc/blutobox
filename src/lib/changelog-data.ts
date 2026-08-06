@@ -29,6 +29,7 @@ export const changelog: ChangelogEntry[] = [
       "Dedicated pages for popular conversions (PNG to WebP, merge PDF, video to GIF, and more), linked from the File converter",
       "New one-click share buttons for WhatsApp and Telegram on file pages",
       "New daily upload limits for accounts (50/day Free, 200/day Pro) to keep the service healthy for everyone",
+      "New Pro perk: customize QR codes with your own colors and a center logo",
     ],
   },
   {
