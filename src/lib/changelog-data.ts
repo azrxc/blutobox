@@ -30,6 +30,13 @@ export const changelog: ChangelogEntry[] = [
       "New one-click share buttons for WhatsApp and Telegram on file pages",
       "New daily upload limits for accounts (50/day Free, 200/day Pro) to keep the service healthy for everyone",
       "New Pro perk: customize QR codes with your own colors and a center logo",
+      "New CLI tool for uploading from the command line, see the cli/ folder in the repo",
+      "Every file converter tool now has an 'Upload & share this on Bluto Box' button after it finishes",
+      "Video-to-GIF: Free can now convert up to 10s at 20fps, Pro up to 60s at 30fps",
+      "Image compressor: Pro can now resize to an exact pixel dimension and compress up to 30 images at once (Free stays at 5)",
+      "PDF merge: Pro can now add page numbers to the footer",
+      "DOCX to PDF: Pro can now set a custom page margin",
+      "New daily download-count limit for anonymous downloads (50/day per network) to match the upload-side limits",
     ],
   },
   {

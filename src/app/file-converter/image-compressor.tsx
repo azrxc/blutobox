@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { zipFiles } from "@/lib/zip-files";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
+
+const FREE_MAX_BATCH = 5;
+const PRO_MAX_BATCH = 30;
 
 function formatBytes(bytes: number) {
   const units = ["B", "KB", "MB", "GB"];
@@ -28,22 +34,30 @@ function downloadBlob(blob: Blob, filename: string) {
 type Result = { name: string; originalBytes: number; compressedBytes: number; blob: Blob };
 
 export function ImageCompressor() {
+  const { data: session } = useSession();
+  const isPro = session?.user?.planTier === "PRO";
+  const maxBatch = isPro ? PRO_MAX_BATCH : FREE_MAX_BATCH;
+
   const [files, setFiles] = useState<File[]>([]);
   const [maxSizeMB, setMaxSizeMB] = useState(1);
+  const [exactDimension, setExactDimension] = useState("");
   const [compressing, setCompressing] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [downloadResult, setDownloadResult] = useState<{ blob: Blob; filename: string } | null>(null);
 
   async function handleCompress() {
     if (files.length === 0) return;
     setCompressing(true);
     setError(null);
     setResults([]);
+    setDownloadResult(null);
     try {
       const imageCompression = (await import("browser-image-compression")).default;
       const compressed: Result[] = [];
+      const maxWidthOrHeight = isPro && exactDimension ? Number(exactDimension) : undefined;
       for (const file of files) {
-        const output = await imageCompression(file, { maxSizeMB, useWebWorker: true });
+        const output = await imageCompression(file, { maxSizeMB, maxWidthOrHeight, useWebWorker: true });
         compressed.push({
           name: file.name,
           originalBytes: file.size,
@@ -62,10 +76,12 @@ export function ImageCompressor() {
   async function handleDownload() {
     if (results.length === 1) {
       downloadBlob(results[0].blob, results[0].name);
+      setDownloadResult({ blob: results[0].blob, filename: results[0].name });
       return;
     }
     const zipped = await zipFiles(results.map((r) => new File([r.blob], r.name, { type: r.blob.type })));
     downloadBlob(zipped, "compressed-images.zip");
+    setDownloadResult({ blob: zipped, filename: "compressed-images.zip" });
   }
 
   return (
@@ -80,12 +96,23 @@ export function ImageCompressor() {
           accept="image/*"
           multiple
           onChange={(e) => {
-            setFiles(Array.from(e.target.files ?? []));
+            const chosen = Array.from(e.target.files ?? []);
+            setFiles(chosen.slice(0, maxBatch));
             setResults([]);
+            setDownloadResult(null);
           }}
           className="hidden"
         />
       </label>
+      {files.length >= maxBatch && !isPro && (
+        <p className="text-xs text-muted">
+          Free is limited to {FREE_MAX_BATCH} images at once.{" "}
+          <Link href="/pricing" className="underline underline-offset-2">
+            Upgrade to Pro
+          </Link>{" "}
+          for up to {PRO_MAX_BATCH}.
+        </p>
+      )}
 
       <div className="space-y-1.5">
         <label className="flex justify-between text-xs text-muted" htmlFor="maxSize">
@@ -103,6 +130,30 @@ export function ImageCompressor() {
           className="w-full"
         />
       </div>
+
+      {isPro ? (
+        <div className="space-y-1">
+          <label className="text-xs text-muted" htmlFor="exactDimension">
+            Max width/height in pixels (optional)
+          </label>
+          <input
+            id="exactDimension"
+            type="number"
+            min={1}
+            placeholder="No resize"
+            value={exactDimension}
+            onChange={(e) => setExactDimension(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+          />
+        </div>
+      ) : (
+        <p className="text-xs text-muted">
+          <Link href="/pricing" className="underline underline-offset-2">
+            Upgrade to Pro
+          </Link>{" "}
+          for exact pixel-dimension resizing and batches of up to {PRO_MAX_BATCH} images.
+        </p>
+      )}
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
@@ -132,6 +183,7 @@ export function ImageCompressor() {
           >
             Download {results.length > 1 ? "all (.zip)" : ""}
           </button>
+          {downloadResult && <UploadToBlutoButton blob={downloadResult.blob} filename={downloadResult.filename} />}
         </div>
       )}
     </div>

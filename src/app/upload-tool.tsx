@@ -10,6 +10,7 @@ import { StorageUsageBar } from "./storage-usage-bar";
 import { QrCodeButton } from "./qr-code-button";
 import { EmailShareForm } from "./email-share-form";
 import { SocialShareButtons } from "./social-share-buttons";
+import { takePendingUpload } from "@/lib/pending-upload";
 
 const RISKY_EXTENSIONS = [".exe", ".scr", ".bat", ".cmd", ".com", ".msi", ".vbs", ".ps1"];
 
@@ -40,7 +41,10 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>(() => {
+    const pending = typeof window !== "undefined" ? takePendingUpload() : null;
+    return pending ? [pending] : [];
+  });
   const [showMatureCheck, setShowMatureCheck] = useState(false);
   const [showMatureInfo, setShowMatureInfo] = useState(false);
   const [linkPassword, setLinkPassword] = useState("");

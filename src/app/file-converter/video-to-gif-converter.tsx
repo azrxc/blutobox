@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
-const MAX_DURATION_SECONDS = 15;
+const FREE_MAX_DURATION_SECONDS = 10;
+const PRO_MAX_DURATION_SECONDS = 60;
+const FREE_MAX_FPS = 20;
+const PRO_MAX_FPS = 30;
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -82,21 +88,35 @@ function renameExt(filename: string) {
 }
 
 export function VideoToGifConverter() {
+  const { data: session } = useSession();
+  const isPro = session?.user?.planTier === "PRO";
+  const maxDuration = isPro ? PRO_MAX_DURATION_SECONDS : FREE_MAX_DURATION_SECONDS;
+  const maxFps = isPro ? PRO_MAX_FPS : FREE_MAX_FPS;
+
   const [file, setFile] = useState<File | null>(null);
   const [fps, setFps] = useState(10);
   const [duration, setDuration] = useState(4);
   const [converting, setConverting] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<Blob | null>(null);
 
   async function handleConvert() {
     if (!file) return;
     setConverting(true);
     setError(null);
     setProgress({ done: 0, total: 0 });
+    setResult(null);
     try {
-      const blob = await convertToGif(file, fps, duration, 480, (done, total) => setProgress({ done, total }));
+      const blob = await convertToGif(
+        file,
+        Math.min(fps, maxFps),
+        Math.min(duration, maxDuration),
+        480,
+        (done, total) => setProgress({ done, total })
+      );
       downloadBlob(blob, renameExt(file.name));
+      setResult(blob);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Conversion failed");
     } finally {
@@ -131,12 +151,21 @@ export function VideoToGifConverter() {
           id="duration"
           type="range"
           min={1}
-          max={MAX_DURATION_SECONDS}
+          max={maxDuration}
           step={1}
           value={duration}
           onChange={(e) => setDuration(Number(e.target.value))}
           className="w-full"
         />
+        {!isPro && (
+          <p className="text-xs text-muted">
+            Free is capped at {FREE_MAX_DURATION_SECONDS}s.{" "}
+            <Link href="/pricing" className="underline underline-offset-2">
+              Upgrade to Pro
+            </Link>{" "}
+            for up to {PRO_MAX_DURATION_SECONDS}s and {PRO_MAX_FPS}fps.
+          </p>
+        )}
       </div>
 
       <div className="space-y-1.5">
@@ -148,7 +177,7 @@ export function VideoToGifConverter() {
           id="fps"
           type="range"
           min={5}
-          max={20}
+          max={maxFps}
           step={1}
           value={fps}
           onChange={(e) => setFps(Number(e.target.value))}
@@ -169,6 +198,7 @@ export function VideoToGifConverter() {
             : "Loading video…"
           : "Convert & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result} filename={file ? renameExt(file.name) : "video.gif"} />}
     </div>
   );
 }

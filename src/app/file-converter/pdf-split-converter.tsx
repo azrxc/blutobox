@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { zipFiles } from "@/lib/zip-files";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -18,11 +19,13 @@ export function PdfSplitConverter() {
   const [file, setFile] = useState<File | null>(null);
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{ blob: Blob; filename: string } | null>(null);
 
   async function handleConvert() {
     if (!file) return;
     setConverting(true);
     setError(null);
+    setResult(null);
     try {
       const { PDFDocument } = await import("pdf-lib");
       const bytes = await file.arrayBuffer();
@@ -43,9 +46,12 @@ export function PdfSplitConverter() {
 
       if (results.length === 1) {
         downloadBlob(results[0], results[0].name);
+        setResult({ blob: results[0], filename: results[0].name });
       } else {
         const zipped = await zipFiles(results);
-        downloadBlob(zipped, `${baseName}-split.zip`);
+        const filename = `${baseName}-split.zip`;
+        downloadBlob(zipped, filename);
+        setResult({ blob: zipped, filename });
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Split failed. Make sure the file is a valid PDF");
@@ -78,6 +84,7 @@ export function PdfSplitConverter() {
       >
         {converting ? "Splitting…" : "Split & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result.blob} filename={result.filename} />}
     </div>
   );
 }

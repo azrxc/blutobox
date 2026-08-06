@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { zipFiles } from "@/lib/zip-files";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 export type Format = "png" | "jpeg" | "webp";
 
@@ -68,11 +69,13 @@ export function ImageFormatConverter({ initialFormat = "png" }: { initialFormat?
   const [quality, setQuality] = useState(0.9);
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{ blob: Blob; filename: string } | null>(null);
 
   async function handleConvert() {
     if (files.length === 0) return;
     setConverting(true);
     setError(null);
+    setResult(null);
     try {
       const results: File[] = [];
       for (const file of files) {
@@ -81,9 +84,11 @@ export function ImageFormatConverter({ initialFormat = "png" }: { initialFormat?
       }
       if (results.length === 1) {
         downloadBlob(results[0], results[0].name);
+        setResult({ blob: results[0], filename: results[0].name });
       } else {
         const zipped = await zipFiles(results);
         downloadBlob(zipped, "converted-images.zip");
+        setResult({ blob: zipped, filename: "converted-images.zip" });
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Conversion failed");
@@ -152,6 +157,7 @@ export function ImageFormatConverter({ initialFormat = "png" }: { initialFormat?
       >
         {converting ? "Converting…" : "Convert & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result.blob} filename={result.filename} />}
     </div>
   );
 }

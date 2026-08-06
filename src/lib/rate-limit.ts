@@ -22,6 +22,12 @@ function makeLimitChecker(prefix: string, limit: number, window: `${number} ${"s
 }
 
 export const checkAnonUploadLimit = makeLimitChecker("anon-upload", 10, "1 h");
+// Anonymous downloads already have a byte-based daily quota, but nothing stops a
+// script from hitting the download endpoint many times with small/different files
+// while staying under that byte total. This backstops that specifically - generous
+// enough that no real shared network (office, family, mobile carrier NAT) should hit
+// it from ordinary multi-link usage.
+export const checkAnonDailyDownloadCountLimit = makeLimitChecker("anon-download-count", 50, "1 d");
 // Logged-in accounts have no per-upload byte throttle like anon does, only a total
 // storage cap - which doesn't stop someone mass-creating many small share links
 // (spam) without ever touching that cap. These backstop that, generous enough that

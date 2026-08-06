@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -45,6 +46,7 @@ export function ImagesToPdfConverter() {
   const [files, setFiles] = useState<File[]>([]);
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<Blob | null>(null);
 
   function removeFile(index: number) {
     setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -54,6 +56,7 @@ export function ImagesToPdfConverter() {
     if (files.length === 0) return;
     setConverting(true);
     setError(null);
+    setResult(null);
     try {
       const { default: jsPDF } = await import("jspdf");
       let doc: InstanceType<typeof jsPDF> | null = null;
@@ -73,7 +76,11 @@ export function ImagesToPdfConverter() {
         doc.addImage(dataUrl, "PNG", 0, 0, width, height);
       }
 
-      if (doc) downloadBlob(doc.output("blob"), "images.pdf");
+      if (doc) {
+        const blob = doc.output("blob");
+        downloadBlob(blob, "images.pdf");
+        setResult(blob);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Conversion failed");
     } finally {
@@ -124,6 +131,7 @@ export function ImagesToPdfConverter() {
       >
         {converting ? "Building PDF…" : "Convert & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result} filename="images.pdf" />}
     </div>
   );
 }

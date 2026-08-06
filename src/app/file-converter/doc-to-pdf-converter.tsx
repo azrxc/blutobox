@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -14,14 +17,20 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export function DocToPdfConverter() {
+  const { data: session } = useSession();
+  const isPro = session?.user?.planTier === "PRO";
+
   const [file, setFile] = useState<File | null>(null);
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<Blob | null>(null);
+  const [margin, setMargin] = useState(10);
 
   async function handleConvert() {
     if (!file) return;
     setConverting(true);
     setError(null);
+    setResult(null);
     let container: HTMLDivElement | null = null;
     try {
       // Import the browser-specific bundle explicitly rather than the package's default
@@ -51,11 +60,12 @@ export function DocToPdfConverter() {
 
       const html2pdf = (await import("html2pdf.js")).default;
       const blob: Blob = await html2pdf()
-        .set({ margin: 10, jsPDF: { unit: "pt", format: "a4" } })
+        .set({ margin: isPro ? margin : 10, jsPDF: { unit: "pt", format: "a4" } })
         .from(container)
         .outputPdf("blob");
 
       downloadBlob(blob, file.name.replace(/\.docx?$/i, ".pdf"));
+      setResult(blob);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Conversion failed");
     } finally {
@@ -83,6 +93,32 @@ export function DocToPdfConverter() {
         engine. Only modern .docx files are supported, not the older .doc format.
       </p>
 
+      {isPro ? (
+        <div className="space-y-1.5">
+          <label className="flex justify-between text-xs text-muted" htmlFor="margin">
+            <span>Page margin</span>
+            <span>{margin}mm</span>
+          </label>
+          <input
+            id="margin"
+            type="range"
+            min={0}
+            max={40}
+            step={2}
+            value={margin}
+            onChange={(e) => setMargin(Number(e.target.value))}
+            className="w-full"
+          />
+        </div>
+      ) : (
+        <p className="text-xs text-muted">
+          <Link href="/pricing" className="underline underline-offset-2">
+            Upgrade to Pro
+          </Link>{" "}
+          to set a custom page margin.
+        </p>
+      )}
+
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       <button
@@ -92,6 +128,7 @@ export function DocToPdfConverter() {
       >
         {converting ? "Converting…" : "Convert & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result} filename={file ? file.name.replace(/\.docx?$/i, ".pdf") : "document.pdf"} />}
     </div>
   );
 }

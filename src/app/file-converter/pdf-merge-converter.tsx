@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -14,9 +17,14 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export function PdfMergeConverter() {
+  const { data: session } = useSession();
+  const isPro = session?.user?.planTier === "PRO";
+
   const [files, setFiles] = useState<File[]>([]);
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<Blob | null>(null);
+  const [addPageNumbers, setAddPageNumbers] = useState(false);
 
   function removeFile(index: number) {
     setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -26,8 +34,9 @@ export function PdfMergeConverter() {
     if (files.length < 2) return;
     setConverting(true);
     setError(null);
+    setResult(null);
     try {
-      const { PDFDocument } = await import("pdf-lib");
+      const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
       const merged = await PDFDocument.create();
 
       for (const file of files) {
@@ -37,8 +46,27 @@ export function PdfMergeConverter() {
         pages.forEach((page) => merged.addPage(page));
       }
 
+      if (isPro && addPageNumbers) {
+        const font = await merged.embedFont(StandardFonts.Helvetica);
+        const pages = merged.getPages();
+        pages.forEach((page, i) => {
+          const label = `Page ${i + 1} of ${pages.length}`;
+          const { width } = page.getSize();
+          const textWidth = font.widthOfTextAtSize(label, 9);
+          page.drawText(label, {
+            x: width / 2 - textWidth / 2,
+            y: 16,
+            size: 9,
+            font,
+            color: rgb(0.5, 0.5, 0.5),
+          });
+        });
+      }
+
       const mergedBytes = await merged.save();
-      downloadBlob(new Blob([new Uint8Array(mergedBytes)], { type: "application/pdf" }), "merged.pdf");
+      const blob = new Blob([new Uint8Array(mergedBytes)], { type: "application/pdf" });
+      downloadBlob(blob, "merged.pdf");
+      setResult(blob);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Merge failed. Make sure all files are valid PDFs");
     } finally {
@@ -80,6 +108,25 @@ export function PdfMergeConverter() {
         </ul>
       )}
 
+      {isPro ? (
+        <label className="flex items-center gap-2 text-xs text-muted">
+          <input
+            type="checkbox"
+            checked={addPageNumbers}
+            onChange={(e) => setAddPageNumbers(e.target.checked)}
+            className="h-3.5 w-3.5 rounded border-border"
+          />
+          Add page numbers to the footer
+        </label>
+      ) : (
+        <p className="text-xs text-muted">
+          <Link href="/pricing" className="underline underline-offset-2">
+            Upgrade to Pro
+          </Link>{" "}
+          to add page numbers to the merged PDF.
+        </p>
+      )}
+
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       <button
@@ -89,6 +136,7 @@ export function PdfMergeConverter() {
       >
         {converting ? "Merging…" : "Merge & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result} filename="merged.pdf" />}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { zipFiles } from "@/lib/zip-files";
+import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -19,12 +20,14 @@ export function PdfToImagesConverter() {
   const [converting, setConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string | null>(null);
+  const [result, setResult] = useState<{ blob: Blob; filename: string } | null>(null);
 
   async function handleConvert() {
     if (!file) return;
     setConverting(true);
     setError(null);
     setProgress("Loading PDF engine…");
+    setResult(null);
     try {
       const pdfjsLib = await import("pdfjs-dist");
       pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -54,9 +57,11 @@ export function PdfToImagesConverter() {
 
       if (results.length === 1) {
         downloadBlob(results[0], results[0].name);
+        setResult({ blob: results[0], filename: results[0].name });
       } else {
         const zipped = await zipFiles(results);
         downloadBlob(zipped, "pdf-pages.zip");
+        setResult({ blob: zipped, filename: "pdf-pages.zip" });
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Conversion failed");
@@ -89,6 +94,7 @@ export function PdfToImagesConverter() {
       >
         {converting ? "Converting…" : "Convert & download"}
       </button>
+      {result && <UploadToBlutoButton blob={result.blob} filename={result.filename} />}
     </div>
   );
 }

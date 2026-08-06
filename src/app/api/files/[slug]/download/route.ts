@@ -10,6 +10,7 @@ import { createStreamToken } from "@/lib/stream-token";
 import { getCurrentPlanTier } from "@/lib/plan";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 import { sendDownloadNotificationEmail } from "@/lib/email";
+import { checkAnonDailyDownloadCountLimit } from "@/lib/rate-limit";
 
 export async function GET(
   req: Request,
@@ -46,9 +47,20 @@ export async function GET(
 
   const session = await auth();
   const planTier = await getCurrentPlanTier(session?.user?.id);
-  const identifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
+  const ip = getClientIp(req);
+  const identifier = session?.user?.id ?? `ip:${ip}`;
   const dailyLimit = dailyDownloadBytesFor(planTier);
   const fileBytes = Number(link.file.sizeBytes);
+
+  if (!session?.user) {
+    const { success } = await checkAnonDailyDownloadCountLimit(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many downloads from this network today. Log in for a higher limit, or try again tomorrow." },
+        { status: 429 }
+      );
+    }
+  }
 
   const quota = await checkDownloadQuota(identifier, fileBytes, dailyLimit);
   if (!quota.allowed) {

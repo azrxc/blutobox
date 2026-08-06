@@ -28,6 +28,11 @@ const rows: Row[] = [
   { label: "Save other people's files to your account", anon: false, free: "Up to 10", pro: "Unlimited" },
   { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
   { label: "QR code colors & logo", anon: false, free: false, pro: true },
+  { label: "Video-to-GIF length", anon: "-", free: "Up to 10s, 20fps", pro: "Up to 60s, 30fps" },
+  { label: "Image compressor batch size", anon: "-", free: "5 images", pro: "30 images" },
+  { label: "Exact image resize", anon: false, free: false, pro: true },
+  { label: "PDF merge page numbers", anon: false, free: false, pro: true },
+  { label: "DOCX to PDF custom margins", anon: false, free: false, pro: true },
 ];
 
 const gridCols = "grid-cols-[1fr_4.5rem_4.5rem_4.5rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";
