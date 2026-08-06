@@ -39,6 +39,8 @@ export const changelog: ChangelogEntry[] = [
       "New daily download-count limit for anonymous downloads (50/day per network) to match the upload-side limits",
       "Text diff tool: Pro can now export a comparison as an HTML file",
       "Referrals now also give both sides +1 creator link slot (on top of the existing +1GB storage), permanently, no subscription needed",
+      "New FAQ page (linked at the bottom of every page)",
+      "File pages are now blocked from search engine indexing, so a share link can't end up in Google results",
     ],
   },
   {

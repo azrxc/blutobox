@@ -38,8 +38,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const link = await prisma.shareLink.findUnique({ where: { slug }, include: { file: true } });
 
+  // File pages are never searchable - a randomly-generated share link getting crawled
+  // and indexed would expose files meant to be shared privately with specific people.
+  const robots = { index: false, follow: false };
+
   if (!link || link.file.status !== "ACTIVE" || (link.expiresAt && link.expiresAt < new Date())) {
-    return { title: "File not found | Bluto Box" };
+    return { title: "File not found | Bluto Box", robots };
   }
 
   if (link.passwordHash) {
@@ -48,6 +52,7 @@ export async function generateMetadata({
     return {
       title,
       description,
+      robots,
       openGraph: { title, description, siteName: "Bluto Box", images: ["/icon.png"] },
       twitter: { card: "summary", title, description, images: ["/icon.png"] },
     };
@@ -62,6 +67,7 @@ export async function generateMetadata({
   return {
     title,
     description,
+    robots,
     openGraph: { title, description, siteName: "Bluto Box", images: ["/icon.png"] },
     twitter: { card: "summary", title, description, images: ["/icon.png"] },
   };

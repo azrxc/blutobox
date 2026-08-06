@@ -82,6 +82,9 @@ export default function RootLayout({
                   <Link href="/changelog" className="transition-colors hover:text-foreground">
                     Changelog
                   </Link>
+                  <Link href="/faq" className="transition-colors hover:text-foreground">
+                    FAQ
+                  </Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Legal</span>
