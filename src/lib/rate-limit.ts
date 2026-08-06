@@ -22,6 +22,12 @@ function makeLimitChecker(prefix: string, limit: number, window: `${number} ${"s
 }
 
 export const checkAnonUploadLimit = makeLimitChecker("anon-upload", 10, "1 h");
+// Logged-in accounts have no per-upload byte throttle like anon does, only a total
+// storage cap - which doesn't stop someone mass-creating many small share links
+// (spam) without ever touching that cap. These backstop that, generous enough that
+// no real single person should ever hit them.
+export const checkFreeDailyUploadCountLimit = makeLimitChecker("free-upload-count", 50, "1 d");
+export const checkProDailyUploadCountLimit = makeLimitChecker("pro-upload-count", 200, "1 d");
 export const checkLoginLimit = makeLimitChecker("login", 8, "15 m");
 export const checkRegisterLimit = makeLimitChecker("register", 5, "1 h");
 export const checkForgotPasswordLimit = makeLimitChecker("forgot-password", 5, "1 h");

@@ -17,7 +17,7 @@ import {
   MULTIPART_PART_SIZE_BYTES,
 } from "@/lib/limits";
 import { getClientIp } from "@/lib/request-ip";
-import { checkAnonUploadLimit } from "@/lib/rate-limit";
+import { checkAnonUploadLimit, checkFreeDailyUploadCountLimit, checkProDailyUploadCountLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
@@ -55,6 +55,15 @@ export async function POST(req: Request) {
     if (!success) {
       return NextResponse.json(
         { error: "Too many uploads from this network. Log in for higher limits, or try again later." },
+        { status: 429 }
+      );
+    }
+  } else {
+    const checkDailyCount = planTier === "PRO" ? checkProDailyUploadCountLimit : checkFreeDailyUploadCountLimit;
+    const { success } = await checkDailyCount(session.user.id);
+    if (!success) {
+      return NextResponse.json(
+        { error: "You've hit your daily upload limit. Try again tomorrow." },
         { status: 429 }
       );
     }
