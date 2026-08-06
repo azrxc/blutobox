@@ -25,6 +25,8 @@ export const changelog: ChangelogEntry[] = [
       "You can now upload directly from the homepage instead of having to click through to a separate page first",
       "New upload option: get an email the first time someone downloads your file",
       "New Pro upload option: limit a link to a set number of total downloads, then it stops working",
+      "New Pro upload option: pick your own custom link name instead of a random one",
+      "Dedicated pages for popular conversions (PNG to WebP, merge PDF, video to GIF, and more), linked from the File converter",
     ],
   },
   {

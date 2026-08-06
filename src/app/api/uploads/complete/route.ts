@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { CompleteMultipartUploadCommand, AbortMultipartUploadCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getS3Client, B2_BUCKET } from "@/lib/storage";
@@ -28,6 +29,10 @@ const completeSchema = z.object({
   sha256: z.string().regex(/^[a-f0-9]{64}$/i).optional(),
   notifyOnDownload: z.boolean().default(false),
   maxDownloads: z.number().int().positive().max(1_000_000).optional(),
+  customSlug: z
+    .string()
+    .regex(/^[a-zA-Z0-9-]{3,50}$/, "Only letters, numbers, and hyphens, 3-50 characters")
+    .optional(),
 });
 
 export async function POST(req: Request) {
@@ -49,6 +54,7 @@ export async function POST(req: Request) {
     sha256,
     notifyOnDownload,
     maxDownloads,
+    customSlug,
   } = parsed.data;
 
   if (sha256 && (await isKnownMalicious(sha256))) {
@@ -83,6 +89,13 @@ export async function POST(req: Request) {
   const ip = getClientIp(req);
   const isPro = (await getCurrentPlanTier(session?.user?.id)) === "PRO";
 
+  if (isPro && customSlug) {
+    const taken = await prisma.shareLink.findUnique({ where: { slug: customSlug } });
+    if (taken) {
+      return NextResponse.json({ error: "That custom link is already taken, try another." }, { status: 409 });
+    }
+  }
+
   const file = await prisma.file.create({
     data: {
       ownerId: session?.user?.id ?? null,
@@ -103,10 +116,22 @@ export async function POST(req: Request) {
     ? new Date(Date.now() + expiresInHours * 60 * 60 * 1000)
     : null;
 
-  const slug = generateSlug();
-  await prisma.shareLink.create({
-    data: { fileId: file.id, slug, passwordHash, expiresAt },
-  });
+  const slug = isPro && customSlug ? customSlug : generateSlug();
+  try {
+    await prisma.shareLink.create({
+      data: { fileId: file.id, slug, passwordHash, expiresAt },
+    });
+  } catch (e) {
+    // Someone else grabbed the same custom slug in the tiny window between the
+    // availability check above and this create - clean up the orphaned file/object.
+    await prisma.file.delete({ where: { id: file.id } }).catch(() => {});
+    const s3 = getS3Client();
+    await s3.send(new DeleteObjectCommand({ Bucket: B2_BUCKET(), Key: key })).catch(() => {});
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      return NextResponse.json({ error: "That custom link is already taken, try another." }, { status: 409 });
+    }
+    throw e;
+  }
 
   if (session?.user?.id) {
     await prisma.user.update({

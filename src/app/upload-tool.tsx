@@ -47,6 +47,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
   const [customHours, setCustomHours] = useState("");
   const [notifyOnDownload, setNotifyOnDownload] = useState(false);
   const [maxDownloads, setMaxDownloads] = useState("");
+  const [customSlug, setCustomSlug] = useState("");
   const [zipping, setZipping] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -84,6 +85,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
           expiresInHours: resolveExpiryHours(),
           notifyOnDownload: Boolean(session?.user) && notifyOnDownload,
           maxDownloads: isPro && maxDownloads ? Number(maxDownloads) : undefined,
+          customSlug: isPro ? customSlug.trim() || undefined : undefined,
         },
         setProgress,
         controller.signal
@@ -119,6 +121,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
     setCustomHours("");
     setNotifyOnDownload(false);
     setMaxDownloads("");
+    setCustomSlug("");
   }
 
   if (shareSlug) {
@@ -265,6 +268,24 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
           {isPro ? (
             <>
               <div className="space-y-1">
+                <label className="text-xs text-muted" htmlFor="customSlug">
+                  Custom link (optional)
+                </label>
+                <div className="flex items-center overflow-hidden rounded-lg border border-border bg-background text-sm">
+                  <span className="shrink-0 pl-3 text-muted">blutobox.com/f/</span>
+                  <input
+                    id="customSlug"
+                    type="text"
+                    placeholder="your-link-name"
+                    value={customSlug}
+                    onChange={(e) => setCustomSlug(e.target.value.replace(/[^a-zA-Z0-9-]/g, ""))}
+                    disabled={uploading}
+                    maxLength={50}
+                    className="w-full bg-transparent px-1 py-2 outline-none"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
                 <label className="text-xs text-muted" htmlFor="linkPassword">
                   Password-protect this link (optional)
                 </label>
@@ -298,7 +319,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro
               </Link>{" "}
-              to password-protect links, set a custom expiry, or limit total downloads.
+              to password-protect links, set a custom expiry, limit total downloads, or pick a custom link name.
             </p>
           )}
 

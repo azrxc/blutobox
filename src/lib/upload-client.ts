@@ -6,6 +6,7 @@ export type UploadOptions = {
   expiresInHours?: number;
   notifyOnDownload?: boolean;
   maxDownloads?: number;
+  customSlug?: string;
 };
 
 export class UploadCancelledError extends Error {
@@ -138,6 +139,7 @@ export async function uploadFile(
     expiresInHours: options.expiresInHours,
     notifyOnDownload: options.notifyOnDownload ?? false,
     maxDownloads: options.maxDownloads,
+    customSlug: options.customSlug || undefined,
   };
 
   try {
