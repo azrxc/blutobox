@@ -172,6 +172,13 @@ Researched pixeldrain, Mega, WeTransfer, and general file-hosting industry pract
 
 Sources: [pixeldrain 2026 review](https://speed-drain.com/blog/why-choose-pixeldrain-2026/), [pixeldrain API docs](https://pixeldrain.com/api), [Mega encryption/sharing review](https://cyberinsider.com/cloud-storage/reviews/mega/), [file-sharing industry trends 2026](https://msafe.co/blog/trends-in-secure-file-sharing-for-2026/), [file upload security best practices](https://www.opswat.com/blog/file-upload-protection-best-practices)
 
+## 💡 Ideas from 2026-08-07 (while waiting on the Vercel monthly reset, not built — for consideration)
+
+- **24-hour Pro day-pass, $0.99 one-time (not recurring)** — for someone who needs Pro limits for a single release/share and doesn't want a subscription. Priced low deliberately (not $1.99) so it reads as an obvious impulse buy rather than inviting a "might as well get the $4.99/mo plan" comparison. Discussed and leaning toward building this, paused mid-conversation to consider it more before committing. Confirmed a token/credit system is the wrong shape for this product — Bluto Box's Pro features are capability unlocks (password protection, bigger uploads, longer video export, QR customization), not metered/consumable units, so a day-pass (a shorter version of the existing subscription) fits better than inventing per-feature token costs.
+- **Uptime/downtime monitoring** — directly motivated by getting blindsided by the Vercel pause with zero alerting. A free monitor that pings the site and emails on downtime would prevent that from happening silently again.
+- **SEO on the free tools** (file-converter, QR generator, text-diff) — these are genuinely useful public utilities that could pull organic search traffic ("convert word to pdf free" style queries) but likely aren't optimized for it yet (no sitemap.xml or structured data confirmed). Real growth potential, no dark patterns involved.
+- **Real speed/Lighthouse audit** — worth running now that tonight's Cloudflare-bundle-size work incidentally trimmed a lot of unnecessary JS from several pages (file-converter, QR, text-diff tools now lazy-load instead of always loading). Should check whether that also measurably improved real page-load speed, and look for more low-hanging fruit.
+
 ## Accounts/credentials already set up (in `.env.local`, not committed to git — also added to Vercel prod env vars)
 
 - Neon (Postgres)
