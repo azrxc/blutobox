@@ -71,6 +71,18 @@ export default function PricingPage() {
     if (data.url) window.location.href = data.url;
   }
 
+  async function buyPass(passType: "day" | "week") {
+    setLoading(true);
+    const res = await fetch("/api/stripe/checkout-pass", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passType }),
+    });
+    const data = await res.json();
+    setLoading(false);
+    if (data.url) window.location.href = data.url;
+  }
+
   async function manage() {
     setLoading(true);
     const res = await fetch("/api/stripe/portal", { method: "POST" });
@@ -199,6 +211,42 @@ export default function PricingPage() {
           </span>
         </div>
       </div>
+
+      {!isPro && (
+        <div className="w-full max-w-sm space-y-3 text-center">
+          <div>
+            <h2 className="text-sm font-semibold">Just need it for a bit?</h2>
+            <p className="mt-1 text-xs text-muted">
+              One-time, no auto-renewal. Top-up anytime.
+            </p>
+          </div>
+          {!session?.user ? (
+            <Link
+              href="/login"
+              className="inline-block rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-surface"
+            >
+              Log in to buy a pass
+            </Link>
+          ) : (
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => buyPass("day")}
+                disabled={loading}
+                className="rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-surface disabled:opacity-50"
+              >
+                24 hours — $0.99
+              </button>
+              <button
+                onClick={() => buyPass("week")}
+                disabled={loading}
+                className="rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-surface disabled:opacity-50"
+              >
+                7 days — $2.99
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </main>
   );
 }

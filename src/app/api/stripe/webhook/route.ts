@@ -48,6 +48,20 @@ async function handleEvent(event: Stripe.Event) {
     case "checkout.session.completed": {
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
       const userId = checkoutSession.metadata?.userId ?? checkoutSession.client_reference_id;
+      const passType = checkoutSession.metadata?.passType;
+
+      if (checkoutSession.mode === "payment" && userId && (passType === "day" || passType === "week")) {
+        // One-time pass, not a subscription - grant proPassExpiresAt, don't touch
+        // planTier/Subscription. "Top-up anytime": extend from whichever is later, the
+        // current time or an already-active pass's expiry, rather than resetting it.
+        const durationMs = (passType === "day" ? 24 : 24 * 7) * 60 * 60 * 1000;
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { proPassExpiresAt: true } });
+        const currentExpiry = user?.proPassExpiresAt?.getTime() ?? 0;
+        const newExpiresAt = new Date(Math.max(currentExpiry, Date.now()) + durationMs);
+        await prisma.user.update({ where: { id: userId }, data: { proPassExpiresAt: newExpiresAt } });
+        break;
+      }
+
       const customerId = checkoutSession.customer as string;
       const subscriptionId = checkoutSession.subscription as string;
       if (userId && customerId) {
