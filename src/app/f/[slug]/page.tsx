@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { cookies, headers } from "next/headers";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { FileViewer } from "./file-viewer";
@@ -15,7 +16,7 @@ import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 import { maxCreatorLinksFor } from "@/lib/limits";
 import { auth } from "@/lib/auth";
-import { effectivePlanTier } from "@/lib/plan";
+import { effectivePlanTier, getCurrentPlanTier } from "@/lib/plan";
 import { BookmarkButton } from "./bookmark-button";
 import { SocialShareButtons } from "../../social-share-buttons";
 
@@ -124,6 +125,7 @@ export default async function FilePage({
     : null;
 
   const session = await auth();
+  const viewerPlanTier = await getCurrentPlanTier(session?.user?.id);
   const isBookmarked = session?.user
     ? Boolean(
         await prisma.bookmark.findUnique({
@@ -183,7 +185,17 @@ export default async function FilePage({
             <FileViewer slug={slug} />
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          {viewerPlanTier !== "PRO" && (
+            <p className="mt-4 text-xs text-muted">
+              Free downloads are capped at ~8MB/s.{" "}
+              <Link href="/pricing" className="underline underline-offset-2">
+                Upgrade to Pro
+              </Link>{" "}
+              for full, unthrottled speed.
+            </p>
+          )}
+
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <DownloadButton
               slug={slug}
               filename={file.filename}
