@@ -13,6 +13,8 @@ export type AccountFile = {
   daysUntilDeletion: number | null;
   linkExpiresAt: string | null;
   slug: string | null;
+  /** Pro-only: downloads in the last 7 days. Undefined on Free (not fetched at all). */
+  downloadsLast7d?: number;
 };
 
 function formatLinkExpiry(iso: string | null) {
@@ -64,7 +66,11 @@ function FileRow({ file }: { file: AccountFile }) {
           <span className="break-all font-medium">{file.filename}</span>
         )}
         <p className="mt-0.5 text-xs text-muted">
-          {formatBytes(file.sizeBytes)} · {file.downloadCount} downloads ·{" "}
+          {formatBytes(file.sizeBytes)} · {file.downloadCount} downloads
+          {file.downloadsLast7d !== undefined && file.downloadsLast7d > 0 && (
+            <span className="text-foreground"> ({file.downloadsLast7d} this week)</span>
+          )}
+          {" · "}
           {file.daysUntilDeletion === null
             ? "Never auto-deleted (Pro)"
             : file.daysUntilDeletion <= 0

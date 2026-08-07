@@ -15,8 +15,11 @@ import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
 import { maxCreatorLinksFor } from "@/lib/limits";
 import { auth } from "@/lib/auth";
+import { effectivePlanTier } from "@/lib/plan";
 import { BookmarkButton } from "./bookmark-button";
 import { SocialShareButtons } from "../../social-share-buttons";
+
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 function formatBytes(bytes: bigint) {
   const n = Number(bytes);
@@ -115,6 +118,10 @@ export default async function FilePage({
   }
 
   const { file } = link;
+  const ownerIsPro = file.owner ? effectivePlanTier(file.owner) === "PRO" : false;
+  const brandColor = ownerIsPro && file.owner?.brandColor && HEX_COLOR.test(file.owner.brandColor)
+    ? file.owner.brandColor
+    : null;
 
   const session = await auth();
   const isBookmarked = session?.user
@@ -146,6 +153,9 @@ export default async function FilePage({
           <p className="mt-1 text-xs text-muted">
             {formatBytes(file.sizeBytes)} · {file.downloadCount} downloads
           </p>
+          {ownerIsPro && file.owner?.brandMessage && (
+            <p className="mt-2 text-sm font-medium">{file.owner.brandMessage}</p>
+          )}
           {file.owner && file.owner.creatorLinks.length > 0 && (
             <p className="mt-1 text-xs text-muted">
               From the creator:{" "}
@@ -174,7 +184,12 @@ export default async function FilePage({
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <DownloadButton slug={slug} filename={file.filename} sizeBytes={Number(file.sizeBytes)} />
+            <DownloadButton
+              slug={slug}
+              filename={file.filename}
+              sizeBytes={Number(file.sizeBytes)}
+              accentColor={brandColor}
+            />
             <CopyButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <QrCodeButton url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />
             <SocialShareButtons url={`${process.env.NEXTAUTH_URL}/f/${slug}`} />

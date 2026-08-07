@@ -6,11 +6,14 @@ export function DownloadButton({
   slug,
   filename,
   sizeBytes,
+  accentColor,
 }: {
   slug: string;
   filename: string;
   sizeBytes: number;
+  accentColor?: string | null;
 }) {
+  const accentStyle = accentColor ? { backgroundColor: accentColor } : undefined;
   const [progress, setProgress] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,7 +76,7 @@ export function DownloadButton({
           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-accent transition-all"
-              style={{ width: `${Math.round(progress * 100)}%` }}
+              style={{ width: `${Math.round(progress * 100)}%`, ...accentStyle }}
             />
           </div>
           <button
@@ -87,6 +90,7 @@ export function DownloadButton({
       <button
         onClick={handleDownload}
         disabled={downloading}
+        style={accentStyle}
         className="w-44 rounded-full bg-accent py-2.5 text-center text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-60"
       >
         {downloading ? `Downloading… ${Math.round(progress * 100)}%` : "Download"}

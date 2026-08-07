@@ -47,6 +47,12 @@ model User {
   bonusStorageBytes BigInt   @default(0)
   bonusCreatorLinks Int      @default(0)
 
+  // Pro branding shown on this creator's file share pages - message is plain text
+  // (rendered as JSX text, never dangerouslySetInnerHTML, so no XSS risk), color is
+  // validated as a strict 6-digit hex before ever being written into an inline style.
+  brandMessage String?
+  brandColor   String?
+
   // One-time, non-recurring Pro access ("day pass" / "week pass") - separate from the
   // real Subscription relation below since a Free user can buy one without ever having
   // a subscription. Effective tier = PRO if planTier is PRO OR this is still in the future.
@@ -112,9 +118,22 @@ model File {
 
   shareLinks    ShareLink[]
   reports       Report[]
+  downloadEvents DownloadEvent[]
 
   @@index([ownerId])
   @@index([uploaderIp])
+}
+
+// One row per real download - deliberately no IP/identity captured, just "a download
+// happened at this time," so Pro's download-analytics view can show a time distribution
+// (downloadCount alone is just a running total, no history of when they happened).
+model DownloadEvent {
+  id        String   @id @default(cuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([fileId, createdAt])
 }
 
 model ShareLink {

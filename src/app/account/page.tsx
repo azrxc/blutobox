@@ -8,12 +8,17 @@ import { ReferralCard } from "./referral-card";
 import { ChangePasswordForm } from "./change-password-form";
 import { UpdateNameForm } from "./update-name-form";
 import { CreatorLinksForm } from "./creator-links-form";
+import { BrandingForm } from "./branding-form";
 import { LogoutButton } from "../logout-button";
 import { FileList, type AccountFile } from "./file-list";
 import { SubscriptionCard, type SubscriptionInfo } from "./subscription-card";
 import { DownloadUsageBar } from "../download-usage-bar";
 import { UsageBar } from "../usage-bar";
 import { AccountTabs } from "./account-tabs";
+
+function sevenDaysAgo() {
+  return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+}
 
 function buildSubscriptionInfo(
   isPro: boolean,
@@ -47,7 +52,8 @@ function buildAccountFiles(
     lastAccessedAt: Date;
     shareLinks: { slug: string; expiresAt: Date | null }[];
   }[],
-  isPro: boolean
+  isPro: boolean,
+  downloadsLast7dByFileId: Map<string, number>
 ): AccountFile[] {
   const now = Date.now();
   return files.map((f) => {
@@ -62,6 +68,7 @@ function buildAccountFiles(
       daysUntilDeletion: isPro ? null : daysLeft,
       linkExpiresAt: f.shareLinks[0]?.expiresAt?.toISOString() ?? null,
       slug: f.shareLinks[0]?.slug ?? null,
+      downloadsLast7d: isPro ? (downloadsLast7dByFileId.get(f.id) ?? 0) : undefined,
     };
   });
 }
@@ -92,7 +99,17 @@ export default async function AccountPage() {
   const totalBytes = totalStorageBytesFor(user.planTier, user.bonusStorageBytes);
   const usedBytes = Number(user.storageUsedBytes);
 
-  const accountFiles = buildAccountFiles(files, isPro);
+  const downloadsLast7dByFileId = new Map<string, number>();
+  if (isPro && files.length > 0) {
+    const grouped = await prisma.downloadEvent.groupBy({
+      by: ["fileId"],
+      where: { fileId: { in: files.map((f) => f.id) }, createdAt: { gte: sevenDaysAgo() } },
+      _count: true,
+    });
+    for (const g of grouped) downloadsLast7dByFileId.set(g.fileId, g._count);
+  }
+
+  const accountFiles = buildAccountFiles(files, isPro, downloadsLast7dByFileId);
   const accountBookmarks = bookmarks
     .filter((b) => b.shareLink.file.status === "ACTIVE")
     .map((b) => ({
@@ -170,10 +187,13 @@ export default async function AccountPage() {
             </div>
           }
           creator={
-            <CreatorLinksForm
-              initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))}
-              maxLinks={maxCreatorLinksFor(user.planTier, user.bonusCreatorLinks)}
-            />
+            <div className="space-y-10">
+              <CreatorLinksForm
+                initialLinks={creatorLinks.map((l) => ({ label: l.label, url: l.url }))}
+                maxLinks={maxCreatorLinksFor(user.planTier, user.bonusCreatorLinks)}
+              />
+              <BrandingForm isPro={isPro} initialMessage={user.brandMessage} initialColor={user.brandColor} />
+            </div>
           }
         />
       </div>

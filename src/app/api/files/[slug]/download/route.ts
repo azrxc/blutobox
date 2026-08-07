@@ -78,6 +78,9 @@ export async function GET(
     where: { id: link.file.id },
     data: { downloadCount: { increment: 1 }, lastAccessedAt: new Date(), deletionWarningSentAt: null },
   });
+  // No IP/identity captured here - just a timestamp, so Pro's download-analytics view
+  // can show a time distribution instead of only a running total.
+  await prisma.downloadEvent.create({ data: { fileId: link.file.id } });
 
   if (link.file.notifyOnDownload && link.file.owner?.email) {
     // Atomically claim the right to send - only the first request that flips
