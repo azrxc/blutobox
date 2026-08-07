@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ToolPageLayout } from "../tool-page-layout";
-import { VideoToGifConverter } from "../video-to-gif-converter";
+import { VideoToGifConverter } from "../lazy-tools";
 
 export const metadata: Metadata = {
   title: "Convert Video to GIF Free | Bluto Box",

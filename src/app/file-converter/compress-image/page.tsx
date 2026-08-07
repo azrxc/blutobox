@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ToolPageLayout } from "../tool-page-layout";
-import { ImageCompressor } from "../image-compressor";
+import { ImageCompressor } from "../lazy-tools";
 
 export const metadata: Metadata = {
   title: "Compress Image Online Free | Bluto Box",

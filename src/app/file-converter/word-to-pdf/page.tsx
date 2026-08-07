@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ToolPageLayout } from "../tool-page-layout";
-import { DocToPdfConverter } from "../doc-to-pdf-converter";
+import { DocToPdfConverter } from "../lazy-tools";
 
 export const metadata: Metadata = {
   title: "Convert Word to PDF Free | Bluto Box",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ToolPageLayout } from "../tool-page-layout";
-import { PdfMergeConverter } from "../pdf-merge-converter";
+import { PdfMergeConverter } from "../lazy-tools";
 
 export const metadata: Metadata = {
   title: "Merge PDF Files Free | Bluto Box",

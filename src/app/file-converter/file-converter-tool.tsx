@@ -1,16 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { ImageFormatConverter } from "./image-format-converter";
-import { ImagesToPdfConverter } from "./images-to-pdf-converter";
-import { PdfToImagesConverter } from "./pdf-to-images-converter";
-import { PdfMergeConverter } from "./pdf-merge-converter";
-import { PdfSplitConverter } from "./pdf-split-converter";
-import { DocToPdfConverter } from "./doc-to-pdf-converter";
-import { HashCalculator } from "./hash-calculator";
-import { ImageCompressor } from "./image-compressor";
-import { DuplicateFinder } from "./duplicate-finder";
-import { VideoToGifConverter } from "./video-to-gif-converter";
+import dynamic from "next/dynamic";
+
+// Loaded on demand instead of statically - only one of these is ever shown at a time
+// (picked via the mode toggle below), but a static import would still pull every tool's
+// library (mammoth, pdf-lib, pdfjs-dist, gifenc, html2pdf.js, ...) into this page's
+// server-rendered bundle, since "use client" components are still SSR'd for the initial
+// render. ssr: false keeps them out of the server bundle entirely.
+const ImageFormatConverter = dynamic(() => import("./image-format-converter").then((m) => m.ImageFormatConverter), { ssr: false });
+const ImagesToPdfConverter = dynamic(() => import("./images-to-pdf-converter").then((m) => m.ImagesToPdfConverter), { ssr: false });
+const PdfToImagesConverter = dynamic(() => import("./pdf-to-images-converter").then((m) => m.PdfToImagesConverter), { ssr: false });
+const PdfMergeConverter = dynamic(() => import("./pdf-merge-converter").then((m) => m.PdfMergeConverter), { ssr: false });
+const PdfSplitConverter = dynamic(() => import("./pdf-split-converter").then((m) => m.PdfSplitConverter), { ssr: false });
+const DocToPdfConverter = dynamic(() => import("./doc-to-pdf-converter").then((m) => m.DocToPdfConverter), { ssr: false });
+const HashCalculator = dynamic(() => import("./hash-calculator").then((m) => m.HashCalculator), { ssr: false });
+const ImageCompressor = dynamic(() => import("./image-compressor").then((m) => m.ImageCompressor), { ssr: false });
+const DuplicateFinder = dynamic(() => import("./duplicate-finder").then((m) => m.DuplicateFinder), { ssr: false });
+const VideoToGifConverter = dynamic(() => import("./video-to-gif-converter").then((m) => m.VideoToGifConverter), { ssr: false });
 
 const MODES = [
   { id: "image", label: "Image format" },
