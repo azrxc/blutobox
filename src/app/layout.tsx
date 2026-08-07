@@ -70,6 +70,9 @@ export default function RootLayout({
                   <Link href="/text-diff" className="transition-colors hover:text-foreground">
                     Text diff
                   </Link>
+                  <Link href="/speed-test" className="transition-colors hover:text-foreground">
+                    Speed test
+                  </Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Company</span>

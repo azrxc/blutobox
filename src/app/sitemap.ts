@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/upload",
     "/qr",
     "/text-diff",
+    "/speed-test",
     "/file-converter",
     "/file-converter/png-to-webp",
     "/file-converter/jpg-to-png",
@@ -32,6 +33,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${base}${route}`,
     lastModified: now,
     changeFrequency: route === "" ? "daily" : "weekly",
-    priority: route === "" ? 1 : route.startsWith("/file-converter") || route === "/qr" || route === "/text-diff" ? 0.8 : 0.5,
+    priority:
+      route === ""
+        ? 1
+        : route.startsWith("/file-converter") || route === "/qr" || route === "/text-diff" || route === "/speed-test"
+          ? 0.8
+          : 0.5,
   }));
 }

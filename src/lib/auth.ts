@@ -18,6 +18,12 @@ class TooManyAttemptsError extends CredentialsSignin {
 const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // NextAuth auto-trusts the request host on Vercel (detects VERCEL=1), which is why
+  // this was never needed before - but that means it silently 500s ("server
+  // configuration" AuthError) on any other host, including `next start` run locally,
+  // or a future Cloudflare/other deployment. Explicit is more portable than relying on
+  // Vercel-specific auto-detection.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
