@@ -335,7 +335,11 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro
               </Link>{" "}
-              to unlock the options above.
+              to unlock the options above, or{" "}
+              <Link href="/pricing" className="underline underline-offset-2">
+                grab a day pass for $0.99
+              </Link>{" "}
+              if you just need it for this one upload.
             </p>
           )}
 

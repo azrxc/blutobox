@@ -191,7 +191,11 @@ export default async function FilePage({
               <Link href="/pricing" className="underline underline-offset-2">
                 Upgrade to Pro
               </Link>{" "}
-              for full, unthrottled speed.
+              for full, unthrottled speed, or{" "}
+              <Link href="/pricing" className="underline underline-offset-2">
+                get a day pass for $0.99
+              </Link>{" "}
+              if it&apos;s just this one download.
             </p>
           )}
 
