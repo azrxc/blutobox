@@ -37,23 +37,24 @@ Running notes on what's done and what's left, so nothing gets forgotten if this 
 
 Once the reset happens (limits reset on the 1st of the month), no code changes should be needed to go back to Vercel - it's still the deployed target, DNS still points at it, `vercel.json` is untouched. Just needs the pause to lift. Double-check real usage stays reasonable afterward now that graalguide is off the account.
 
-## 🔴 Found tonight, needs the user to check: STRIPE_SECRET_KEY situation
-
-While testing the Pro day/week pass (below), the `STRIPE_SECRET_KEY` in `.env.local` returned "Expired API Key" from Stripe's own API - a real 401 from Stripe, not a guess. Turned out to likely be a stale local copy (the current/working key may have only ever been added directly to Vercel's environment variables, never synced back to `.env.local`). **Not yet confirmed fixed** - user was getting the current key from Stripe's dashboard to paste into `.env.local` themselves; this was still in progress when the day-pass work got paused to focus on other buildable-without-Stripe items. **Needs a final check**: re-run the Stripe API test once the key is updated locally to confirm it authenticates, before continuing the day-pass Stripe integration.
-
-## 💳 In progress: Pro day-pass / week-pass (one-time, not recurring)
+## ✅ Pro day-pass / week-pass (one-time, not recurring) - complete 2026-08-08
 
 **What**: $0.99 for 24 hours, $2.99 for 7 days, one-time Stripe payment (not a subscription) - "no auto-renewal, top-up anytime" messaging. Pricing sanity-checked against Canva's real day/week pass prices (see the ideas section below for the reasoning).
 
-**Done (backend groundwork, safe/committed regardless of Stripe key status)**:
-- `User.proPassExpiresAt` (nullable DateTime) added to the schema and pushed to the live database via `prisma db push` (see migration-drift note below for why not `migrate dev`).
-- `src/lib/plan.ts`: new `effectivePlanTier()` helper - a user is effectively PRO if `planTier` is PRO OR `proPassExpiresAt` is still in the future. `getCurrentPlanTier()` now uses this.
-- Applied consistently everywhere plan tier gets read directly from the DB (bypassing the shared helper): `presign` route, `account/storage` route, and all three places in `auth.ts` that populate the NextAuth JWT/session (credentials login, Google sign-in, the `trigger:"update"` refresh) - otherwise a pass wouldn't be reflected client-side even if the server enforced it correctly.
-- `cleanup.ts`'s inactive-file warning/deletion queries also account for it, so a file owned by someone on an active pass isn't wrongly treated as "Free tier" for the 30-day cleanup sweep.
+**`STRIPE_SECRET_KEY` situation - resolved.** The key in `.env.local` really was dead (confirmed twice via direct live API calls, `StripeAuthenticationError: Expired API Key`, not a guess or a caching issue). Root cause never fully confirmed, but a fresh key generated in Stripe's dashboard tested successfully (real `balance.retrieve()` call succeeded). `.env.local` updated. **Still needs doing**: same key updated in Vercel's prod env vars (Settings → Environment Variables) - not urgent since Vercel's still paused, but needed before this works live.
 
-**Not yet done**:
-- The actual Stripe side: creating the two live one-time Price objects, a new checkout route (`mode: "payment"`, not `"subscription"`), extending the webhook to handle a one-time-payment completion (set `proPassExpiresAt`, not touch `planTier`/`Subscription`), and the purchase UI on the pricing page. All blocked on confirming the Stripe key works (above).
-- Should extend the existing expiry rather than reset it if someone buys a pass while already covered by one ("top-up anytime" - take the later of the two expiry times), not yet implemented since the checkout/webhook code doesn't exist yet.
+**Backend groundwork**:
+- `User.proPassExpiresAt` (nullable DateTime), pushed via `prisma db push` (see migration-drift note below for why not `migrate dev`).
+- `src/lib/plan.ts`: `effectivePlanTier()` helper - PRO if `planTier` is PRO OR `proPassExpiresAt` is still in the future. `getCurrentPlanTier()` uses this.
+- Applied everywhere plan tier gets read directly from the DB: `presign` route, `account/storage` route, all three places in `auth.ts` that populate the NextAuth JWT/session, `cleanup.ts`'s inactive-file queries.
+
+**Stripe integration**:
+- Two live one-time Prices created (`STRIPE_PRO_DAYPASS_PRICE_ID`, `STRIPE_PRO_WEEKPASS_PRICE_ID` in `.env.local`).
+- `/api/stripe/checkout-pass` - `mode: "payment"`, metadata carries `userId`/`passType`.
+- Webhook branches on `mode === "payment"` + a `passType` in metadata before falling through to the existing subscription logic - grants `proPassExpiresAt`, doesn't touch `planTier`/`Subscription`. "Top-up anytime" implemented by extending from whichever is later, current time or an already-active pass's expiry.
+- "Just need it for a bit?" section on `/pricing`, hidden if already Pro, login-gated (a pass needs a `userId` to attach to).
+
+**Verified end-to-end for real**: registered a throwaway test account, verified its email directly in the DB (same shortcut as the referral program test), logged in through the real login form, called the checkout API as that authenticated user, got back a genuine Stripe LIVE checkout session URL for the correct price. Did not complete an actual payment (stopped at Stripe's hosted page - no real charge). Test account cleaned up, no leftover data.
 
 **Found and deliberately avoided a real data-loss risk while working on this**: running `prisma migrate dev` surfaced a pre-existing mismatch between this repo's migration history and what's actually recorded in the live database (a migration folder appears to have been renamed at some point after being applied - database still references the old name). Prisma's only suggested fix was `prisma migrate reset`, which would drop all data in the database. Did not do that. Used `prisma db push` instead (applies the schema diff directly, no data loss possible for an additive nullable column), then hand-wrote the migration SQL file to keep the tracked history consistent with every other change in this project. **The underlying migration-history drift itself is still unresolved** and worth looking into carefully at some point (not urgent, not blocking anything, but `prisma migrate dev` shouldn't be run again until it's understood, in case it prompts the same reset suggestion).
 
@@ -225,7 +226,7 @@ Sources: [pixeldrain 2026 review](https://speed-drain.com/blog/why-choose-pixeld
 
 ## 💡 Ideas from 2026-08-07 (while waiting on the Vercel monthly reset, not built — for consideration)
 
-- ~~Pro day-pass ($0.99/24h) + week-pass ($2.99/7d)~~ — **in progress**, see "💳 In progress: Pro day-pass / week-pass" section above for real status (backend done, Stripe integration blocked on the key situation).
+- ~~Pro day-pass ($0.99/24h) + week-pass ($2.99/7d)~~ — **done 2026-08-08**, see "✅ Pro day-pass / week-pass" section above.
 - ~~SEO on the free tools~~ — **done**, see "SEO for the free tools (2026-08-07)" above.
 - ~~Basic error alerting~~ — **done 2026-08-08**, see "Error alerting for Stripe webhook + upload failures" above. (Ended up using Resend, not Gmail SMTP - that plan was based on a stale checklist note.)
 - ~~Real speed/Lighthouse audit~~ — **done 2026-08-08**, see "Lighthouse audit findings" above.
