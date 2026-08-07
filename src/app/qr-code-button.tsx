@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import QRCode from "qrcode";
 import { svgToPngDataUrl } from "./qr-to-png";
 
 const DOWNLOAD_SIZE = 1024;
@@ -15,6 +14,7 @@ export function QrCodeButton({ url }: { url: string }) {
   async function toggle() {
     if (!show && !svg) {
       try {
+        const QRCode = (await import("qrcode")).default;
         const generated = await QRCode.toString(url, { type: "svg", margin: 1, width: 220 });
         setSvg(generated);
       } catch {
@@ -27,6 +27,7 @@ export function QrCodeButton({ url }: { url: string }) {
   async function handleDownload() {
     setDownloading(true);
     try {
+      const QRCode = (await import("qrcode")).default;
       const highRes = await QRCode.toString(url, { type: "svg", margin: 1, width: DOWNLOAD_SIZE });
       const pngDataUrl = await svgToPngDataUrl(highRes, DOWNLOAD_SIZE);
       const link = document.createElement("a");

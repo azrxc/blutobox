@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ToolPageLayout } from "../tool-page-layout";
-import { ImageFormatConverter } from "../image-format-converter";
+import { ImageFormatConverter } from "../lazy-tools";
 
 export const metadata: Metadata = {
   title: "Convert JPG to PNG Free | Bluto Box",

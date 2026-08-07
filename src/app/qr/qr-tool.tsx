@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import QRCode from "qrcode";
 import { svgToPngDataUrl } from "../qr-to-png";
 import { ProBadge } from "../pro-badge";
 
@@ -36,6 +35,7 @@ export function QrTool() {
     setError(null);
     if (!text.trim()) return;
     try {
+      const QRCode = (await import("qrcode")).default;
       const generated = await QRCode.toString(text.trim(), {
         type: "svg",
         margin: 1,
@@ -55,6 +55,7 @@ export function QrTool() {
     setDownloading(true);
     setError(null);
     try {
+      const QRCode = (await import("qrcode")).default;
       const highRes = await QRCode.toString(text.trim(), {
         type: "svg",
         margin: 1,

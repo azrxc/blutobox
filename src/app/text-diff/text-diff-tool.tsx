@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { diffWords, diffLines, type Change } from "diff";
+import type { Change } from "diff";
 import { UploadToBlutoButton } from "../file-converter/upload-to-bluto-button";
 import { ProBadge } from "../pro-badge";
 
@@ -49,7 +49,8 @@ export function TextDiffTool() {
   const [result, setResult] = useState<Change[] | null>(null);
   const [exported, setExported] = useState<Blob | null>(null);
 
-  function handleCompare() {
+  async function handleCompare() {
+    const { diffWords, diffLines } = await import("diff");
     const parts = mode === "words" ? diffWords(original, changed) : diffLines(original, changed);
     setResult(parts);
     setExported(null);

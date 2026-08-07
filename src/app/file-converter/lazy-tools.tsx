@@ -10,3 +10,4 @@ export const ImageCompressor = dynamic(() => import("./image-compressor").then((
 export const VideoToGifConverter = dynamic(() => import("./video-to-gif-converter").then((m) => m.VideoToGifConverter), { ssr: false });
 export const PdfMergeConverter = dynamic(() => import("./pdf-merge-converter").then((m) => m.PdfMergeConverter), { ssr: false });
 export const PdfToImagesConverter = dynamic(() => import("./pdf-to-images-converter").then((m) => m.PdfToImagesConverter), { ssr: false });
+export const ImageFormatConverter = dynamic(() => import("./image-format-converter").then((m) => m.ImageFormatConverter), { ssr: false });
