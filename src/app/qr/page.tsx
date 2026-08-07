@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { QrTool } from "./qr-tool";
+import { QrTool } from "./lazy-qr-tool";
 
 export const metadata: Metadata = {
   title: "Free QR Code Generator | Bluto Box",

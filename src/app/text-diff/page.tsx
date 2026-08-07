@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TextDiffTool } from "./text-diff-tool";
+import { TextDiffTool } from "./lazy-text-diff-tool";
 
 export const metadata: Metadata = {
   title: "Free Text Diff / Compare Tool | Bluto Box",

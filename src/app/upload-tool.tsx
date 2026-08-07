@@ -7,7 +7,7 @@ import { uploadFile, UploadCancelledError } from "@/lib/upload-client";
 import { zipFiles } from "@/lib/zip-files";
 import { CopyLinkField } from "./copy-link-field";
 import { StorageUsageBar } from "./storage-usage-bar";
-import { QrCodeButton } from "./qr-code-button";
+import { QrCodeButton } from "./lazy-qr-code-button";
 import { EmailShareForm } from "./email-share-form";
 import { SocialShareButtons } from "./social-share-buttons";
 import { takePendingUpload } from "@/lib/pending-upload";

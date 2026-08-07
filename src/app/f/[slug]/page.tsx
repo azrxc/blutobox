@@ -9,7 +9,7 @@ import { CopyButton } from "./copy-button";
 import { NsfwGate } from "./nsfw-gate";
 import { DownloadButton } from "./download-button";
 import { DownloadUsageBar } from "../../download-usage-bar";
-import { QrCodeButton } from "../../qr-code-button";
+import { QrCodeButton } from "../../lazy-qr-code-button";
 import { EmailShareForm } from "../../email-share-form";
 import { unlockCookieName, verifyUnlockToken } from "@/lib/link-lock";
 import { isAgeVerificationRestrictedRegion } from "@/lib/region-block";
