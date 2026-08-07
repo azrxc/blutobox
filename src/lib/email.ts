@@ -26,6 +26,34 @@ function escapeHtml(input: string) {
     .replace(/"/g, "&quot;");
 }
 
+// Deliberately its own env var rather than querying for role=ADMIN users - alerting
+// infrastructure that only works when the database is healthy defeats the point of
+// alerting when the database is the thing that's broken.
+export async function sendAdminAlert(subject: string, details: string) {
+  const to = process.env.ADMIN_ALERT_EMAIL;
+  if (!to) {
+    console.error(`[alert] ADMIN_ALERT_EMAIL not set, dropping alert: ${subject}\n${details}`);
+    return;
+  }
+
+  const resend = getResend();
+  if (!resend) {
+    console.error(`[alert] ${subject}\n${details}`);
+    return;
+  }
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `[Bluto Box alert] ${subject}`,
+    html: `<pre style="white-space:pre-wrap;font-family:monospace">${escapeHtml(details)}</pre>`,
+  });
+  if (error) {
+    // Nothing further to alert to here - this IS the alert path. Just log it.
+    console.error(`[alert] Failed to send admin alert email:`, error);
+  }
+}
+
 export async function sendDeletionWarningEmail(email: string, filename: string, slug: string) {
   const fileUrl = `${process.env.NEXTAUTH_URL}/f/${slug}`;
   const pricingUrl = `${process.env.NEXTAUTH_URL}/pricing`;

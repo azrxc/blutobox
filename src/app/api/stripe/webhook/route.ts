@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import { sendAdminAlert } from "@/lib/email";
 
 function billingIntervalFrom(item: Stripe.SubscriptionItem | undefined): string | null {
   const interval = item?.price?.recurring?.interval;
@@ -25,6 +26,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  try {
+    await handleEvent(event);
+  } catch (err) {
+    // A failure here means a real payment event (money already moved) didn't get
+    // recorded correctly - e.g. someone paid but didn't get flipped to Pro. That's
+    // worth knowing about immediately, not discovering later from a confused user.
+    const message = err instanceof Error ? err.message : String(err);
+    await sendAdminAlert(
+      "Stripe webhook handler failed",
+      `Event type: ${event.type}\nEvent id: ${event.id}\nError: ${message}`
+    ).catch(() => {});
+    return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+async function handleEvent(event: Stripe.Event) {
   switch (event.type) {
     case "checkout.session.completed": {
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
@@ -78,6 +97,4 @@ export async function POST(req: Request) {
       break;
     }
   }
-
-  return NextResponse.json({ received: true });
 }

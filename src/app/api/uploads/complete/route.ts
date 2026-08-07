@@ -11,6 +11,7 @@ import { getClientIp } from "@/lib/request-ip";
 import { isKnownMalicious } from "@/lib/virustotal";
 import { getCurrentPlanTier } from "@/lib/plan";
 import { FREE_ALLOWED_EXPIRY_HOURS } from "@/lib/limits";
+import { sendAdminAlert } from "@/lib/email";
 
 export const maxDuration = 60;
 
@@ -41,6 +42,16 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid completion request" }, { status: 400 });
   }
+  try {
+    return await completeUpload(req, parsed.data);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    await sendAdminAlert("Upload completion failed", `Error: ${message}`).catch(() => {});
+    return NextResponse.json({ error: "Upload completion failed" }, { status: 500 });
+  }
+}
+
+async function completeUpload(req: Request, data: z.infer<typeof completeSchema>) {
   const {
     key,
     filename,
@@ -55,7 +66,7 @@ export async function POST(req: Request) {
     notifyOnDownload,
     maxDownloads,
     customSlug,
-  } = parsed.data;
+  } = data;
 
   if (sha256 && (await isKnownMalicious(sha256))) {
     const s3 = getS3Client();
