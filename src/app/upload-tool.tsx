@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { uploadFile, UploadCancelledError } from "@/lib/upload-client";
 import { zipFiles } from "@/lib/zip-files";
+import { stripImageMetadata } from "@/lib/strip-image-metadata";
 import { CopyLinkField } from "./copy-link-field";
 import { StorageUsageBar } from "./storage-usage-bar";
 import { QrCodeButton } from "./lazy-qr-code-button";
@@ -77,10 +78,11 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     try {
-      let fileToUpload = files[0];
-      if (files.length > 1) {
+      const cleanedFiles = await Promise.all(files.map(stripImageMetadata));
+      let fileToUpload = cleanedFiles[0];
+      if (cleanedFiles.length > 1) {
         setZipping(true);
-        fileToUpload = await zipFiles(files);
+        fileToUpload = await zipFiles(cleanedFiles);
         setZipping(false);
       }
       const { slug } = await uploadFile(
@@ -204,6 +206,12 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
       {files.length > 1 && (
         <p className="text-xs text-muted">
           Multiple files will be bundled into one .zip and shared as a single link.
+        </p>
+      )}
+
+      {files.some((f) => ["image/jpeg", "image/png", "image/webp"].includes(f.type)) && (
+        <p className="text-xs text-muted">
+          Photos have location &amp; camera metadata removed automatically before uploading, for your privacy.
         </p>
       )}
 
