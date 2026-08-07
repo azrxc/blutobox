@@ -41,6 +41,7 @@ export async function POST(
   const res = NextResponse.json({ ok: true });
   res.cookies.set(unlockCookieName(slug), makeUnlockToken(slug), {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 6,
