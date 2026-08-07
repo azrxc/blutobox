@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 
 export default function WordToPdfPage() {
   return (
-    <ToolPageLayout title="Convert Word to PDF" intro="Turn a .docx file into a PDF.">
+    <ToolPageLayout
+      title="Convert Word to PDF"
+      intro="Turn a .docx file into a PDF."
+      structuredDataPath="/file-converter/word-to-pdf"
+      structuredDataDescription="Convert a .docx Word document to PDF for free, right in your browser. No upload, no sign-up."
+    >
       <DocToPdfConverter />
     </ToolPageLayout>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FileConverterTool } from "./file-converter-tool";
+import { ToolStructuredData } from "../structured-data";
 
 export const metadata: Metadata = {
   title: "Free File Converter | Bluto Box",
@@ -21,6 +22,11 @@ const POPULAR_CONVERSIONS = [
 export default function FileConverterPage() {
   return (
     <main className="flex flex-1 flex-col items-center gap-10 px-6 py-16">
+      <ToolStructuredData
+        name="Bluto Box File Converter"
+        description="Convert images between PNG/JPG/WebP, combine images into a PDF, or split a PDF into images. Free, no sign-up, done entirely in your browser."
+        path="/file-converter"
+      />
       <FileConverterTool />
       <div className="w-full max-w-md">
         <p className="mb-2 text-xs font-medium text-muted">Popular conversions</p>

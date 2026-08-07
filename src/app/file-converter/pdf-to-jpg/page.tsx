@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 
 export default function PdfToJpgPage() {
   return (
-    <ToolPageLayout title="Convert PDF to JPG" intro="Every page becomes its own image.">
+    <ToolPageLayout
+      title="Convert PDF to JPG"
+      intro="Every page becomes its own image."
+      structuredDataPath="/file-converter/pdf-to-jpg"
+      structuredDataDescription="Turn every page of a PDF into a JPG image, free, right in your browser. No upload, no sign-up."
+    >
       <PdfToImagesConverter />
     </ToolPageLayout>
   );

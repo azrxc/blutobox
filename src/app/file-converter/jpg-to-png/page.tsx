@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 
 export default function JpgToPngPage() {
   return (
-    <ToolPageLayout title="Convert JPG to PNG" intro="Lossless format, transparency support.">
+    <ToolPageLayout
+      title="Convert JPG to PNG"
+      intro="Lossless format, transparency support."
+      structuredDataPath="/file-converter/jpg-to-png"
+      structuredDataDescription="Convert JPG images to PNG for free, right in your browser. No upload, no sign-up, no watermark."
+    >
       <ImageFormatConverter initialFormat="png" />
     </ToolPageLayout>
   );

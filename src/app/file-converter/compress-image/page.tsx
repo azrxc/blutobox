@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 
 export default function CompressImagePage() {
   return (
-    <ToolPageLayout title="Compress an image" intro="Pick a target size, we'll get as close as we can.">
+    <ToolPageLayout
+      title="Compress an image"
+      intro="Pick a target size, we'll get as close as we can."
+      structuredDataPath="/file-converter/compress-image"
+      structuredDataDescription="Shrink an image's file size for free, right in your browser. No upload, no sign-up, no watermark."
+    >
       <ImageCompressor />
     </ToolPageLayout>
   );

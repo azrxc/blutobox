@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { checkLoginLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/request-ip";
+import { effectivePlanTier } from "@/lib/plan";
 
 class EmailNotVerifiedError extends CredentialsSignin {
   code = "email_not_verified";
@@ -49,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           role: user.role,
-          planTier: user.planTier,
+          planTier: effectivePlanTier(user),
         };
       },
     }),
@@ -72,7 +73,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       user.id = dbUser.id;
       user.name = dbUser.name;
       user.role = dbUser.role;
-      user.planTier = dbUser.planTier;
+      user.planTier = effectivePlanTier(dbUser);
       return true;
     },
     async jwt({ token, user, trigger }) {
@@ -87,7 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (dbUser) {
           token.name = dbUser.name;
           token.role = dbUser.role;
-          token.planTier = dbUser.planTier;
+          token.planTier = effectivePlanTier(dbUser);
         }
       }
       return token;

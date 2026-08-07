@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { totalStorageBytesFor } from "@/lib/limits";
+import { effectivePlanTier } from "@/lib/plan";
 
 export async function GET() {
   const session = await auth();
@@ -14,9 +15,10 @@ export async function GET() {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  const planTier = effectivePlanTier(user);
   return NextResponse.json({
     usedBytes: Number(user.storageUsedBytes),
-    totalBytes: totalStorageBytesFor(user.planTier, user.bonusStorageBytes),
-    planTier: user.planTier,
+    totalBytes: totalStorageBytesFor(planTier, user.bonusStorageBytes),
+    planTier,
   });
 }

@@ -47,6 +47,11 @@ model User {
   bonusStorageBytes BigInt   @default(0)
   bonusCreatorLinks Int      @default(0)
 
+  // One-time, non-recurring Pro access ("day pass" / "week pass") - separate from the
+  // real Subscription relation below since a Free user can buy one without ever having
+  // a subscription. Effective tier = PRO if planTier is PRO OR this is still in the future.
+  proPassExpiresAt DateTime?
+
   files           File[]
   subscription    Subscription?
   verificationTokens VerificationToken[]

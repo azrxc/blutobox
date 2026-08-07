@@ -18,6 +18,7 @@ import {
 } from "@/lib/limits";
 import { getClientIp } from "@/lib/request-ip";
 import { checkAnonUploadLimit, checkFreeDailyUploadCountLimit, checkProDailyUploadCountLimit } from "@/lib/rate-limit";
+import { effectivePlanTier } from "@/lib/plan";
 
 export const maxDuration = 30;
 
@@ -39,10 +40,10 @@ export async function POST(req: Request) {
   const currentUser = session?.user?.id
     ? await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { planTier: true, storageUsedBytes: true, bonusStorageBytes: true },
+        select: { planTier: true, proPassExpiresAt: true, storageUsedBytes: true, bonusStorageBytes: true },
       })
     : null;
-  const planTier = currentUser?.planTier ?? null;
+  const planTier = currentUser ? effectivePlanTier(currentUser) : null;
 
   const ip = getClientIp(req);
   const banned = await prisma.bannedIp.findUnique({ where: { ip } });

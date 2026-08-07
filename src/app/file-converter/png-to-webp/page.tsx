@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 
 export default function PngToWebpPage() {
   return (
-    <ToolPageLayout title="Convert PNG to WebP" intro="Smaller file size, same image quality.">
+    <ToolPageLayout
+      title="Convert PNG to WebP"
+      intro="Smaller file size, same image quality."
+      structuredDataPath="/file-converter/png-to-webp"
+      structuredDataDescription="Convert PNG images to WebP for free, right in your browser. No upload, no sign-up, no watermark."
+    >
       <ImageFormatConverter initialFormat="webp" />
     </ToolPageLayout>
   );

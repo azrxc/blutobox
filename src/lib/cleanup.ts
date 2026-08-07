@@ -7,6 +7,11 @@ export const FREE_INACTIVITY_DAYS = 30;
 export const ANON_INACTIVITY_DAYS = 7;
 export const WARNING_DAYS_BEFORE_DELETION = 3;
 
+// A user on a currently-active day/week pass shouldn't be treated as "Free" here even
+// though their base planTier still says FREE - same effective-tier logic as everywhere
+// else, just expressed as a query filter instead of the in-app helper.
+const notCurrentlyProViaPass = { OR: [{ proPassExpiresAt: null }, { proPassExpiresAt: { lt: new Date() } }] };
+
 export async function warnUsersOfUpcomingDeletion() {
   const deletionCutoff = new Date(Date.now() - FREE_INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
   const warningCutoff = new Date(
@@ -18,7 +23,7 @@ export async function warnUsersOfUpcomingDeletion() {
       status: "ACTIVE",
       deletionWarningSentAt: null,
       lastAccessedAt: { lt: warningCutoff, gte: deletionCutoff },
-      owner: { planTier: "FREE" },
+      owner: { planTier: "FREE", ...notCurrentlyProViaPass },
     },
     include: { owner: true, shareLinks: { take: 1 } },
   });
@@ -52,7 +57,7 @@ export async function deleteInactiveFreeFiles() {
       status: "ACTIVE",
       OR: [
         { ownerId: null, lastAccessedAt: { lt: anonCutoff } },
-        { owner: { planTier: "FREE" }, lastAccessedAt: { lt: freeCutoff } },
+        { owner: { planTier: "FREE", ...notCurrentlyProViaPass }, lastAccessedAt: { lt: freeCutoff } },
       ],
     },
     select: { id: true, b2Key: true, ownerId: true, sizeBytes: true },
