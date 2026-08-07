@@ -2,6 +2,22 @@
 
 Running notes on what's done and what's left, so nothing gets forgotten if this project is picked back up later.
 
+## 🔴 In progress: migrating hosting from Vercel to Cloudflare Workers (2026-08-06)
+
+**Why**: Vercel's Hobby plan account got paused after a separate, unrelated project (graalguide.com, sharing the same Vercel account) burned through the shared 1M/month Edge Request limit — Bluto Box itself had near-zero real traffic and wasn't the cause. No self-serve resume available before the monthly reset (Vercel's dashboard only offered "Upgrade to resume service"). Decided against paying $20/mo for Pro; decided against waiting ~25 days for the reset either, since ongoing development needs to keep shipping. graalguide.com has already been moved to GitHub Pages.
+
+**Why Cloudflare specifically** (not Render/Railway/Fly.io): researched and compared directly - Cloudflare Workers gives sub-5ms cold starts across 330+ cities vs Render/Railway's single-region deployments (100-200ms penalty for distant users, and Railway dropped its own CDN in 2026) and vs Fly.io's smaller 30+ region footprint and more hands-on infrastructure management. $5/mo flat includes 10M requests/month (10x what just got exceeded), and it's already this project's domain registrar/DNS/email provider, so no new account needed. Free tier (100K requests/day, no credit card required) is being used for the actual migration/testing before deciding whether the $5/mo tier is ever needed.
+
+**Done**: `@opennextjs/cloudflare` adapter installed and configured (`wrangler.jsonc`, `open-next.config.ts`), `custom-worker.ts` added for the cron trigger (calls the existing `/api/cron/cleanup` endpoint on a schedule, replacing `vercel.json`'s cron config), `region-block.ts` swapped from Vercel's `x-vercel-ip-*` headers to Cloudflare's `cf-ipcountry`/`cf-region-code` for the OH/SD/WY age-verification block. Regular `next build`/typecheck/lint all pass clean.
+
+**Not yet done / needs real verification**:
+- **Could not verify the actual Cloudflare-specific build (`opennextjs-cloudflare build`) completes locally** — it needs to create symlinks, which fails with `EPERM` on Windows without Developer Mode enabled (OpenNext's own docs warn Windows isn't fully supported, WSL is recommended). This is a local tooling limitation, not a confirmed code problem, but it means the migration is genuinely unverified past this point.
+- **Plan to get a real answer**: connect Cloudflare's native Git integration ("Workers Builds", Cloudflare dashboard → Settings → Builds → Connect) so the build runs on Cloudflare's own Linux infrastructure instead of locally — same "push to deploy" workflow as Vercel had, and sidesteps the Windows symlink issue entirely.
+- **`cf-region-code` header format is unconfirmed** — Cloudflare's docs confirm the header name (via the "Add visitor location headers" Managed Transform, Rules → Settings → Managed Transforms — this must be manually turned on, it's off by default) but not whether the value is a bare code ("OH") or ISO 3166-2 style ("US-OH"). The code normalizes for either, but this needs a real check once deployed (log the raw header value for one real US request) to confirm the age-verification geo-block is actually working correctly for Ohio/South Dakota/Wyoming.
+- **All environment variables need to be re-added** in the Cloudflare dashboard (or via `wrangler secret put`) — nothing carries over automatically from Vercel.
+- **DNS needs to be pointed at the new Worker** once a successful deployment is confirmed — not done yet, blutobox.com still points at the paused Vercel project.
+- Old `vercel.json` and the Vercel project itself left in place for now as a fallback reference, not yet removed.
+
 ## ✅ Built and working (tested end-to-end, including live production)
 
 - **Live at https://blutobox-14ks.vercel.app/** — confirmed working end-to-end in production: register, login, upload (real browser test, not just server-to-server), file view/download, all verified 2026-08-01
