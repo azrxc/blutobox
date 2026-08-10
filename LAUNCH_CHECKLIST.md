@@ -211,6 +211,8 @@ Researched actual current pricing for every service Bluto Box depends on (B2, Cl
 
 Sources: [Backblaze B2 pricing](https://www.backblaze.com/cloud-storage/pricing), [B2 + Cloudflare Bandwidth Alliance details](https://leanopstech.com/blog/backblaze-b2-pricing-2026/), [Vercel Pro plan pricing 2026](https://temps.sh/blog/vercel-pricing-2026-pro-plan-explained), [Upstash pricing](https://upstash.com/pricing), [Neon pricing](https://neon.com/pricing), [Stripe fees 2026](https://merchantcostconsulting.com/lower-credit-card-processing-fees/the-complete-guide-to-stripe-credit-card-processing-rates-and-fees/), [pixeldrain pricing](https://www.techjockey.com/detail/pixeldrain)
 
+**Real data point (2026-08-08), corrects the estimate above**: actual net payout for one $4.99 monthly Pro subscription, after fees and tax, is **RM18.22**. The Stripe-fee-only estimate above (~$4.55 net, assuming US-style 2.9%+$0.30) was too optimistic for this account specifically - it didn't account for Malaysia-specific card/tax handling. RM18.22 works out to roughly $4.25-4.30 USD equivalent net, i.e. **closer to ~14-15% total deducted (fees + tax combined), not ~9%**. Worth using this real number instead of the earlier US-centric assumption for any future margin math, especially the day-pass/week-pass economics (those were sanity-checked on list price only, not actual net-after-fee take-home - a $0.99 day-pass nets meaningfully less than $0.99, same proportional hit likely applies).
+
 ## 💡 Ideas from competitor research (2026-08-01, not built — for consideration)
 
 Researched pixeldrain, Mega, WeTransfer, and general file-hosting industry practices to see what Bluto Box is missing. Not urgent, just logged so nothing gets lost:
