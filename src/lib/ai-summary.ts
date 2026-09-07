@@ -7,7 +7,7 @@ import { effectivePlanTier } from "@/lib/plan";
 // DeepSeek's API is OpenAI-compatible - same SDK, different base URL/model. Chosen
 // over Claude/GPT for this feature specifically because it's dramatically cheaper
 // per token, and a short public-facing summary doesn't need frontier-level quality.
-const MODEL = "deepseek-chat";
+const MODEL = "deepseek-v4-flash";
 
 // Independent of plan upload/storage limits (src/lib/limits.ts) - this is a fixed,
 // feature-level cost/latency bound, not a plan quota, so it's kept local here.
@@ -43,7 +43,7 @@ let cachedClient: OpenAI | null | undefined;
 function getClient(): OpenAI | null {
   if (cachedClient !== undefined) return cachedClient;
   const apiKey = process.env.DEEPSEEK_API_KEY;
-  cachedClient = apiKey ? new OpenAI({ apiKey, baseURL: "https://api.deepseek.com/v1" }) : null;
+  cachedClient = apiKey ? new OpenAI({ apiKey, baseURL: "https://api.deepseek.com" }) : null;
   return cachedClient;
 }
 
