@@ -68,7 +68,7 @@ export function FileViewer({ slug }: { slug: string }) {
   if (!data) {
     return (
       <div className="flex flex-col items-center gap-3 py-8">
-        <LoadingIcon size={28} />
+        <LoadingIcon size={56} />
         <p className="text-sm text-muted">Loading preview…</p>
       </div>
     );

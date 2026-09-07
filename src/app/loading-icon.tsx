@@ -1,4 +1,4 @@
-export function LoadingIcon({ size = 28 }: { size?: number }) {
+export function LoadingIcon({ size = 56 }: { size?: number }) {
   return (
     <span
       className="inline-flex shrink-0 items-center justify-center rounded-full bg-black p-2"
