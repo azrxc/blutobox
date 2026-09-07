@@ -157,6 +157,25 @@ const faqs: QA[] = [
       </p>
     ),
   },
+  {
+    q: "How does the AI summary feature work?",
+    a: (
+      <>
+        <p>
+          Any file page for a PDF or text-based file (<code className="rounded bg-surface px-1 py-0.5">.txt</code>,{" "}
+          <code className="rounded bg-surface px-1 py-0.5">.md</code>,{" "}
+          <code className="rounded bg-surface px-1 py-0.5">.json</code>, and similar) has a &quot;Generate AI
+          summary&quot; button, useful for checking what a file actually contains before downloading it. It&apos;s
+          not currently supported for APKs, ZIPs, images, video, audio, or other binary file types, there&apos;s no
+          readable text in those for it to summarize, so the button won&apos;t appear on those file pages.
+        </p>
+        <p className="mt-2">
+          Clicking it uses up one of your daily AI summary uses, whether or not a summary already existed for that
+          file, uses reset daily: 1/day if you&apos;re not logged in, 3/day on a Free account, 15/day on Pro.
+        </p>
+      </>
+    ),
+  },
 ];
 
 export default function FaqPage() {

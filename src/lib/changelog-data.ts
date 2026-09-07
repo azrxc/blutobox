@@ -7,6 +7,16 @@ export type ChangelogEntry = {
 
 export const changelog: ChangelogEntry[] = [
   {
+    date: "2026-09-07",
+    title: "AI summary for file pages",
+    intro: "New tool for checking what's actually in a file before you download it.",
+    highlights: [
+      "PDF and text-based file pages now have a 'Generate AI summary' button, get a quick AI-written summary of the file's contents without downloading it first",
+      "Uses: 1/day if you're not logged in, 3/day on Free, 15/day on Pro, resets daily",
+      "Not yet supported for APKs, ZIPs, images, video, audio, or other binary files, see the FAQ for why",
+    ],
+  },
+  {
     date: "2026-08-06",
     title: "Clearer wording for sensitive content",
     intro: "Small stuff today, but stuff I'd been meaning to get right for a while:",
