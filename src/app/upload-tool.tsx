@@ -47,8 +47,6 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
     const pending = typeof window !== "undefined" ? takePendingUpload() : null;
     return pending ? [pending] : [];
   });
-  const [showMatureCheck, setShowMatureCheck] = useState(false);
-  const [showMatureInfo, setShowMatureInfo] = useState(false);
   const [linkPassword, setLinkPassword] = useState("");
   const [expiryChoice, setExpiryChoice] = useState("");
   const [customHours, setCustomHours] = useState("");
@@ -69,9 +67,8 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
     return expiryChoice ? Number(expiryChoice) : undefined;
   }
 
-  async function handleUpload(isNsfw: boolean) {
+  async function handleUpload() {
     if (files.length === 0) return;
-    setShowMatureCheck(false);
     setError(null);
     setUploading(true);
     setProgress(0);
@@ -88,7 +85,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
       const { slug } = await uploadFile(
         fileToUpload,
         {
-          isNsfw,
+          isNsfw: false,
           linkPassword: isPro ? linkPassword : undefined,
           expiresInHours: resolveExpiryHours(),
           notifyOnDownload: Boolean(session?.user) && notifyOnDownload,
@@ -367,50 +364,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
         </div>
       )}
 
-      {showMatureCheck ? (
-        <div className="space-y-3 rounded-xl border border-border bg-surface p-4">
-          <p className="text-sm font-medium">Does this file contain sensitive content?</p>
-          <p className="text-xs text-muted">
-            We&apos;ll apply an age restriction so it&apos;s not shown to everyone by default.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowMatureInfo((v) => !v)}
-            className="text-xs text-muted underline underline-offset-2 hover:text-foreground"
-          >
-            What counts as sensitive content?
-          </button>
-          {showMatureInfo && (
-            <p className="rounded-lg bg-background px-3 py-2 text-xs text-muted">
-              Nudity, sexual content, graphic violence, or other content not suitable for all audiences.
-            </p>
-          )}
-          <div className="flex gap-3">
-            <button
-              onClick={() => handleUpload(false)}
-              className="flex-1 rounded-full bg-accent py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85"
-            >
-              No
-            </button>
-            <button
-              onClick={() => handleUpload(true)}
-              className="flex-1 rounded-full border border-border py-2.5 text-sm font-medium transition-colors hover:bg-background"
-            >
-              Yes
-            </button>
-          </div>
-          <p className="text-[11px] leading-relaxed text-muted">
-            You&apos;re responsible for answering accurately. Files found to contain sensitive content that
-            wasn&apos;t declared here may be removed, and repeated violations can get your account suspended.
-          </p>
-          <button
-            onClick={() => setShowMatureCheck(false)}
-            className="w-full text-center text-xs text-muted underline underline-offset-2"
-          >
-            Cancel
-          </button>
-        </div>
-      ) : uploading ? (
+      {uploading ? (
         <div className="flex gap-3">
           <button
             disabled
@@ -427,7 +381,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
         </div>
       ) : (
         <button
-          onClick={() => setShowMatureCheck(true)}
+          onClick={handleUpload}
           disabled={files.length === 0}
           className="w-full rounded-full bg-accent py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-40"
         >
