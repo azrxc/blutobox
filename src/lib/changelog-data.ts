@@ -11,8 +11,11 @@ export const changelog: ChangelogEntry[] = [
     title: "AI text adventure",
     intro: "New free tool:",
     highlights: [
-      "New: an AI-driven text adventure at /adventure, an AI game master narrates a story and continues it based on what you type, no two playthroughs alike. Family-friendly by design",
+      "New: an AI-driven text adventure at /adventure, an AI game master narrates a story and continues it based on what you choose or type, no two playthroughs alike. Family-friendly by design",
       "Pick a preset scenario or write your own starting prompt",
+      "Click a suggested action or type your own at each step",
+      "A meter (Trust, Health, Sanity, Suspicion - whatever fits the story) tracks how things are going based on your choices; reaching one end wins the story, the other ends it",
+      "Some moments are tense enough that only the suggested choices are available, no time to type something else",
       "One active adventure at a time. Logged-in accounts get it tied to their account and can pick up where they left off from any device; not logged in keeps it on that browser",
       "Daily turns (starting or continuing a story): 8/day if you're not logged in, 25/day on Free, 100/day on Pro",
     ],
