@@ -7,7 +7,6 @@ import { FileViewer } from "./file-viewer";
 import { ReportForm } from "./report-form";
 import { PasswordGate } from "./password-gate";
 import { CopyButton } from "./copy-button";
-import { NsfwGate } from "./nsfw-gate";
 import { DownloadButton } from "./download-button";
 import { DownloadUsageBar } from "../../download-usage-bar";
 import { QrCodeButton } from "../../lazy-qr-code-button";
@@ -180,7 +179,7 @@ export default async function FilePage({
           )}
         </div>
 
-        <NsfwGate isNsfw={file.isNsfw}>
+        <>
           <div className="flex justify-center rounded-2xl border border-border bg-surface p-6">
             <FileViewer slug={slug} />
           </div>
@@ -212,7 +211,7 @@ export default async function FilePage({
             {session?.user && <BookmarkButton slug={slug} initialBookmarked={isBookmarked} />}
             <EmailShareForm slug={slug} />
           </div>
-        </NsfwGate>
+        </>
 
         <div className="flex justify-end">
           <ReportForm slug={slug} />
