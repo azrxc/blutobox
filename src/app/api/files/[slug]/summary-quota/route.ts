@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { getClientIp } from "@/lib/request-ip";
 import { getCurrentPlanTier } from "@/lib/plan";
 import { dailySummaryLimitFor } from "@/lib/limits";
-import { checkSummaryQuota } from "@/lib/summary-quota";
+import { checkDailyQuota } from "@/lib/daily-quota";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const identifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
   const limit = dailySummaryLimitFor(planTier);
 
-  const { used } = await checkSummaryQuota(identifier, limit);
+  const { used } = await checkDailyQuota("ai-summary", identifier, limit);
 
   return NextResponse.json({ used, limit });
 }

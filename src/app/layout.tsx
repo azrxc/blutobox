@@ -73,6 +73,9 @@ export default function RootLayout({
                   <Link href="/speed-test" className="transition-colors hover:text-foreground">
                     Speed test
                   </Link>
+                  <Link href="/adventure" className="transition-colors hover:text-foreground">
+                    AI text adventure
+                  </Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Company</span>

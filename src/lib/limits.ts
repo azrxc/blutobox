@@ -52,6 +52,21 @@ export function dailySummaryLimitFor(planTier: "FREE" | "PRO" | null) {
   return ANON_DAILY_SUMMARY_LIMIT;
 }
 
+// Per-identity daily count of AI adventure turns (src/lib/adventure.ts) - a starting
+// guess, easy to tune. A "turn" is one player action + one AI reply, whether it's
+// starting a new adventure or continuing one - every turn costs, same "every click
+// costs" rule as the AI summary quota above. Separate counter from AI summary's,
+// same way upload/download are separate.
+export const ANON_DAILY_ADVENTURE_TURNS = 8;
+export const FREE_DAILY_ADVENTURE_TURNS = 25;
+export const PRO_DAILY_ADVENTURE_TURNS = 100;
+
+export function dailyAdventureTurnLimitFor(planTier: "FREE" | "PRO" | null) {
+  if (planTier === "PRO") return PRO_DAILY_ADVENTURE_TURNS;
+  if (planTier === "FREE") return FREE_DAILY_ADVENTURE_TURNS;
+  return ANON_DAILY_ADVENTURE_TURNS;
+}
+
 // Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
 export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
 

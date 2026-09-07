@@ -176,6 +176,28 @@ const faqs: QA[] = [
       </>
     ),
   },
+  {
+    q: "What's the AI text adventure?",
+    a: (
+      <>
+        <p>
+          A free tool at{" "}
+          <Link href="/adventure" className="underline underline-offset-2">
+            /adventure
+          </Link>
+          : an AI game master narrates a story, you type what you do next, and it continues from there. No two
+          playthroughs are the same. It&apos;s kept family-friendly (no explicit or graphic content) regardless of
+          what a player tries to type.
+        </p>
+        <p className="mt-2">
+          You get one active adventure at a time. If you&apos;re logged in, it&apos;s tied to your account and
+          picks up where you left off on any device. If you&apos;re not logged in, it&apos;s remembered on that
+          browser only. Each action you take (starting or continuing a story) uses one of your daily turns: 8/day
+          if you&apos;re not logged in, 25/day on Free, 100/day on Pro.
+        </p>
+      </>
+    ),
+  },
 ];
 
 export default function FaqPage() {

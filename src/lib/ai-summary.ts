@@ -1,4 +1,3 @@
-import OpenAI from "openai";
 // Import the internal implementation directly, not the package's main entry -
 // pdf-parse@1.x's index.js has a leftover debug-mode block that misfires when
 // bundled (misdetects `module.parent`), trying to read a test fixture PDF that
@@ -7,11 +6,7 @@ import OpenAI from "openai";
 import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
-
-// DeepSeek's API is OpenAI-compatible - same SDK, different base URL/model. Chosen
-// over Claude/GPT for this feature specifically because it's dramatically cheaper
-// per token, and a short public-facing summary doesn't need frontier-level quality.
-const MODEL = "deepseek-v4-flash";
+import { getDeepSeekClient, DEEPSEEK_MODEL } from "@/lib/deepseek";
 
 // Independent of plan upload/storage limits (src/lib/limits.ts) - this is a fixed,
 // feature-level cost/latency bound, not a plan quota, so it's kept local here.
@@ -41,14 +36,6 @@ const SUMMARY_SYSTEM_PROMPT =
   "private correspondence, credentials, etc.), keep the summary generic and do " +
   "not quote specific details.";
 
-let cachedClient: OpenAI | null | undefined;
-function getClient(): OpenAI | null {
-  if (cachedClient !== undefined) return cachedClient;
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  cachedClient = apiKey ? new OpenAI({ apiKey, baseURL: "https://api.deepseek.com" }) : null;
-  return cachedClient;
-}
-
 export type SummaryResult = { ok: true; summary: string } | { ok: false; reason: string };
 
 // Triggered on-demand by a viewer clicking "Generate AI summary" (src/app/api/files/[slug]/generate-summary/route.ts),
@@ -59,7 +46,7 @@ export type SummaryResult = { ok: true; summary: string } | { ok: false; reason:
 // Never throws - always resolves to a result the caller can relay to the UI.
 export async function generateFileSummary(fileId: string): Promise<SummaryResult> {
   try {
-    const client = getClient();
+    const client = getDeepSeekClient();
     if (!client) return { ok: false, reason: "AI summaries aren't configured yet" };
 
     const file = await prisma.file.findUnique({ where: { id: fileId } });
@@ -86,7 +73,7 @@ export async function generateFileSummary(fileId: string): Promise<SummaryResult
     if (!excerpt) return { ok: false, reason: "Couldn't extract any text from this file" };
 
     const completion = await client.chat.completions.create({
-      model: MODEL,
+      model: DEEPSEEK_MODEL,
       max_tokens: 300,
       messages: [
         { role: "system", content: SUMMARY_SYSTEM_PROMPT },

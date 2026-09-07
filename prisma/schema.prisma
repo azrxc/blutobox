@@ -65,6 +65,7 @@ model User {
   cancellationFeedback CancellationFeedback[]
   creatorLinks    CreatorLink[]
   bookmarks       Bookmark[]
+  adventure       Adventure?
 }
 
 model CreatorLink {
@@ -116,9 +117,11 @@ model File {
   downloadNotifiedAt DateTime?
   maxDownloads       Int?
 
-  // AI-generated public summary of file contents (Pro-only perk, see src/lib/ai-summary.ts).
-  // Re-gated by the owner's *current* plan tier at display time, not just at generation
-  // time, same as brandMessage/brandColor.
+  // AI-generated summary of file contents (src/lib/ai-summary.ts). Generated on-demand
+  // by whoever first clicks "Generate AI summary" on the file page, then cached here so
+  // Bluto Box only pays for one DeepSeek call per file - every viewer's click still
+  // spends their own daily quota though, cached or not, and the button never
+  // auto-reveals this to a later viewer without them clicking it themselves.
   aiSummary            String?   @db.Text
   aiSummaryGeneratedAt DateTime?
 
@@ -167,6 +170,24 @@ model Bookmark {
 
   @@unique([userId, shareLinkId])
   @@index([userId])
+}
+
+// One active AI-driven text adventure per identity at a time (v1 is deliberately
+// single-session, no multi-adventure management UI). ownerId/anonToken are both
+// nullable-unique so at most one row exists per identity - starting a new adventure
+// deletes the old row first rather than allowing several to accumulate. Logged-in
+// users are tied to their account (works across devices); anonymous players are
+// tied to a long-lived cookie token instead (src/lib/adventure-session.ts).
+model Adventure {
+  id           String    @id @default(cuid())
+  ownerId      String?   @unique
+  owner        User?     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  anonToken    String?   @unique
+  scenario     String    @db.Text
+  turns        Json
+  turnCount    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  lastPlayedAt DateTime  @default(now())
 }
 
 model Report {

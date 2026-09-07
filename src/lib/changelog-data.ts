@@ -8,6 +8,17 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-07",
+    title: "AI text adventure",
+    intro: "New free tool:",
+    highlights: [
+      "New: an AI-driven text adventure at /adventure, an AI game master narrates a story and continues it based on what you type, no two playthroughs alike. Family-friendly by design",
+      "Pick a preset scenario or write your own starting prompt",
+      "One active adventure at a time. Logged-in accounts get it tied to their account and can pick up where they left off from any device; not logged in keeps it on that browser",
+      "Daily turns (starting or continuing a story): 8/day if you're not logged in, 25/day on Free, 100/day on Pro",
+    ],
+  },
+  {
+    date: "2026-09-07",
     title: "New look, AI summaries, and a simpler upload flow",
     intro: "A bigger batch than usual:",
     highlights: [

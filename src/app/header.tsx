@@ -101,6 +101,9 @@ export function Header() {
           <Link href="/text-diff" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             Text diff
           </Link>
+          <Link href="/adventure" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
+            AI text adventure
+          </Link>
           <Link href="/faq" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             FAQ
           </Link>
