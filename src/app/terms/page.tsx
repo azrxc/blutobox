@@ -2,14 +2,15 @@ export default function TermsPage() {
   return (
     <main className="mx-auto max-w-2xl flex-1 space-y-6 px-6 py-16 text-sm leading-relaxed">
       <h1 className="text-2xl font-semibold tracking-tight">Terms of Service</h1>
-      <p className="text-muted">Last updated: August 5, 2026</p>
+      <p className="text-muted">Last updated: September 7, 2026</p>
 
       <section className="space-y-2">
         <h2 className="text-lg font-medium">1. What this service is</h2>
         <p>
           Bluto Box (&quot;we&quot;, &quot;us&quot;) provides file storage and sharing tools, with a Free tier and
           a paid Pro tier. By using this service you agree to these terms. You must be at least 13 years old to
-          use this service; if you are under 18, you must not view content flagged as sensitive/mature.
+          use this service. Bluto Box does not review or classify content before it&apos;s shared; files may not
+          be suitable for all audiences, and viewing or downloading a shared file is at your own risk.
         </p>
       </section>
 
@@ -30,10 +31,10 @@ export default function TermsPage() {
           <li>Spam, or content whose primary purpose is phishing or fraud</li>
         </ul>
         <p>
-          Sensitive content (consensual, legal adult content) must be accurately labeled as such at upload time.
-          Users must be 18 or older to view content labeled as sensitive. This is separate from the graphic
-          violence prohibition above. Labeling adult content correctly does not make otherwise-prohibited content
-          allowed. Misrepresenting content&apos;s classification may result in removal and account suspension.
+          Consensual, legal adult content is permitted, subject to the prohibitions above (no CSAM, no
+          non-consensual imagery, no real graphic violence). Bluto Box does not pre-screen or classify uploaded
+          content; you are responsible for what you upload and for complying with any age restrictions that apply
+          in your jurisdiction when accessing a shared link.
         </p>
       </section>
 

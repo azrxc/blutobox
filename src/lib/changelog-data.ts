@@ -8,12 +8,14 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-07",
-    title: "AI summary for file pages",
-    intro: "New tool for checking what's actually in a file before you download it.",
+    title: "New look, AI summaries, and a simpler upload flow",
+    intro: "A bigger batch than usual:",
     highlights: [
-      "PDF and text-based file pages now have a 'Generate AI summary' button, get a quick AI-written summary of the file's contents without downloading it first",
-      "Uses: 1/day if you're not logged in, 3/day on Free, 15/day on Pro, resets daily",
-      "Not yet supported for APKs, ZIPs, images, video, audio, or other binary files, see the FAQ for why",
+      "New logo across the site and favicon",
+      "New galaxy-style background for dark mode",
+      "Simplified uploading: removed the 'flag as sensitive content' step, Bluto Box no longer asks uploaders to self-label content",
+      "New: PDF and text-based file pages now have a 'Generate AI summary' button, get a quick AI-written summary of a file's contents without downloading it first. Uses: 1/day if you're not logged in, 3/day on Free, 15/day on Pro, resets daily. Not yet supported for APKs, ZIPs, images, video, audio, or other binary files, see the FAQ for why",
+      "Migrated hosting to a new, isolated infrastructure account after the previous one got paused by another unrelated project sharing the same account",
     ],
   },
   {
