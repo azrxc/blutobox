@@ -3,7 +3,14 @@ import { consumeDownloadQuota } from "@/lib/download-quota";
 
 export const runtime = "edge";
 
-const THROTTLE_BYTES_PER_SEC = 8 * 1024 * 1024; // 8 MB/s for Free/anonymous downloads
+// Target is ~8 MB/s delivered to the client, but the pacing loop below only
+// accounts for server-side production time, not real Edge Function overhead
+// (cold starts, the upstream B2 fetch, per-chunk scheduling) - measured on
+// production (2026-09-07): a 25MB file averaged 2.6 MB/s actual against an
+// 8 MB/s configured value, a ~3x gap. Compensated upward so delivered speed
+// actually lands near the advertised 8 MB/s - re-measure via /speed-test if
+// this ever needs re-tuning.
+const THROTTLE_BYTES_PER_SEC = 24.6 * 1024 * 1024;
 const QUOTA_FLUSH_BYTES = 4 * 1024 * 1024; // batch quota writes so we're not hitting Redis every chunk
 
 export async function GET(req: Request) {
