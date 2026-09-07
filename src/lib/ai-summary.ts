@@ -1,5 +1,10 @@
 import OpenAI from "openai";
-import { PDFParse } from "pdf-parse";
+// Import the internal implementation directly, not the package's main entry -
+// pdf-parse@1.x's index.js has a leftover debug-mode block that misfires when
+// bundled (misdetects `module.parent`), trying to read a test fixture PDF that
+// doesn't exist outside the package's own repo and crashing on import. This path
+// bypasses that wrapper entirely - a known, documented workaround for this package.
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
 import { effectivePlanTier } from "@/lib/plan";
@@ -76,8 +81,7 @@ export async function generateAndStoreFileSummary(fileId: string): Promise<void>
     let excerpt: string;
     if (kind === "pdf") {
       const buf = Buffer.from(await res.arrayBuffer());
-      const parser = new PDFParse({ data: buf });
-      const result = await parser.getText();
+      const result = await pdfParse(buf);
       excerpt = result.text.slice(0, TEXT_EXCERPT_MAX_CHARS).trim();
     } else {
       excerpt = (await res.text()).slice(0, TEXT_EXCERPT_MAX_CHARS).trim();
