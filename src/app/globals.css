@@ -32,14 +32,6 @@
     --accent: #f2f0ea;
     --accent-foreground: #171613;
   }
-
-  body {
-    background-color: var(--background);
-    background-image: url("/starfield.svg");
-    background-repeat: repeat;
-    background-size: 600px 600px;
-    background-attachment: fixed;
-  }
 }
 
 * {
