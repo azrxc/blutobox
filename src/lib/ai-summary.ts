@@ -7,7 +7,6 @@ import OpenAI from "openai";
 import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
-import { effectivePlanTier } from "@/lib/plan";
 
 // DeepSeek's API is OpenAI-compatible - same SDK, different base URL/model. Chosen
 // over Claude/GPT for this feature specifically because it's dramatically cheaper
@@ -16,19 +15,17 @@ const MODEL = "deepseek-v4-flash";
 
 // Independent of plan upload/storage limits (src/lib/limits.ts) - this is a fixed,
 // feature-level cost/latency bound, not a plan quota, so it's kept local here.
-const MAX_SUMMARY_FILE_BYTES = 20 * 1024 * 1024; // 20MB
+// Exported so the file page can decide whether to show the "Generate" button at all.
+export const MAX_SUMMARY_FILE_BYTES = 20 * 1024 * 1024; // 20MB
 
 // Caps worst-case cost per call regardless of source file size - applies to both
 // plain-text content and text extracted from a PDF.
 const TEXT_EXCERPT_MAX_CHARS = 50_000;
 
-// Free accounts get a small lifetime taste of this Pro perk - bounded, predictable
-// cost (a few cents at most per account, ever), not an ongoing free-tier expense.
-const FREE_LIFETIME_SUMMARY_LIMIT = 2;
-
 const TEXT_MIME_EXTRAS = new Set(["application/json", "application/xml"]);
 
-function classifyMimeType(mimeType: string): "pdf" | "text" | null {
+// Exported so the file page can decide whether to show the "Generate" button at all.
+export function classifyMimeType(mimeType: string): "pdf" | "text" | null {
   const mt = mimeType.toLowerCase();
   if (mt === "application/pdf") return "pdf";
   if (mt.startsWith("text/") || TEXT_MIME_EXTRAS.has(mt)) return "text";
@@ -52,31 +49,31 @@ function getClient(): OpenAI | null {
   return cachedClient;
 }
 
-// Fire-and-forget, best-effort, one-shot: called once via `after()` right after any
-// logged-in user's upload completes. Never throws - on any failure (ineligible
-// file, missing key, fetch error, API error, empty response) it just returns,
-// leaving File.aiSummary null, same fail-open shape as src/lib/virustotal.ts.
-export async function generateAndStoreFileSummary(fileId: string): Promise<void> {
+export type SummaryResult = { ok: true; summary: string } | { ok: false; reason: string };
+
+// Triggered on-demand by a viewer clicking "Generate AI summary" (src/app/api/files/[slug]/generate-summary/route.ts),
+// not automatically at upload time - eligibility no longer depends on the file
+// owner's plan at all, only the file's own type/size. The caller (the API route)
+// is responsible for the viewer's own quota check before calling this - this
+// function only handles whether the FILE is eligible and doing the actual work.
+// Never throws - always resolves to a result the caller can relay to the UI.
+export async function generateFileSummary(fileId: string): Promise<SummaryResult> {
   try {
     const client = getClient();
-    if (!client) return; // DEEPSEEK_API_KEY not configured yet - silent no-op
+    if (!client) return { ok: false, reason: "AI summaries aren't configured yet" };
 
-    const file = await prisma.file.findUnique({
-      where: { id: fileId },
-      include: { owner: { select: { id: true, planTier: true, proPassExpiresAt: true, freeAiSummariesUsed: true } } },
-    });
-    if (!file || !file.owner) return; // anonymous upload - never eligible
-
-    const isPro = effectivePlanTier(file.owner) === "PRO";
-    if (!isPro && file.owner.freeAiSummariesUsed >= FREE_LIFETIME_SUMMARY_LIMIT) return;
+    const file = await prisma.file.findUnique({ where: { id: fileId } });
+    if (!file) return { ok: false, reason: "File not found" };
 
     const kind = classifyMimeType(file.mimeType);
-    if (!kind) return;
-    if (file.sizeBytes > BigInt(MAX_SUMMARY_FILE_BYTES)) return;
+    if (!kind) return { ok: false, reason: "This file type isn't eligible for AI summaries" };
+    if (file.sizeBytes > BigInt(MAX_SUMMARY_FILE_BYTES)) {
+      return { ok: false, reason: "File is too large for an AI summary" };
+    }
 
     const signedUrl = await getSignedDownloadUrl(file.b2Key);
     const res = await fetch(signedUrl);
-    if (!res.ok) return;
+    if (!res.ok) return { ok: false, reason: "Couldn't read the file" };
 
     let excerpt: string;
     if (kind === "pdf") {
@@ -86,7 +83,7 @@ export async function generateAndStoreFileSummary(fileId: string): Promise<void>
     } else {
       excerpt = (await res.text()).slice(0, TEXT_EXCERPT_MAX_CHARS).trim();
     }
-    if (!excerpt) return;
+    if (!excerpt) return { ok: false, reason: "Couldn't extract any text from this file" };
 
     const completion = await client.chat.completions.create({
       model: MODEL,
@@ -98,21 +95,16 @@ export async function generateAndStoreFileSummary(fileId: string): Promise<void>
     });
 
     const summary = completion.choices[0]?.message?.content?.trim();
-    if (!summary) return;
+    if (!summary) return { ok: false, reason: "AI summary came back empty" };
 
     await prisma.file.update({
       where: { id: fileId },
       data: { aiSummary: summary, aiSummaryGeneratedAt: new Date() },
     });
 
-    if (!isPro) {
-      await prisma.user.update({
-        where: { id: file.owner.id },
-        data: { freeAiSummariesUsed: { increment: 1 } },
-      });
-    }
+    return { ok: true, summary };
   } catch (err) {
     console.error("[ai-summary] generation failed for file", fileId, err);
-    // Fail silently - same pattern as src/lib/virustotal.ts's fail-open check.
+    return { ok: false, reason: "Something went wrong generating the summary" };
   }
 }

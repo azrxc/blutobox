@@ -1,4 +1,4 @@
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -12,7 +12,6 @@ import { isKnownMalicious } from "@/lib/virustotal";
 import { getCurrentPlanTier } from "@/lib/plan";
 import { FREE_ALLOWED_EXPIRY_HOURS } from "@/lib/limits";
 import { sendAdminAlert } from "@/lib/email";
-import { generateAndStoreFileSummary } from "@/lib/ai-summary";
 
 export const maxDuration = 60;
 
@@ -150,12 +149,6 @@ async function completeUpload(req: Request, data: z.infer<typeof completeSchema>
       where: { id: session.user.id },
       data: { storageUsedBytes: { increment: BigInt(size) } },
     });
-
-    // Pro gets unlimited AI file summaries, Free gets a small lifetime taste -
-    // both handled inside generateAndStoreFileSummary. Deferred via after() so
-    // it never adds latency to the upload response, same mechanism already used
-    // in src/app/api/discord/interactions/route.ts.
-    after(() => generateAndStoreFileSummary(file.id));
   }
 
   return NextResponse.json({ ok: true, slug, fileId: file.id });

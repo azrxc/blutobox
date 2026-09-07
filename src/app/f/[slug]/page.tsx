@@ -18,6 +18,8 @@ import { auth } from "@/lib/auth";
 import { effectivePlanTier, getCurrentPlanTier } from "@/lib/plan";
 import { BookmarkButton } from "./bookmark-button";
 import { SocialShareButtons } from "../../social-share-buttons";
+import { GenerateSummaryButton } from "./generate-summary-button";
+import { classifyMimeType, MAX_SUMMARY_FILE_BYTES } from "@/lib/ai-summary";
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
@@ -179,11 +181,8 @@ export default async function FilePage({
           )}
         </div>
 
-        {file.aiSummary && (
-          <div className="rounded-2xl border border-border bg-surface p-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">AI summary</h2>
-            <p className="mt-1.5 text-sm">{file.aiSummary}</p>
-          </div>
+        {classifyMimeType(file.mimeType) && file.sizeBytes <= BigInt(MAX_SUMMARY_FILE_BYTES) && (
+          <GenerateSummaryButton slug={slug} />
         )}
 
         <>

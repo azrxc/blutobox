@@ -39,6 +39,19 @@ export function dailyDownloadBytesFor(planTier: "FREE" | "PRO" | null) {
   return ANON_DAILY_DOWNLOAD_BYTES;
 }
 
+// Per-viewer daily count of AI summary requests (src/lib/summary-quota.ts) - a
+// starting guess, easy to tune. Real per-call cost is a fraction of a cent, so
+// this is about a sane usage cap and a visible feature, not cost protection.
+export const ANON_DAILY_SUMMARY_LIMIT = 1;
+export const FREE_DAILY_SUMMARY_LIMIT = 3;
+export const PRO_DAILY_SUMMARY_LIMIT = 15;
+
+export function dailySummaryLimitFor(planTier: "FREE" | "PRO" | null) {
+  if (planTier === "PRO") return PRO_DAILY_SUMMARY_LIMIT;
+  if (planTier === "FREE") return FREE_DAILY_SUMMARY_LIMIT;
+  return ANON_DAILY_SUMMARY_LIMIT;
+}
+
 // Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
 export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
 

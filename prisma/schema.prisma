@@ -47,11 +47,6 @@ model User {
   bonusStorageBytes BigInt   @default(0)
   bonusCreatorLinks Int      @default(0)
 
-  // Lifetime count of free-tier AI file summaries used (see src/lib/ai-summary.ts) -
-  // Free accounts get a small capped taste of the Pro perk, tracked here so it's a
-  // one-time lifetime allowance rather than resetting or being tied to any one file.
-  freeAiSummariesUsed Int @default(0)
-
   // Pro branding shown on this creator's file share pages - message is plain text
   // (rendered as JSX text, never dangerouslySetInnerHTML, so no XSS risk), color is
   // validated as a strict 6-digit hex before ever being written into an inline style.
