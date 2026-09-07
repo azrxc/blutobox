@@ -186,6 +186,17 @@ model Adventure {
   scenario     String    @db.Text
   turns        Json
   turnCount    Int       @default(0)
+  // Game-like meter (Trust, Health, Sanity, etc. - chosen by the AI to fit the
+  // scenario at start time), 0-100, adjusted by the AI each turn based on the
+  // player's choice. statGoal says which direction is the win: "high" means 100 is
+  // victory and 0 is defeat (e.g. Trust); "low" means the reverse (e.g. Suspicion,
+  // where reaching 0 is safety and 100 means getting caught). Hitting either bound
+  // ends the story - `won` records which one it was.
+  statLabel    String?
+  statGoal     String    @default("high")
+  statValue    Int       @default(50)
+  ended        Boolean   @default(false)
+  won          Boolean   @default(false)
   createdAt    DateTime  @default(now())
   lastPlayedAt DateTime  @default(now())
 }

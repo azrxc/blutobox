@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Adventure" ADD COLUMN "statLabel" TEXT;
+ALTER TABLE "Adventure" ADD COLUMN "statValue" INTEGER NOT NULL DEFAULT 50;
+ALTER TABLE "Adventure" ADD COLUMN "ended" BOOLEAN NOT NULL DEFAULT false;

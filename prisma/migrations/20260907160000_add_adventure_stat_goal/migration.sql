@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Adventure" ADD COLUMN "statGoal" TEXT NOT NULL DEFAULT 'high';
+ALTER TABLE "Adventure" ADD COLUMN "won" BOOLEAN NOT NULL DEFAULT false;

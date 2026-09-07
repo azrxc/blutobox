@@ -7,7 +7,7 @@ import { getClientIp } from "@/lib/request-ip";
 import { getCurrentPlanTier } from "@/lib/plan";
 import { dailyAdventureTurnLimitFor } from "@/lib/limits";
 import { checkDailyQuota, consumeDailyQuota } from "@/lib/daily-quota";
-import { startAdventure, continueAdventure, type Turn } from "@/lib/adventure";
+import { startAdventure, continueAdventure, STAT_MIN, STAT_MAX, type Turn, type StatGoal } from "@/lib/adventure";
 import { ADVENTURE_ANON_COOKIE, ADVENTURE_ANON_COOKIE_MAX_AGE, newAnonToken } from "@/lib/adventure-session";
 
 export const maxDuration = 30;
@@ -91,7 +91,9 @@ export async function POST(req: Request) {
     const result = await startAdventure(parsed.data.scenario);
     if (!result.ok) return NextResponse.json({ error: result.reason }, { status: 502 });
 
-    const turns: Turn[] = [{ role: "narrator", content: result.text }];
+    const turns: Turn[] = [
+      { role: "narrator", content: result.narrative, choices: result.choices, critical: result.critical },
+    ];
     await prisma.adventure.deleteMany({ where });
     const adventure = await prisma.adventure.create({
       data: {
@@ -99,6 +101,8 @@ export async function POST(req: Request) {
         scenario: parsed.data.scenario,
         turns,
         turnCount: 1,
+        statLabel: result.statLabel,
+        statGoal: result.statGoal,
       },
     });
 
@@ -111,19 +115,33 @@ export async function POST(req: Request) {
   if (!existing) {
     return NextResponse.json({ error: "No adventure in progress" }, { status: 404 });
   }
+  if (existing.ended) {
+    return NextResponse.json({ error: "This story has ended - start a new adventure" }, { status: 400 });
+  }
 
   const priorTurns = existing.turns as unknown as Turn[];
-  const result = await continueAdventure(priorTurns, parsed.data.message);
+  const statLabel = existing.statLabel ?? "Progress";
+  const statGoal = existing.statGoal as StatGoal;
+  const result = await continueAdventure(priorTurns, parsed.data.message, statLabel, existing.statValue, statGoal);
   if (!result.ok) return NextResponse.json({ error: result.reason }, { status: 502 });
+
+  const statValue = Math.max(STAT_MIN, Math.min(STAT_MAX, existing.statValue + result.statDelta));
+  const ended = statValue <= STAT_MIN || statValue >= STAT_MAX;
+  const won = ended && (statGoal === "high" ? statValue >= STAT_MAX : statValue <= STAT_MIN);
 
   const turns: Turn[] = [
     ...priorTurns,
     { role: "player", content: parsed.data.message.trim() },
-    { role: "narrator", content: result.text },
+    {
+      role: "narrator",
+      content: result.narrative,
+      choices: ended ? undefined : result.choices,
+      critical: ended ? undefined : result.critical,
+    },
   ];
   const adventure = await prisma.adventure.update({
     where,
-    data: { turns, turnCount: { increment: 1 }, lastPlayedAt: new Date() },
+    data: { turns, turnCount: { increment: 1 }, lastPlayedAt: new Date(), statValue, ended, won },
   });
 
   const res = NextResponse.json({ adventure, used, limit });

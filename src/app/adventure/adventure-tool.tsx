@@ -2,8 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type Turn = { role: "narrator" | "player"; content: string };
-type Adventure = { id: string; scenario: string; turns: Turn[]; turnCount: number };
+type Turn = { role: "narrator" | "player"; content: string; choices?: string[]; critical?: boolean };
+type Adventure = {
+  id: string;
+  scenario: string;
+  turns: Turn[];
+  turnCount: number;
+  statLabel: string | null;
+  statValue: number;
+  ended: boolean;
+  won: boolean;
+};
 
 const PRESETS = [
   { label: "Fantasy quest", scenario: "A young adventurer sets out from a quiet village after a strange light is seen over the old forest." },
@@ -62,8 +71,8 @@ export function AdventureTool() {
     }
   }
 
-  async function handleContinue() {
-    const message = actionInput.trim();
+  async function handleContinue(override?: string) {
+    const message = (override ?? actionInput).trim();
     if (!message || sending || quotaExhausted) return;
     setError(null);
     setSending(true);
@@ -106,8 +115,9 @@ export function AdventureTool() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">AI Text Adventure</h1>
           <p className="mt-2 text-sm text-muted">
-            Pick a starting scenario, or write your own. The story continues based on whatever you type next, so no
-            two playthroughs are the same.
+            Pick a starting scenario, or write your own. A meter (Trust, Health, Sanity - the AI picks one that fits)
+            tracks how things are going based on what you choose, and the story continues from there, so no two
+            playthroughs are the same.
           </p>
         </div>
 
@@ -158,6 +168,10 @@ export function AdventureTool() {
     );
   }
 
+  const lastTurn = adventure.turns[adventure.turns.length - 1];
+  const lastChoices = !adventure.ended && lastTurn?.role === "narrator" ? lastTurn.choices : undefined;
+  const isCritical = !adventure.ended && lastTurn?.role === "narrator" && lastTurn.critical === true;
+
   return (
     <div className="flex w-full max-w-lg flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -182,7 +196,27 @@ export function AdventureTool() {
         )}
       </div>
 
-      <div ref={scrollRef} className="max-h-[28rem] space-y-3 overflow-y-auto rounded-2xl border border-border bg-surface p-4">
+      {adventure.statLabel && (
+        <div>
+          <div className="flex items-center justify-between text-xs text-muted">
+            <span className="font-medium">{adventure.statLabel}</span>
+            <span>{adventure.statValue}/100</span>
+          </div>
+          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-border">
+            <div
+              className="h-full rounded-full bg-accent transition-all"
+              style={{ width: `${adventure.statValue}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      <div
+        ref={scrollRef}
+        className={`max-h-[28rem] space-y-3 overflow-y-auto rounded-2xl border p-4 transition-colors ${
+          isCritical ? "border-red-500/40 bg-red-500/5" : "border-border bg-surface"
+        }`}
+      >
         {adventure.turns.map((turn, i) =>
           turn.role === "narrator" ? (
             <p key={i} className="text-sm leading-relaxed">
@@ -199,26 +233,59 @@ export function AdventureTool() {
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
-      {quotaExhausted ? (
+      {adventure.ended ? (
+        <p className={`text-sm font-medium ${adventure.won ? "text-emerald-600 dark:text-emerald-400" : "text-muted"}`}>
+          {adventure.won
+            ? "You made it. The story ends here, on a high note - start a new adventure to play again."
+            : "The story ends here. Start a new adventure to try again."}
+        </p>
+      ) : quotaExhausted ? (
         <p className="text-sm text-muted">Daily adventure limit reached. Come back tomorrow to continue the story.</p>
       ) : (
-        <div className="flex items-center gap-2">
-          <input
-            value={actionInput}
-            onChange={(e) => setActionInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleContinue()}
-            maxLength={500}
-            disabled={sending}
-            placeholder="What do you do?"
-            className="flex-1 rounded-full border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-accent disabled:opacity-60"
-          />
-          <button
-            onClick={handleContinue}
-            disabled={sending || !actionInput.trim()}
-            className="shrink-0 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-50"
-          >
-            Go
-          </button>
+        <div className="flex flex-col gap-2">
+          {isCritical && (
+            <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400">
+              No time to think, pick one now
+            </p>
+          )}
+          {lastChoices && lastChoices.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {lastChoices.map((choice, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleContinue(choice)}
+                  disabled={sending}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+                    isCritical
+                      ? "border-red-500/40 bg-red-500/10 hover:bg-red-500/20"
+                      : "border-border bg-surface hover:bg-accent/10"
+                  }`}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
+          )}
+          {!isCritical && (
+            <div className="flex items-center gap-2">
+              <input
+                value={actionInput}
+                onChange={(e) => setActionInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleContinue()}
+                maxLength={500}
+                disabled={sending}
+                placeholder="Or write your own action..."
+                className="flex-1 rounded-full border border-border bg-surface px-4 py-2.5 text-sm outline-none focus:border-accent disabled:opacity-60"
+              />
+              <button
+                onClick={() => handleContinue()}
+                disabled={sending || !actionInput.trim()}
+                className="shrink-0 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-85 disabled:opacity-50"
+              >
+                Go
+              </button>
+            </div>
+          )}
         </div>
       )}
 
