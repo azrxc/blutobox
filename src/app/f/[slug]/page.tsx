@@ -179,6 +179,13 @@ export default async function FilePage({
           )}
         </div>
 
+        {file.aiSummary && (
+          <div className="rounded-2xl border border-border bg-surface p-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-muted">AI summary</h2>
+            <p className="mt-1.5 text-sm">{file.aiSummary}</p>
+          </div>
+        )}
+
         <>
           <div className="flex justify-center rounded-2xl border border-border bg-surface p-6">
             <FileViewer slug={slug} />
