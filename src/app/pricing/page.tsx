@@ -11,29 +11,63 @@ type Row = {
   pro: string | boolean;
 };
 
-const rows: Row[] = [
-  { label: "Total storage", anon: "No account", free: "5 GB", pro: "50 GB" },
-  { label: "Max file size", anon: "200 MB", free: "2 GB", pro: "10 GB" },
-  { label: "Daily download limit", anon: "3 GB/day", free: "5 GB/day", pro: "25 GB/day" },
-  { label: "Daily upload count limit", anon: "10/hour per IP", free: "50/day", pro: "200/day" },
-  { label: "Inline preview & streaming", anon: true, free: true, pro: true },
-  { label: "Password-protected links", anon: false, free: false, pro: true },
-  { label: "Limit total downloads per link", anon: false, free: false, pro: true },
-  { label: "Custom link name", anon: false, free: false, pro: true },
-  { label: "Email me on first download", anon: false, free: true, pro: true },
-  { label: "Multi-file bundling (.zip)", anon: true, free: true, pro: true },
-  { label: "Link expiry", anon: "24h / 7d presets", free: "24h / 7d presets", pro: "Any custom duration" },
-  { label: "Account & upload history", anon: false, free: true, pro: true },
-  { label: "Creator links on your files", anon: false, free: "1 link", pro: "Up to 5 links" },
-  { label: "Save other people's files to your account", anon: false, free: "Up to 10", pro: "Unlimited" },
-  { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
-  { label: "QR code colors & logo", anon: false, free: false, pro: true },
-  { label: "Video-to-GIF length", anon: "-", free: "Up to 10s, 20fps", pro: "Up to 60s, 30fps" },
-  { label: "Image compressor batch size", anon: "-", free: "5 images", pro: "30 images" },
-  { label: "Exact image resize", anon: false, free: false, pro: true },
-  { label: "PDF merge page numbers", anon: false, free: false, pro: true },
-  { label: "DOCX to PDF custom margins", anon: false, free: false, pro: true },
-  { label: "Text diff HTML export", anon: false, free: false, pro: true },
+type Section = { section: string; rows: Row[] };
+
+const sections: Section[] = [
+  {
+    section: "Storage & files",
+    rows: [
+      { label: "Total storage", anon: "No account", free: "5 GB", pro: "50 GB" },
+      { label: "Max file size", anon: "200 MB", free: "2 GB", pro: "10 GB" },
+      { label: "Inactive files auto-deleted", anon: "After 7 days unused", free: "After 30 days unused", pro: "Never" },
+    ],
+  },
+  {
+    section: "Uploads & downloads",
+    rows: [
+      { label: "Daily upload count limit", anon: "10/hour per IP", free: "50/day", pro: "200/day" },
+      { label: "Daily download limit", anon: "3 GB/day", free: "5 GB/day", pro: "25 GB/day" },
+      { label: "Inline preview & streaming", anon: true, free: true, pro: true },
+      { label: "Multi-file bundling (.zip)", anon: true, free: true, pro: true },
+    ],
+  },
+  {
+    section: "Sharing & links",
+    rows: [
+      { label: "Password-protected links", anon: false, free: false, pro: true },
+      { label: "Limit total downloads per link", anon: false, free: false, pro: true },
+      { label: "Custom link name", anon: false, free: false, pro: true },
+      { label: "Link expiry", anon: "24h / 7d presets", free: "24h / 7d presets", pro: "Any custom duration" },
+      { label: "Email me on first download", anon: false, free: true, pro: true },
+    ],
+  },
+  {
+    section: "AI tools",
+    rows: [
+      { label: "AI file summary (uses per day)", anon: "1/day", free: "3/day", pro: "15/day" },
+      { label: "AI text adventure (turns per day)", anon: "8/day", free: "25/day", pro: "100/day" },
+    ],
+  },
+  {
+    section: "Account & creator features",
+    rows: [
+      { label: "Account & upload history", anon: false, free: true, pro: true },
+      { label: "Creator links on your files", anon: false, free: "1 link", pro: "Up to 5 links" },
+      { label: "Save other people's files to your account", anon: false, free: "Up to 10", pro: "Unlimited" },
+    ],
+  },
+  {
+    section: "Free tools (Pro perks)",
+    rows: [
+      { label: "QR code colors & logo", anon: false, free: false, pro: true },
+      { label: "Video-to-GIF length", anon: "-", free: "Up to 10s, 20fps", pro: "Up to 60s, 30fps" },
+      { label: "Image compressor batch size", anon: "-", free: "5 images", pro: "30 images" },
+      { label: "Exact image resize", anon: false, free: false, pro: true },
+      { label: "PDF merge page numbers", anon: false, free: false, pro: true },
+      { label: "DOCX to PDF custom margins", anon: false, free: false, pro: true },
+      { label: "Text diff HTML export", anon: false, free: false, pro: true },
+    ],
+  },
 ];
 
 const gridCols = "grid-cols-[1fr_4.5rem_4.5rem_4.5rem] sm:grid-cols-[1fr_6rem_6rem_6rem]";
@@ -150,21 +184,28 @@ export default function PricingPage() {
         </div>
 
         <div className="divide-y divide-border border-t border-border">
-          {rows.map((row) => (
-            <div
-              key={row.label}
-              className={`grid ${gridCols} items-center gap-x-2 px-4 py-3.5 text-xs sm:px-6 sm:text-sm`}
-            >
-              <span className="text-muted">{row.label}</span>
-              <span className="text-center">
-                <Cell value={row.anon} />
-              </span>
-              <span className="text-center">
-                <Cell value={row.free} />
-              </span>
-              <span className="text-center">
-                <Cell value={row.pro} />
-              </span>
+          {sections.map((group) => (
+            <div key={group.section}>
+              <p className="bg-background px-4 pb-1.5 pt-3 text-[11px] font-semibold uppercase tracking-wide text-muted sm:px-6">
+                {group.section}
+              </p>
+              {group.rows.map((row) => (
+                <div
+                  key={row.label}
+                  className={`grid ${gridCols} items-center gap-x-2 px-4 py-3.5 text-xs sm:px-6 sm:text-sm`}
+                >
+                  <span className="text-muted">{row.label}</span>
+                  <span className="text-center">
+                    <Cell value={row.anon} />
+                  </span>
+                  <span className="text-center">
+                    <Cell value={row.free} />
+                  </span>
+                  <span className="text-center">
+                    <Cell value={row.pro} />
+                  </span>
+                </div>
+              ))}
             </div>
           ))}
         </div>
