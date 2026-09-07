@@ -16,8 +16,8 @@ export function Header() {
           <Image
             src="/logo.png"
             alt=""
-            width={44}
-            height={44}
+            width={28}
+            height={28}
             className="shrink-0 dark:invert"
             priority
           />
