@@ -212,13 +212,20 @@ const faqs: QA[] = [
             /ai/daily-character
           </Link>
           : one new AI-generated character revealed each day, the same one for everyone (like a daily puzzle) -
-          a name, personality, backstory, and a portrait description you could hand to an art tool.
+          a name, personality, backstory, an AI-generated portrait, and a short backstory.
         </p>
         <p className="mt-2">
-          Clicking &quot;Claim today&apos;s streak&quot; counts that day toward a running streak, which resets if
-          you miss a day. You can also save characters you like to a personal collection - up to 5 if
-          you&apos;re not logged in, 20 on Free, 100 on Pro. Saving and claiming are both free and don&apos;t use
-          any daily-turn quota from the other AI tools.
+          Before the character&apos;s real traits are shown, you get one guess: pick which of 3 traits actually
+          belongs to them (2 are decoys). You&apos;ll see how your guess compares to everyone else who played
+          today. You can also ask the character a few questions - it answers in-character, and stays
+          family-friendly no matter what you ask it. Clicking &quot;Claim today&apos;s streak&quot; counts that
+          day toward a running streak, which resets if you miss a day.
+        </p>
+        <p className="mt-2">
+          You can save characters you like to a personal collection - up to 5 if you&apos;re not logged in, 20
+          on Free, 100 on Pro. Asking questions is limited per day (separate from the other AI tools&apos;
+          quotas): 3/day if you&apos;re not logged in, 10/day on Free, 30/day on Pro. Guessing, claiming, and
+          saving are all free.
         </p>
       </>
     ),

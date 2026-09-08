@@ -48,6 +48,7 @@ const sections: Section[] = [
       { label: "AI text adventure (turns per day)", anon: "8/day", free: "25/day", pro: "100/day" },
       { label: "AI text adventure (saved at once)", anon: "2", free: "5", pro: "15" },
       { label: "Daily Character (saved collection size)", anon: "5", free: "20", pro: "100" },
+      { label: "Daily Character (questions per day)", anon: "3/day", free: "10/day", pro: "30/day" },
     ],
   },
   {

@@ -8,6 +8,16 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "Daily Character now has real portraits, a guess game, and Q&A",
+    intro: "A bigger update to Daily Character:",
+    highlights: [
+      "New: real AI-generated portrait art for today's character, not just a text description",
+      "New: guess which of 3 traits actually belongs to today's character (2 are decoys) before they're revealed, and see how your guess compares to everyone else who played today",
+      "New: ask today's character a few questions and get an in-character answer - 3/day if you're not logged in, 10/day on Free, 30/day on Pro",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "Bluto Box AI is now its own section, plus Daily Character",
     intro: "AI experiences now have their own home, and a new daily habit to check out:",
     highlights: [
