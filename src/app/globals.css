@@ -35,7 +35,7 @@
 
   body {
     background-color: var(--background);
-    background-image: url("/starfield.svg?v=3");
+    background-image: url("/starfield.svg?v=4");
     background-repeat: repeat;
     background-size: 600px 600px;
     background-attachment: fixed;
