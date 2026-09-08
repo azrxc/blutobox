@@ -110,14 +110,17 @@ export async function generateDailyCharacter(): Promise<CharacterResult> {
 
   if (!character) return { ok: false, reason: "Something went wrong generating today's character" };
 
-  // Best-effort - if image generation fails (provider hiccup, content policy, not
-  // configured), the character still works text-only. One image per day site-wide,
-  // so this is never in the per-viewer request path.
-  const imageResult = await generatePortraitImage(character.portrait);
+  // Off by default - real per-image cost adds up faster than it feels worth at
+  // near-zero traffic. Set DAILY_CHARACTER_IMAGES_ENABLED="true" to turn it back on
+  // once it feels worth it (e.g. once there's real traffic to justify it). Text,
+  // the guess game, and chat all still work fully either way - images were always
+  // best-effort on top, never load-bearing.
+  const imagesEnabled = process.env.DAILY_CHARACTER_IMAGES_ENABLED === "true";
+  const imageResult = imagesEnabled ? await generatePortraitImage(character.portrait) : null;
 
   return {
     ok: true,
     ...character,
-    portraitImageUrl: imageResult.ok ? imageResult.dataUrl : null,
+    portraitImageUrl: imageResult?.ok ? imageResult.dataUrl : null,
   };
 }

@@ -119,8 +119,19 @@ export async function GET(req: Request) {
   const traits = todaysResult.character.traits as string[];
   const decoyTraits = todaysResult.character.decoyTraits as string[];
 
+  // Portrait art is a Pro perk, not a free giveaway - it's still only generated
+  // once per day site-wide (same cost either way), but only Pro viewers actually
+  // see it. Free/anon get a locked hint instead of nothing, as an upgrade nudge.
+  const isPro = planTier === "PRO";
+  const hasImage = Boolean(todaysResult.character.portraitImageUrl);
+  const todayForResponse = {
+    ...todaysResult.character,
+    portraitImageUrl: isPro ? todaysResult.character.portraitImageUrl : null,
+  };
+
   const res = NextResponse.json({
-    today: todaysResult.character,
+    today: todayForResponse,
+    imageLockedForFreeTier: hasImage && !isPro,
     claimedToday: streak?.lastClaimedDate === today,
     currentStreak: streak?.currentStreak ?? 0,
     longestStreak: streak?.longestStreak ?? 0,
@@ -259,7 +270,9 @@ export async function POST(req: Request) {
       description: character.description,
       traits: character.traits as string[],
       portrait: character.portrait,
-      portraitImageUrl: character.portraitImageUrl,
+      // Portrait art is Pro-only (see the GET handler) - don't let Free/anon save
+      // their way to the image by saving the character instead of just viewing it.
+      portraitImageUrl: planTier === "PRO" ? character.portraitImageUrl : null,
       sourceDate: character.date,
     },
   });

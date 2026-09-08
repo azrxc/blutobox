@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Character = {
   id: string;
@@ -18,6 +19,7 @@ type ChatMessage = { question: string; answer: string };
 
 type State = {
   today: Character | null;
+  imageLockedForFreeTier: boolean;
   claimedToday: boolean;
   currentStreak: number;
   longestStreak: number;
@@ -164,6 +166,15 @@ export function DailyCharacterTool() {
             alt={`Portrait of ${today.name}`}
             className="mb-4 aspect-square w-full rounded-xl border border-border object-cover"
           />
+        )}
+        {state.imageLockedForFreeTier && (
+          <Link
+            href="/pricing"
+            className="mb-4 flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background text-center transition-colors hover:bg-accent/5"
+          >
+            <span className="text-sm font-medium">Portrait art is a Pro perk</span>
+            <span className="text-xs text-muted underline underline-offset-2">Upgrade to see today&apos;s art</span>
+          </Link>
         )}
         <div className="flex items-start justify-between gap-3">
           <div>
