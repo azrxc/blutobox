@@ -212,14 +212,16 @@ const faqs: QA[] = [
             /ai/daily-character
           </Link>
           : one new AI-generated character revealed each day, the same one for everyone (like a daily puzzle) -
-          a name, personality, backstory, an AI-generated portrait, and a short backstory.
+          a name, personality, and a short backstory. Pro accounts also see an AI-generated portrait of that
+          day&apos;s character; Free and anonymous visitors see a locked preview instead.
         </p>
         <p className="mt-2">
           Before the character&apos;s real traits are shown, you get one guess: pick which of 3 traits actually
           belongs to them (2 are decoys). You&apos;ll see how your guess compares to everyone else who played
           today. You can also ask the character a few questions - it answers in-character, and stays
           family-friendly no matter what you ask it. Clicking &quot;Claim today&apos;s streak&quot; counts that
-          day toward a running streak, which resets if you miss a day.
+          day toward a running streak, which resets if you miss a day. If you&apos;re logged in, you can turn on
+          an email reminder that only fires when your streak is actually at risk of resetting.
         </p>
         <p className="mt-2">
           You can save characters you like to a personal collection - up to 5 if you&apos;re not logged in, 20
