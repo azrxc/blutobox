@@ -49,7 +49,13 @@ function isValidQuestion(q: unknown): q is TriviaQuestion {
 
 async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null; debug: string }> {
   const completion = await chatCompletion({
-    max_tokens: 1200,
+    // Generous headroom, not a tight estimate - this model spends a variable, often
+    // large chunk of max_tokens on hidden reasoning before ever emitting the answer
+    // (observed 275 reasoning tokens vs ~190 real content for a lucky run locally,
+    // and a full budget-exhausted empty response from a slower host in production).
+    // A tighter cap here reproduces the exact "finish_reason=length, empty content"
+    // failure this was debugged from.
+    max_tokens: 3000,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: "Generate today's trivia quiz. Make it interesting and varied." },
@@ -86,19 +92,15 @@ async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null
 export async function generateDailyTrivia(): Promise<TriviaResult> {
   if (!isAIConfigured()) return { ok: false, reason: "The trivia generator isn't configured yet" };
 
-  const debugLog: string[] = [];
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
       const { questions, debug } = await tryGenerateTrivia();
       if (questions) return { ok: true, questions };
-      debugLog.push(`attempt ${attempt}: ${debug}`);
+      console.warn(`[daily-trivia] attempt ${attempt} came back empty/malformed (${debug}), retrying`);
     } catch (err) {
-      debugLog.push(`attempt ${attempt} threw: ${err instanceof Error ? err.message : String(err)}`);
+      console.warn(`[daily-trivia] attempt ${attempt} threw, retrying`, err);
     }
   }
 
-  // TEMPORARY: surfacing real failure detail to debug a live production issue
-  // (works locally against both providers, fails consistently in prod) - revert
-  // to a plain user-facing message once root-caused.
-  return { ok: false, reason: `DEBUG: ${debugLog.join(" || ")}` };
+  return { ok: false, reason: "Something went wrong generating today's trivia" };
 }
