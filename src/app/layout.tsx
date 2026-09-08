@@ -31,13 +31,11 @@ export const metadata: Metadata = {
     title: "Bluto Box",
     description: "Upload and share files.",
     siteName: "Bluto Box",
-    images: ["/icon.png"],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Bluto Box",
     description: "Upload and share files.",
-    images: ["/icon.png"],
   },
 };
 
