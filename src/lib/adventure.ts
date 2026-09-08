@@ -1,4 +1,4 @@
-import { getDeepSeekClient, DEEPSEEK_MODEL } from "@/lib/deepseek";
+import { getDeepSeekClient, chatCompletion, DEEPSEEK_MODEL } from "@/lib/deepseek";
 
 export type Turn = { role: "narrator" | "player"; content: string; choices?: string[]; critical?: boolean };
 
@@ -70,7 +70,7 @@ export async function startAdventure(scenario: string): Promise<StartResult> {
     const client = getDeepSeekClient();
     if (!client) return { ok: false, reason: "The adventure tool isn't configured yet" };
 
-    const completion = await client.chat.completions.create({
+    const completion = await chatCompletion(client, {
       model: DEEPSEEK_MODEL,
       max_tokens: 400,
       messages: [
@@ -131,7 +131,7 @@ export async function continueAdventure(
     if (!action) return { ok: false, reason: "Enter an action first" };
 
     const contextTurns = priorTurns.slice(-MAX_CONTEXT_TURNS);
-    const completion = await client.chat.completions.create({
+    const completion = await chatCompletion(client, {
       model: DEEPSEEK_MODEL,
       max_tokens: 400,
       messages: [

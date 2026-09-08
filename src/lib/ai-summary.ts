@@ -6,7 +6,7 @@
 import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
-import { getDeepSeekClient, DEEPSEEK_MODEL } from "@/lib/deepseek";
+import { getDeepSeekClient, chatCompletion, DEEPSEEK_MODEL } from "@/lib/deepseek";
 
 // Independent of plan upload/storage limits (src/lib/limits.ts) - this is a fixed,
 // feature-level cost/latency bound, not a plan quota, so it's kept local here.
@@ -72,7 +72,7 @@ export async function generateFileSummary(fileId: string): Promise<SummaryResult
     }
     if (!excerpt) return { ok: false, reason: "Couldn't extract any text from this file" };
 
-    const completion = await client.chat.completions.create({
+    const completion = await chatCompletion(client, {
       model: DEEPSEEK_MODEL,
       max_tokens: 300,
       messages: [
