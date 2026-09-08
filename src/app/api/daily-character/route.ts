@@ -81,6 +81,7 @@ async function getOrCreateTodaysCharacter() {
         tagline: result.tagline,
         description: result.description,
         traits: result.traits,
+        decoyTraits: result.decoyTraits,
         portrait: result.portrait,
         portraitImageUrl: result.portraitImageUrl,
       },
