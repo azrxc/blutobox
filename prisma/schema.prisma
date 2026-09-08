@@ -65,7 +65,7 @@ model User {
   cancellationFeedback CancellationFeedback[]
   creatorLinks    CreatorLink[]
   bookmarks       Bookmark[]
-  adventure       Adventure?
+  adventures      Adventure[]
 }
 
 model CreatorLink {
@@ -172,17 +172,16 @@ model Bookmark {
   @@index([userId])
 }
 
-// One active AI-driven text adventure per identity at a time (v1 is deliberately
-// single-session, no multi-adventure management UI). ownerId/anonToken are both
-// nullable-unique so at most one row exists per identity - starting a new adventure
-// deletes the old row first rather than allowing several to accumulate. Logged-in
-// users are tied to their account (works across devices); anonymous players are
-// tied to a long-lived cookie token instead (src/lib/adventure-session.ts).
+// A saved AI-driven text adventure. A player can have several (capped per plan
+// tier, see MAX_SAVED_ADVENTURES in src/lib/limits.ts) and reopen any of them -
+// starting a new one doesn't delete the others, it's a history/save-slot list.
+// Logged-in users are tied to their account (works across devices); anonymous
+// players are tied to a long-lived cookie token instead (src/lib/adventure-session.ts).
 model Adventure {
   id           String    @id @default(cuid())
-  ownerId      String?   @unique
+  ownerId      String?
   owner        User?     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  anonToken    String?   @unique
+  anonToken    String?
   scenario     String    @db.Text
   turns        Json
   turnCount    Int       @default(0)
@@ -199,6 +198,9 @@ model Adventure {
   won          Boolean   @default(false)
   createdAt    DateTime  @default(now())
   lastPlayedAt DateTime  @default(now())
+
+  @@index([ownerId])
+  @@index([anonToken])
 }
 
 model Report {

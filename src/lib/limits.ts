@@ -67,6 +67,19 @@ export function dailyAdventureTurnLimitFor(planTier: "FREE" | "PRO" | null) {
   return ANON_DAILY_ADVENTURE_TURNS;
 }
 
+// Total saved adventures per identity (not daily - a standing cap on how many
+// history slots exist at once), so anonymous cookies/accounts can't accumulate
+// unbounded rows for free. Starting new past the cap requires deleting one first.
+export const ANON_MAX_SAVED_ADVENTURES = 2;
+export const FREE_MAX_SAVED_ADVENTURES = 5;
+export const PRO_MAX_SAVED_ADVENTURES = 15;
+
+export function maxSavedAdventuresFor(planTier: "FREE" | "PRO" | null) {
+  if (planTier === "PRO") return PRO_MAX_SAVED_ADVENTURES;
+  if (planTier === "FREE") return FREE_MAX_SAVED_ADVENTURES;
+  return ANON_MAX_SAVED_ADVENTURES;
+}
+
 // Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
 export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
 

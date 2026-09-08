@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getClientIp } from "@/lib/request-ip";
 import { getCurrentPlanTier } from "@/lib/plan";
-import { dailyAdventureTurnLimitFor } from "@/lib/limits";
+import { dailyAdventureTurnLimitFor, maxSavedAdventuresFor } from "@/lib/limits";
 import { checkDailyQuota, consumeDailyQuota } from "@/lib/daily-quota";
 import { startAdventure, continueAdventure, STAT_MIN, STAT_MAX, type Turn, type StatGoal } from "@/lib/adventure";
 import { ADVENTURE_ANON_COOKIE, ADVENTURE_ANON_COOKIE_MAX_AGE, newAnonToken } from "@/lib/adventure-session";
@@ -25,6 +25,8 @@ async function resolveIdentity(userId: string | undefined): Promise<Identity> {
   return { type: "anon", token: newAnonToken(), isNew: true };
 }
 
+// Scopes every list/lookup/mutation to just this identity's own rows - the only
+// ownership check needed, since every query below goes through this.
 function adventureWhere(identity: Identity) {
   return identity.type === "user" ? { ownerId: identity.userId } : { anonToken: identity.token };
 }
@@ -47,20 +49,21 @@ export async function GET(req: Request) {
   const planTier = await getCurrentPlanTier(session?.user?.id);
   const quotaIdentifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
   const limit = dailyAdventureTurnLimitFor(planTier);
+  const maxSaved = maxSavedAdventuresFor(planTier);
 
-  const [adventure, { used }] = await Promise.all([
-    prisma.adventure.findUnique({ where: adventureWhere(identity) }),
+  const [adventures, { used }] = await Promise.all([
+    prisma.adventure.findMany({ where: adventureWhere(identity), orderBy: { lastPlayedAt: "desc" } }),
     checkDailyQuota(QUOTA_PREFIX, quotaIdentifier, limit),
   ]);
 
-  const res = NextResponse.json({ adventure, used, limit });
+  const res = NextResponse.json({ adventures, used, limit, maxSaved });
   setAnonCookie(res, identity);
   return res;
 }
 
 const bodySchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("start"), scenario: z.string().min(1).max(300) }),
-  z.object({ action: z.literal("continue"), message: z.string().min(1).max(500) }),
+  z.object({ action: z.literal("continue"), adventureId: z.string().min(1), message: z.string().min(1).max(500) }),
 ]);
 
 export async function POST(req: Request) {
@@ -88,13 +91,21 @@ export async function POST(req: Request) {
   const where = adventureWhere(identity);
 
   if (parsed.data.action === "start") {
+    const maxSaved = maxSavedAdventuresFor(planTier);
+    const savedCount = await prisma.adventure.count({ where });
+    if (savedCount >= maxSaved) {
+      return NextResponse.json(
+        { error: `You've reached your limit of ${maxSaved} saved adventures. Delete one to start a new one.` },
+        { status: 400 }
+      );
+    }
+
     const result = await startAdventure(parsed.data.scenario);
     if (!result.ok) return NextResponse.json({ error: result.reason }, { status: 502 });
 
     const turns: Turn[] = [
       { role: "narrator", content: result.narrative, choices: result.choices, critical: result.critical },
     ];
-    await prisma.adventure.deleteMany({ where });
     const adventure = await prisma.adventure.create({
       data: {
         ...(identity.type === "user" ? { ownerId: identity.userId } : { anonToken: identity.token }),
@@ -111,9 +122,11 @@ export async function POST(req: Request) {
     return res;
   }
 
-  const existing = await prisma.adventure.findUnique({ where });
+  // continue - scoped to this identity's own row via `where`, so someone else's
+  // adventureId can never be read or mutated even if guessed.
+  const existing = await prisma.adventure.findFirst({ where: { ...where, id: parsed.data.adventureId } });
   if (!existing) {
-    return NextResponse.json({ error: "No adventure in progress" }, { status: 404 });
+    return NextResponse.json({ error: "Adventure not found" }, { status: 404 });
   }
   if (existing.ended) {
     return NextResponse.json({ error: "This story has ended - start a new adventure" }, { status: 400 });
@@ -140,7 +153,7 @@ export async function POST(req: Request) {
     },
   ];
   const adventure = await prisma.adventure.update({
-    where,
+    where: { id: existing.id },
     data: { turns, turnCount: { increment: 1 }, lastPlayedAt: new Date(), statValue, ended, won },
   });
 
@@ -149,9 +162,15 @@ export async function POST(req: Request) {
   return res;
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "Missing adventure id" }, { status: 400 });
+
   const session = await auth();
   const identity = await resolveIdentity(session?.user?.id);
-  await prisma.adventure.deleteMany({ where: adventureWhere(identity) });
+  // deleteMany (not delete) so this silently no-ops instead of 500ing if the id
+  // doesn't belong to this identity, rather than leaking whether it exists at all.
+  await prisma.adventure.deleteMany({ where: { ...adventureWhere(identity), id } });
   return NextResponse.json({ ok: true });
 }
