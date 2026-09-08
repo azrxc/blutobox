@@ -16,6 +16,18 @@ export class UploadCancelledError extends Error {
   }
 }
 
+// Thrown instead of a plain Error when the server's rejection points at a specific
+// upgrade path (see the upgradeTo field on presign's 413 responses), so the UI can
+// render an actual link instead of just the error text.
+export class UploadLimitError extends Error {
+  upgradeTo: "pro" | "signup";
+  constructor(message: string, upgradeTo: "pro" | "signup") {
+    super(message);
+    this.name = "UploadLimitError";
+    this.upgradeTo = upgradeTo;
+  }
+}
+
 const MULTIPART_CONCURRENCY = 5;
 
 async function hashFile(file: File): Promise<string> {
@@ -28,7 +40,11 @@ async function hashFile(file: File): Promise<string> {
 
 async function throwForResponse(res: Response, fallback: string): Promise<never> {
   const data = await res.json().catch(() => null);
-  throw new Error(data?.error ?? `${fallback} (status ${res.status})`);
+  const message = data?.error ?? `${fallback} (status ${res.status})`;
+  if (data?.upgradeTo === "pro" || data?.upgradeTo === "signup") {
+    throw new UploadLimitError(message, data.upgradeTo);
+  }
+  throw new Error(message);
 }
 
 function putWithProgress(

@@ -257,6 +257,22 @@ export default function PricingPage() {
       </div>
 
       {!isPro && (
+        <p className="max-w-sm text-center text-xs text-muted">
+          Free accounts can also earn up to +10GB of bonus storage (and extra creator link slots) just by inviting
+          friends, no payment involved.{" "}
+          {session?.user ? (
+            <Link href="/account" className="underline underline-offset-2">
+              Get your invite link
+            </Link>
+          ) : (
+            <Link href="/register" className="underline underline-offset-2">
+              Sign up to get your invite link
+            </Link>
+          )}
+        </p>
+      )}
+
+      {!isPro && (
         <div className="w-full max-w-sm space-y-3 text-center">
           <div>
             <h2 className="text-sm font-semibold">Just need it for a bit?</h2>

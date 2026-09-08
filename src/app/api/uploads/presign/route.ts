@@ -72,8 +72,13 @@ export async function POST(req: Request) {
 
   const maxBytes = maxUploadBytesFor(planTier);
   if (size > maxBytes) {
+    // Point the error at whatever would actually raise this specific ceiling -
+    // signing up is the bigger win for an anonymous upload (200MB -> 2GB, free),
+    // Pro is the next step up from Free (2GB -> 10GB). Already-Pro has no ceiling
+    // left to point at, so no upgrade link renders for that case.
+    const upgradeTo = planTier === "PRO" ? null : planTier === "FREE" ? "pro" : "signup";
     return NextResponse.json(
-      { error: `File too large. Max allowed is ${Math.floor(maxBytes / (1024 * 1024))}MB for your plan.` },
+      { error: `File too large. Max allowed is ${Math.floor(maxBytes / (1024 * 1024))}MB for your plan.`, upgradeTo },
       { status: 413 }
     );
   }
@@ -82,9 +87,11 @@ export async function POST(req: Request) {
     const totalBytes = totalStorageBytesFor((planTier as "FREE" | "PRO") ?? "FREE", currentUser?.bonusStorageBytes ?? 0);
     const used = Number(currentUser?.storageUsedBytes ?? 0);
     if (used + size > totalBytes) {
+      const upgradeTo = planTier === "PRO" ? null : "pro";
       return NextResponse.json(
         {
           error: `This would exceed your storage limit (${Math.floor(totalBytes / (1024 * 1024 * 1024))}GB). Delete some files or upgrade to Pro.`,
+          upgradeTo,
         },
         { status: 413 }
       );

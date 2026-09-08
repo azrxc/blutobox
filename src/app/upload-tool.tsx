@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { uploadFile, UploadCancelledError } from "@/lib/upload-client";
+import { uploadFile, UploadCancelledError, UploadLimitError } from "@/lib/upload-client";
 import { zipFiles } from "@/lib/zip-files";
 import { stripImageMetadata } from "@/lib/strip-image-metadata";
 import { CopyLinkField } from "./copy-link-field";
@@ -57,6 +57,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorUpgradeTo, setErrorUpgradeTo] = useState<"pro" | "signup" | null>(null);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -70,6 +71,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
   async function handleUpload() {
     if (files.length === 0) return;
     setError(null);
+    setErrorUpgradeTo(null);
     setUploading(true);
     setProgress(0);
     const controller = new AbortController();
@@ -101,6 +103,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
         setProgress(0);
       } else {
         setError(e instanceof Error ? e.message : "Upload failed");
+        setErrorUpgradeTo(e instanceof UploadLimitError ? e.upgradeTo : null);
       }
     } finally {
       setZipping(false);
@@ -183,7 +186,25 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
       <StorageUsageBar />
 
       {error && (
-        <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">
+          {error}
+          {errorUpgradeTo === "pro" && (
+            <>
+              {" "}
+              <Link href="/pricing" className="font-medium underline underline-offset-2">
+                See Pro plans
+              </Link>
+            </>
+          )}
+          {errorUpgradeTo === "signup" && (
+            <>
+              {" "}
+              <Link href="/register" className="font-medium underline underline-offset-2">
+                Sign up free
+              </Link>
+            </>
+          )}
+        </p>
       )}
 
       <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface px-6 py-10 text-center transition-colors hover:border-foreground/30">
