@@ -5,6 +5,7 @@ import Link from "next/link";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "./header";
+import { ProPromoBanner } from "./pro-promo-banner";
 
 // Self-hides until a real publisher ID is set, same pattern as Google sign-in and
 // the "Support us" button elsewhere in this app - safe to leave this deployed
@@ -61,6 +62,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
+          <ProPromoBanner />
         </Providers>
         <footer className="border-t border-border/80">
           <div className="mx-auto max-w-5xl px-6 py-10 text-xs text-muted">

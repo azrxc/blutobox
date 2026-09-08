@@ -8,6 +8,14 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "Occasional Pro perk reminders for Free accounts",
+    highlights: [
+      "Logged-in Free accounts may now see a small, dismissible reminder highlighting one specific Pro perk, at most once every few days, never blocking anything",
+      "Anonymous visitors and Pro accounts never see this",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "New: Daily Trivia",
     intro: "A third Bluto Box AI experience:",
     highlights: [
