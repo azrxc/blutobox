@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ShareEndingCard } from "./share-ending-card";
 
 type Turn = { role: "narrator" | "player"; content: string; choices?: string[]; critical?: boolean };
 type Adventure = {
@@ -318,14 +319,25 @@ export function AdventureTool() {
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       {openAdventure.ended ? (
-        <p className={`text-sm font-medium ${openAdventure.won ? "text-emerald-600 dark:text-emerald-400" : "text-muted"}`}>
-          {openAdventure.won
-            ? "You made it. The story ends here, on a high note."
-            : "The story ends here."}{" "}
-          <button onClick={() => setShowPicker(true)} className="underline underline-offset-2">
-            Start a new adventure
-          </button>
-        </p>
+        <div className="space-y-3">
+          <p className={`text-sm font-medium ${openAdventure.won ? "text-emerald-600 dark:text-emerald-400" : "text-muted"}`}>
+            {openAdventure.won
+              ? "You made it. The story ends here, on a high note."
+              : "The story ends here."}{" "}
+            <button onClick={() => setShowPicker(true)} className="underline underline-offset-2">
+              Start a new adventure
+            </button>
+          </p>
+          {lastTurn?.role === "narrator" && (
+            <ShareEndingCard
+              scenario={openAdventure.scenario}
+              finalNarrative={lastTurn.content}
+              statLabel={openAdventure.statLabel ?? "Progress"}
+              statValue={openAdventure.statValue}
+              won={openAdventure.won}
+            />
+          )}
+        </div>
       ) : quotaExhausted ? (
         <p className="text-sm text-muted">Daily adventure limit reached. Come back tomorrow to continue the story.</p>
       ) : (
