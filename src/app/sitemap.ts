@@ -23,6 +23,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/ai",
     "/adventure",
     "/ai/daily-character",
+    "/compare",
+    "/gofile-alternative",
+    "/wetransfer-alternative",
+    "/mega-alternative",
     "/file-converter",
     "/file-converter/png-to-webp",
     "/file-converter/jpg-to-png",
@@ -46,7 +50,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
             route === "/speed-test" ||
             route === "/ai" ||
             route === "/adventure" ||
-            route === "/ai/daily-character"
+            route === "/ai/daily-character" ||
+            route === "/compare" ||
+            route === "/gofile-alternative" ||
+            route === "/wetransfer-alternative" ||
+            route === "/mega-alternative"
           ? 0.8
           : 0.5,
   }));

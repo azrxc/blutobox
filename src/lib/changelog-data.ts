@@ -8,6 +8,15 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "New: comparison pages against other file hosts",
+    intro: "Added a few honest, fact-checked comparisons for people evaluating alternatives:",
+    highlights: [
+      "New: /compare, plus dedicated pages against Gofile, WeTransfer, and Mega",
+      "Each one lays out the real free-tier differences side by side - no exaggerated claims",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "Daily Character now has real portraits, a guess game, and Q&A",
     intro: "A bigger update to Daily Character:",
     highlights: [

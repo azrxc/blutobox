@@ -103,6 +103,21 @@ export default function RootLayout({
                   </Link>
                 </div>
                 <div className="flex flex-col gap-2">
+                  <span className="font-medium text-foreground">Compare</span>
+                  <Link href="/compare" className="transition-colors hover:text-foreground">
+                    All comparisons
+                  </Link>
+                  <Link href="/gofile-alternative" className="transition-colors hover:text-foreground">
+                    vs Gofile
+                  </Link>
+                  <Link href="/wetransfer-alternative" className="transition-colors hover:text-foreground">
+                    vs WeTransfer
+                  </Link>
+                  <Link href="/mega-alternative" className="transition-colors hover:text-foreground">
+                    vs Mega
+                  </Link>
+                </div>
+                <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Company</span>
                   <Link href="/about" className="transition-colors hover:text-foreground">
                     About
