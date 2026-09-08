@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ComparisonPage } from "../compare/comparison-page";
 
 export const metadata: Metadata = {
-  title: "WeTransfer Alternative - No Monthly Cap | Bluto Box",
+  title: "WeTransfer Alternative | Bluto Box",
   description:
     "Looking for a WeTransfer alternative? Bluto Box links don't expire in 3 days and there's no 10-transfers-per-month ceiling on the free plan.",
 };
@@ -32,7 +32,7 @@ export default function WeTransferAlternativePage() {
           body: "WeTransfer is designed around a single send-and-forget transfer. Bluto Box gives every upload a lasting link plus an account to keep track of what you've shared.",
         },
       ]}
-      sourceNote="Based on WeTransfer's publicly documented free-plan limits as of September 2026. Limits change over time on any service - check the provider's own site for current details."
+      sourceNote="Based on WeTransfer's publicly documented free-plan limits as of September 2026. Limits change over time on any service, so it's worth checking the provider's own site for the current details."
     />
   );
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ComparisonPage } from "../compare/comparison-page";
 
 export const metadata: Metadata = {
-  title: "Mega Alternative - No Shared-IP Lockouts | Bluto Box",
+  title: "Mega Alternative | Bluto Box",
   description:
     "Looking for a Mega.nz alternative? Bluto Box's daily download quota is tied to your own account, not your IP address, so it can't be used up by someone else on your network.",
 };
@@ -31,7 +31,7 @@ export default function MegaAlternativePage() {
           body: "Mega is built as an encrypted cloud drive first. If all you need is upload-a-file-get-a-link, Bluto Box does that one job without extra setup.",
         },
       ]}
-      sourceNote="Based on Mega's publicly documented free-tier transfer-quota behavior as of September 2026. Limits change over time on any service - check the provider's own site for current details."
+      sourceNote="Based on Mega's publicly documented free-tier transfer-quota behavior as of September 2026. Limits change over time on any service, so it's worth checking the provider's own site for the current details."
     />
   );
 }

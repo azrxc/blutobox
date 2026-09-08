@@ -116,6 +116,12 @@ export default function RootLayout({
                   <Link href="/mega-alternative" className="transition-colors hover:text-foreground">
                     vs Mega
                   </Link>
+                  <Link href="/pixeldrain-alternative" className="transition-colors hover:text-foreground">
+                    vs Pixeldrain
+                  </Link>
+                  <Link href="/buzzheavier-alternative" className="transition-colors hover:text-foreground">
+                    vs Buzzheavier
+                  </Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Company</span>

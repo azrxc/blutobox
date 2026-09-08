@@ -22,6 +22,16 @@ const COMPARISONS = [
     title: "vs Mega",
     description: "A daily quota tied to your account, not a 6-hour window shared by your whole network.",
   },
+  {
+    href: "/pixeldrain-alternative",
+    title: "vs Pixeldrain",
+    description: "A Pro plan under half the price, with a flat quota instead of a per-file bandwidth pool.",
+  },
+  {
+    href: "/buzzheavier-alternative",
+    title: "vs Buzzheavier",
+    description: "No ads around your downloads, and a file that doesn't need to go viral to stay online.",
+  },
 ];
 
 export default function ComparePage() {
@@ -31,7 +41,7 @@ export default function ComparePage() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Bluto Box vs other file hosts</h1>
           <p className="mt-2 text-sm text-muted">
-            Same basic job as any of these — upload a file, get a link, share it. Here&apos;s where the free tiers
+            These do the same basic job: upload a file, get a link, share it. Here&apos;s where the free tiers
             actually differ.
           </p>
         </div>

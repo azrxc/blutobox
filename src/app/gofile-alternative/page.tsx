@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { ComparisonPage } from "../compare/comparison-page";
 
 export const metadata: Metadata = {
-  title: "Gofile Alternative - No Ads, Clear Limits | Bluto Box",
+  title: "Gofile Alternative | Bluto Box",
   description:
-    "Looking for a Gofile alternative? Bluto Box uploads work the same way - no account needed - without ad-gated downloads or a hidden daily cap.",
+    "Looking for a Gofile alternative? Bluto Box works the same way, no account needed, but without ad-gated downloads or a hidden daily cap.",
 };
 
 export default function GofileAlternativePage() {
@@ -32,7 +32,7 @@ export default function GofileAlternativePage() {
           body: "An inactive Gofile link can be gone in 10 days. Bluto Box keeps a Free-tier link alive for 30 days of inactivity, and Pro files are never auto-deleted.",
         },
       ]}
-      sourceNote="Based on Gofile's publicly documented free-tier behavior as of September 2026. Limits change over time on any service - check the provider's own site for current details."
+      sourceNote="Based on Gofile's publicly documented free-tier behavior as of September 2026. Limits change over time on any service, so it's worth checking the provider's own site for the current details."
     />
   );
 }

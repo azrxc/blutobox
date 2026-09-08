@@ -27,6 +27,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/gofile-alternative",
     "/wetransfer-alternative",
     "/mega-alternative",
+    "/pixeldrain-alternative",
+    "/buzzheavier-alternative",
     "/file-converter",
     "/file-converter/png-to-webp",
     "/file-converter/jpg-to-png",
@@ -54,7 +56,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
             route === "/compare" ||
             route === "/gofile-alternative" ||
             route === "/wetransfer-alternative" ||
-            route === "/mega-alternative"
+            route === "/mega-alternative" ||
+            route === "/pixeldrain-alternative" ||
+            route === "/buzzheavier-alternative"
           ? 0.8
           : 0.5,
   }));

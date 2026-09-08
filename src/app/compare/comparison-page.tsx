@@ -26,7 +26,7 @@ export function ComparisonPage({ competitorName, rows, whySwitch, sourceNote }: 
           A {competitorName} alternative without the catch
         </h1>
         <p className="mt-3 text-sm text-muted">
-          Same job — upload a file, get a link, share it — with clearer limits and no account required to start.
+          It does the same job: upload a file, get a link, share it. Just with clearer limits, and you don&apos;t need an account to start.
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link
