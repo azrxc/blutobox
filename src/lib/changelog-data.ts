@@ -8,6 +8,14 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "Clearer upgrade paths and referral visibility",
+    highlights: [
+      "Hitting a file size or storage limit while uploading now shows an actual link to fix it (sign up if you're anonymous, upgrade to Pro if you're on Free), not just plain error text",
+      "The pricing page now mentions the referral program for Free accounts wanting more storage without paying",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "New: optional streak reminder emails for Daily Character",
     intro: "For people building a streak on Daily Character:",
     highlights: [
