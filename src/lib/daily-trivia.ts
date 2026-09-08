@@ -47,7 +47,7 @@ function isValidQuestion(q: unknown): q is TriviaQuestion {
   );
 }
 
-async function tryGenerateTrivia(): Promise<TriviaQuestion[] | null> {
+async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null; debug: string }> {
   const completion = await chatCompletion({
     max_tokens: 1200,
     messages: [
@@ -57,36 +57,48 @@ async function tryGenerateTrivia(): Promise<TriviaQuestion[] | null> {
   });
 
   const raw = completion.choices[0]?.message?.content;
-  if (!raw) return null;
+  const finishReason = completion.choices[0]?.finish_reason;
+  if (!raw) return { questions: null, debug: `empty content, finish_reason=${finishReason}` };
 
   try {
     const parsed = JSON.parse(stripCodeFence(raw));
-    if (!Array.isArray(parsed.questions) || parsed.questions.length < QUESTION_COUNT) return null;
+    if (!Array.isArray(parsed.questions) || parsed.questions.length < QUESTION_COUNT) {
+      return { questions: null, debug: `bad shape: ${raw.slice(0, 500)}` };
+    }
     const questions = parsed.questions.slice(0, QUESTION_COUNT);
-    if (!questions.every(isValidQuestion)) return null;
-    return questions.map((q: TriviaQuestion) => ({
-      question: q.question,
-      options: q.options.slice(0, 4),
-      correctIndex: q.correctIndex,
-      category: q.category,
-    }));
-  } catch {
-    return null;
+    if (!questions.every(isValidQuestion)) {
+      return { questions: null, debug: `failed validation: ${raw.slice(0, 500)}` };
+    }
+    return {
+      questions: questions.map((q: TriviaQuestion) => ({
+        question: q.question,
+        options: q.options.slice(0, 4),
+        correctIndex: q.correctIndex,
+        category: q.category,
+      })),
+      debug: "ok",
+    };
+  } catch (err) {
+    return { questions: null, debug: `JSON.parse threw: ${err instanceof Error ? err.message : String(err)} | raw: ${raw.slice(0, 500)}` };
   }
 }
 
 export async function generateDailyTrivia(): Promise<TriviaResult> {
   if (!isAIConfigured()) return { ok: false, reason: "The trivia generator isn't configured yet" };
 
+  const debugLog: string[] = [];
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      const questions = await tryGenerateTrivia();
+      const { questions, debug } = await tryGenerateTrivia();
       if (questions) return { ok: true, questions };
-      console.warn(`[daily-trivia] attempt ${attempt} came back empty/malformed, retrying`);
+      debugLog.push(`attempt ${attempt}: ${debug}`);
     } catch (err) {
-      console.warn(`[daily-trivia] attempt ${attempt} threw, retrying`, err);
+      debugLog.push(`attempt ${attempt} threw: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
-  return { ok: false, reason: "Something went wrong generating today's trivia" };
+  // TEMPORARY: surfacing real failure detail to debug a live production issue
+  // (works locally against both providers, fails consistently in prod) - revert
+  // to a plain user-facing message once root-caused.
+  return { ok: false, reason: `DEBUG: ${debugLog.join(" || ")}` };
 }
