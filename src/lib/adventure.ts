@@ -1,4 +1,4 @@
-import { getDeepSeekClient, chatCompletion, DEEPSEEK_MODEL } from "@/lib/deepseek";
+﻿import { isAIConfigured, chatCompletion } from "@/lib/deepseek";
 
 export type Turn = { role: "narrator" | "player"; content: string; choices?: string[]; critical?: boolean };
 
@@ -67,12 +67,10 @@ function toDeepSeekMessages(turns: Turn[]) {
 
 export async function startAdventure(scenario: string): Promise<StartResult> {
   try {
-    const client = getDeepSeekClient();
-    if (!client) return { ok: false, reason: "The adventure tool isn't configured yet" };
+    if (!isAIConfigured()) return { ok: false, reason: "The adventure tool isn't configured yet" };
 
-    const completion = await chatCompletion(client, {
-      model: DEEPSEEK_MODEL,
-      max_tokens: 400,
+    const completion = await chatCompletion({
+      max_tokens: 700,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
@@ -124,16 +122,14 @@ export async function continueAdventure(
   statGoal: StatGoal
 ): Promise<ContinueResult> {
   try {
-    const client = getDeepSeekClient();
-    if (!client) return { ok: false, reason: "The adventure tool isn't configured yet" };
+    if (!isAIConfigured()) return { ok: false, reason: "The adventure tool isn't configured yet" };
 
     const action = playerAction.trim().slice(0, MAX_ACTION_CHARS);
     if (!action) return { ok: false, reason: "Enter an action first" };
 
     const contextTurns = priorTurns.slice(-MAX_CONTEXT_TURNS);
-    const completion = await chatCompletion(client, {
-      model: DEEPSEEK_MODEL,
-      max_tokens: 400,
+    const completion = await chatCompletion({
+      max_tokens: 700,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         ...toDeepSeekMessages(contextTurns),

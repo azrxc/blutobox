@@ -6,7 +6,7 @@
 import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import { prisma } from "@/lib/prisma";
 import { getSignedDownloadUrl } from "@/lib/storage";
-import { getDeepSeekClient, chatCompletion, DEEPSEEK_MODEL } from "@/lib/deepseek";
+import { isAIConfigured, chatCompletion } from "@/lib/deepseek";
 
 // Independent of plan upload/storage limits (src/lib/limits.ts) - this is a fixed,
 // feature-level cost/latency bound, not a plan quota, so it's kept local here.
@@ -46,8 +46,7 @@ export type SummaryResult = { ok: true; summary: string } | { ok: false; reason:
 // Never throws - always resolves to a result the caller can relay to the UI.
 export async function generateFileSummary(fileId: string): Promise<SummaryResult> {
   try {
-    const client = getDeepSeekClient();
-    if (!client) return { ok: false, reason: "AI summaries aren't configured yet" };
+    if (!isAIConfigured()) return { ok: false, reason: "AI summaries aren't configured yet" };
 
     const file = await prisma.file.findUnique({ where: { id: fileId } });
     if (!file) return { ok: false, reason: "File not found" };
@@ -72,8 +71,7 @@ export async function generateFileSummary(fileId: string): Promise<SummaryResult
     }
     if (!excerpt) return { ok: false, reason: "Couldn't extract any text from this file" };
 
-    const completion = await chatCompletion(client, {
-      model: DEEPSEEK_MODEL,
+    const completion = await chatCompletion({
       max_tokens: 300,
       messages: [
         { role: "system", content: SUMMARY_SYSTEM_PROMPT },

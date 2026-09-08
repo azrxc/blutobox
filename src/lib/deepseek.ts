@@ -1,22 +1,32 @@
 import OpenAI from "openai";
 
-// Routed through OpenRouter rather than DeepSeek's own official API - DeepSeek's
-// model weights are open, so 28+ independent hosts (DeepInfra, StreamLake, etc.)
-// run the same model and compete on price via OpenRouter, coming out 3-5x cheaper
-// than DeepSeek's own direct API (which also introduced peak/off-peak surge
-// pricing on 2026-08-16). Same model, cheaper access path - verified 2026-09-08,
-// see the memory note on always checking aggregators before a vendor's direct API.
-export const DEEPSEEK_MODEL = "deepseek/deepseek-v4-flash";
+// Two-tier fallback: try DeepSeek's own direct API first (if DEEPSEEK_API_KEY is
+// set - this exists so a pre-paid balance on that account gets spent down instead
+// of wasted), and only fall back to OpenRouter if the direct API specifically
+// fails with "insufficient balance" (HTTP 402). OpenRouter is preferred long-term -
+// DeepSeek's model weights are open, so 28+ independent hosts run the same model
+// and compete on price there, coming out 3-5x cheaper than DeepSeek's own direct
+// API (which also introduced peak/off-peak surge pricing on 2026-08-16) - see the
+// memory note on always checking aggregators before a vendor's direct API. Once
+// the direct balance runs out for good, every call quietly falls through to
+// OpenRouter forever after - no manual cutover needed.
+const DIRECT_MODEL = "deepseek-v4-flash";
+const OPENROUTER_MODEL = "deepseek/deepseek-v4-flash";
 
-let cachedClient: OpenAI | null | undefined;
+let directClient: OpenAI | null | undefined;
+let openRouterClient: OpenAI | null | undefined;
 
-// Shared lazy singleton so every caller (AI summary, adventure, ...) reuses one
-// client instead of each rolling its own - returns null if OPENROUTER_API_KEY
-// isn't configured, callers degrade gracefully instead of crashing.
-export function getDeepSeekClient(): OpenAI | null {
-  if (cachedClient !== undefined) return cachedClient;
+function getDirectClient(): OpenAI | null {
+  if (directClient !== undefined) return directClient;
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  directClient = apiKey ? new OpenAI({ apiKey, baseURL: "https://api.deepseek.com" }) : null;
+  return directClient;
+}
+
+function getOpenRouterClient(): OpenAI | null {
+  if (openRouterClient !== undefined) return openRouterClient;
   const apiKey = process.env.OPENROUTER_API_KEY;
-  cachedClient = apiKey
+  openRouterClient = apiKey
     ? new OpenAI({
         apiKey,
         baseURL: "https://openrouter.ai/api/v1",
@@ -26,20 +36,38 @@ export function getDeepSeekClient(): OpenAI | null {
         },
       })
     : null;
-  return cachedClient;
+  return openRouterClient;
 }
 
-type ChatCompletionParams = OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming;
+// Callers check this before doing any work (extracting text, etc.) that would be
+// wasted if no AI provider is configured at all.
+export function isAIConfigured(): boolean {
+  return Boolean(getDirectClient() || getOpenRouterClient());
+}
 
-// `provider.sort: "price"` is an OpenRouter extension, not part of the OpenAI SDK's
-// own request type - always route to whichever of DeepSeek V4 Flash's many
-// competing hosts is cheapest right now, instead of load-balancing across all of
-// them for reliability. The cast is needed because the SDK's TS types don't know
-// about this OpenRouter-specific field. Pinned to the non-streaming params/return
-// type since every caller here awaits a single full response, never a stream.
-export function chatCompletion(
-  client: OpenAI,
-  params: ChatCompletionParams
-): Promise<OpenAI.Chat.Completions.ChatCompletion> {
-  return client.chat.completions.create({ ...params, provider: { sort: "price" } } as ChatCompletionParams);
+type ChatCompletionParams = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, "model">;
+
+export async function chatCompletion(params: ChatCompletionParams): Promise<OpenAI.Chat.Completions.ChatCompletion> {
+  const direct = getDirectClient();
+  if (direct) {
+    try {
+      return await direct.chat.completions.create({ ...params, model: DIRECT_MODEL });
+    } catch (err) {
+      const status = (err as { status?: number } | null)?.status;
+      if (status !== 402) throw err;
+      console.warn("[deepseek] direct API balance exhausted, falling back to OpenRouter");
+    }
+  }
+
+  const openRouter = getOpenRouterClient();
+  if (!openRouter) throw new Error("No AI provider configured");
+  // `provider.sort: "price"` is an OpenRouter extension, not part of the OpenAI
+  // SDK's own request type - always route to whichever of DeepSeek V4 Flash's many
+  // competing hosts is cheapest right now. The cast is needed because the SDK's TS
+  // types don't know about this OpenRouter-specific field.
+  return openRouter.chat.completions.create({
+    ...params,
+    model: OPENROUTER_MODEL,
+    provider: { sort: "price" },
+  } as OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming);
 }
