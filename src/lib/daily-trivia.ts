@@ -117,16 +117,25 @@ export async function generateDailyTrivia(): Promise<TriviaResult> {
   if (!isAIConfigured()) return { ok: false, reason: "The trivia generator isn't configured yet" };
 
   const startedAt = Date.now();
+  const debugLog: string[] = [];
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    if (Date.now() - startedAt > TIME_BUDGET_MS) break;
+    if (Date.now() - startedAt > TIME_BUDGET_MS) {
+      debugLog.push(`stopped before attempt ${attempt}, budget exhausted at ${Date.now() - startedAt}ms`);
+      break;
+    }
+    const attemptStart = Date.now();
     try {
       const { questions, debug } = await tryGenerateTrivia();
+      const ms = Date.now() - attemptStart;
       if (questions) return { ok: true, questions };
-      console.warn(`[daily-trivia] attempt ${attempt} came back empty/malformed (${debug}), retrying`);
+      debugLog.push(`attempt ${attempt} (${ms}ms): ${debug}`);
     } catch (err) {
-      console.warn(`[daily-trivia] attempt ${attempt} threw, retrying`, err);
+      const ms = Date.now() - attemptStart;
+      debugLog.push(`attempt ${attempt} (${ms}ms) threw: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
-  return { ok: false, reason: "Something went wrong generating today's trivia" };
+  // TEMPORARY (round 3): timing + reason data to find why every attempt still
+  // fails in production despite the widened parser - revert once root-caused.
+  return { ok: false, reason: `DEBUG: ${debugLog.join(" || ")}` };
 }
