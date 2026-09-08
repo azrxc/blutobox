@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
     "/about",
+    "/contact",
     "/pricing",
     "/faq",
     "/changelog",
@@ -19,6 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/qr",
     "/text-diff",
     "/speed-test",
+    "/ai",
+    "/adventure",
     "/file-converter",
     "/file-converter/png-to-webp",
     "/file-converter/jpg-to-png",
@@ -36,7 +39,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:
       route === ""
         ? 1
-        : route.startsWith("/file-converter") || route === "/qr" || route === "/text-diff" || route === "/speed-test"
+        : route.startsWith("/file-converter") ||
+            route === "/qr" ||
+            route === "/text-diff" ||
+            route === "/speed-test" ||
+            route === "/ai" ||
+            route === "/adventure"
           ? 0.8
           : 0.5,
   }));
