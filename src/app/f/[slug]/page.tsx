@@ -20,6 +20,7 @@ import { BookmarkButton } from "./bookmark-button";
 import { SocialShareButtons } from "../../social-share-buttons";
 import { GenerateSummaryButton } from "./generate-summary-button";
 import { classifyMimeType, MAX_SUMMARY_FILE_BYTES } from "@/lib/ai-summary";
+import { AdSlot } from "../../ad-slot";
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
@@ -218,6 +219,8 @@ export default async function FilePage({
             <EmailShareForm slug={slug} />
           </div>
         </>
+
+        {viewerPlanTier !== "PRO" && <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_FILE_PAGE} />}
 
         <div className="flex justify-end">
           <ReportForm slug={slug} />

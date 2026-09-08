@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "./header";
+
+// Self-hides until a real publisher ID is set, same pattern as Google sign-in and
+// the "Support us" button elsewhere in this app - safe to leave this deployed
+// before the AdSense account is even approved. Once approved, Google's own
+// AdSense dashboard (Privacy & messaging) handles the EU/UK cookie-consent
+// banner automatically - no custom consent code needed here.
+const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +52,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        {ADSENSE_CLIENT_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
         <Providers>
           <Header />
           {children}
@@ -90,6 +106,9 @@ export default function RootLayout({
                   </Link>
                   <Link href="/faq" className="transition-colors hover:text-foreground">
                     FAQ
+                  </Link>
+                  <Link href="/contact" className="transition-colors hover:text-foreground">
+                    Contact
                   </Link>
                 </div>
                 <div className="flex flex-col gap-2">
