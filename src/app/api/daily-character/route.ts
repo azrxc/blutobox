@@ -3,10 +3,25 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getClientIp } from "@/lib/request-ip";
 import { getCurrentPlanTier } from "@/lib/plan";
-import { maxSavedCharactersFor } from "@/lib/limits";
+import { maxSavedCharactersFor, dailyCharacterChatLimitFor } from "@/lib/limits";
+import { checkDailyQuota, consumeDailyQuota } from "@/lib/daily-quota";
 import { generateDailyCharacter } from "@/lib/daily-character";
+import { askCharacter } from "@/lib/character-chat";
+import { recordGuess, getGuessStats } from "@/lib/character-stats";
 import { ANON_IDENTITY_COOKIE, ANON_IDENTITY_COOKIE_MAX_AGE, newAnonToken } from "@/lib/anon-identity";
+
+const CHAT_QUOTA_PREFIX = "character-chat";
+
+function shuffledGuessOptions(traits: string[], decoyTraits: string[]): string[] {
+  const options = [traits[0], ...decoyTraits.slice(0, 2)];
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  return options;
+}
 
 export const maxDuration = 60; // text + image generation sequentially can take longer than a text-only call
 
@@ -83,31 +98,50 @@ export async function GET(req: Request) {
   const identity = await resolveIdentity(session?.user?.id);
   const planTier = await getCurrentPlanTier(session?.user?.id);
   const maxSaved = maxSavedCharactersFor(planTier);
+  const chatLimit = dailyCharacterChatLimitFor(planTier);
+  const chatIdentifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
   const where = identityWhere(identity);
+  const today = todayUtc();
 
-  const [todaysResult, streak, saved] = await Promise.all([
+  const [todaysResult, streak, saved, chatQuota] = await Promise.all([
     getOrCreateTodaysCharacter(),
     prisma.characterStreak.findUnique({ where }),
     prisma.savedCharacter.findMany({ where, orderBy: { savedAt: "desc" } }),
+    checkDailyQuota(CHAT_QUOTA_PREFIX, chatIdentifier, chatLimit),
   ]);
 
   if (!todaysResult.ok) {
     return NextResponse.json({ error: todaysResult.reason }, { status: 502 });
   }
 
+  const guessedToday = streak?.lastGuessDate === today;
+  const traits = todaysResult.character.traits as string[];
+  const decoyTraits = todaysResult.character.decoyTraits as string[];
+
   const res = NextResponse.json({
     today: todaysResult.character,
-    claimedToday: streak?.lastClaimedDate === todayUtc(),
+    claimedToday: streak?.lastClaimedDate === today,
     currentStreak: streak?.currentStreak ?? 0,
     longestStreak: streak?.longestStreak ?? 0,
     saved,
     maxSaved,
+    guessedToday,
+    guessCorrect: guessedToday ? streak?.lastGuessCorrect ?? null : null,
+    guessOptions: guessedToday ? null : shuffledGuessOptions(traits, decoyTraits),
+    guessStats: guessedToday ? await getGuessStats(today) : null,
+    chatUsed: chatQuota.used,
+    chatLimit,
   });
   setAnonCookie(res, identity);
   return res;
 }
 
-const bodySchema = z.discriminatedUnion("action", [z.object({ action: z.literal("claim") }), z.object({ action: z.literal("save") })]);
+const bodySchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("claim") }),
+  z.object({ action: z.literal("save") }),
+  z.object({ action: z.literal("guess"), choice: z.string().min(1) }),
+  z.object({ action: z.literal("chat"), question: z.string().min(1).max(200) }),
+]);
 
 export async function POST(req: Request) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
@@ -150,6 +184,56 @@ export async function POST(req: Request) {
       currentStreak: updated.currentStreak,
       longestStreak: updated.longestStreak,
     });
+    setAnonCookie(res, identity);
+    return res;
+  }
+
+  if (parsed.data.action === "guess") {
+    const streak = await prisma.characterStreak.findUnique({ where });
+    if (streak?.lastGuessDate === today) {
+      return NextResponse.json({ error: "You've already guessed today" }, { status: 400 });
+    }
+
+    const traits = todaysResult.character.traits as string[];
+    const correct = parsed.data.choice === traits[0];
+
+    await Promise.all([
+      prisma.characterStreak.upsert({
+        where,
+        create: {
+          ...(identity.type === "user" ? { ownerId: identity.userId } : { anonToken: identity.token }),
+          lastGuessDate: today,
+          lastGuessCorrect: correct,
+        },
+        update: { lastGuessDate: today, lastGuessCorrect: correct },
+      }),
+      recordGuess(today, correct),
+    ]);
+
+    const res = NextResponse.json({ correct, guessStats: await getGuessStats(today) });
+    setAnonCookie(res, identity);
+    return res;
+  }
+
+  if (parsed.data.action === "chat") {
+    const planTier = await getCurrentPlanTier(session?.user?.id);
+    const chatLimit = dailyCharacterChatLimitFor(planTier);
+    const chatIdentifier = session?.user?.id ?? `ip:${getClientIp(req)}`;
+
+    const { allowed, used: usedBefore } = await checkDailyQuota(CHAT_QUOTA_PREFIX, chatIdentifier, chatLimit);
+    if (!allowed) {
+      return NextResponse.json({ error: "Daily question limit reached. Come back tomorrow." }, { status: 429 });
+    }
+    await consumeDailyQuota(CHAT_QUOTA_PREFIX, chatIdentifier);
+
+    const character = todaysResult.character;
+    const result = await askCharacter(
+      { name: character.name, tagline: character.tagline, description: character.description, traits: character.traits as string[] },
+      parsed.data.question
+    );
+    if (!result.ok) return NextResponse.json({ error: result.reason }, { status: 502 });
+
+    const res = NextResponse.json({ answer: result.answer, chatUsed: usedBefore + 1, chatLimit });
     setAnonCookie(res, identity);
     return res;
   }

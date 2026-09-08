@@ -217,6 +217,10 @@ model DailyCharacter {
   tagline     String
   description String   @db.Text
   traits      Json
+  // 2 plausible-but-false traits alongside the real 3, for the "guess the real
+  // trait" mini-game (src/app/api/daily-character/route.ts) - generated once
+  // alongside the character, not a separate AI call.
+  decoyTraits Json     @default("[]")
   portrait    String   @db.Text
   // Data URI (base64), null if image generation failed or wasn't configured -
   // the feature still works text-only either way. One image per day, generated
@@ -228,16 +232,20 @@ model DailyCharacter {
 
 // One streak record per identity - tracks consecutive days claimed. Claiming
 // resets to 1 if a day was missed, increments if the last claim was yesterday,
-// no-ops if today is already claimed.
+// no-ops if today is already claimed. Also doubles as today's guess-game state
+// (lastGuessDate/lastGuessCorrect) since it's already the one-row-per-identity
+// daily-state table - no need for a second table just for the guess.
 model CharacterStreak {
-  id              String   @id @default(cuid())
-  ownerId         String?  @unique
-  owner           User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  anonToken       String?  @unique
-  currentStreak   Int      @default(0)
-  longestStreak   Int      @default(0)
-  lastClaimedDate String?
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(cuid())
+  ownerId          String?  @unique
+  owner            User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  anonToken        String?  @unique
+  currentStreak    Int      @default(0)
+  longestStreak    Int      @default(0)
+  lastClaimedDate  String?
+  lastGuessDate    String?
+  lastGuessCorrect Boolean?
+  updatedAt        DateTime @updatedAt
 }
 
 // A viewer's personal collection of characters they chose to keep - snapshotted

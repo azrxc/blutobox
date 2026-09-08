@@ -8,12 +8,20 @@ export type CharacterResult =
       tagline: string;
       description: string;
       traits: string[];
+      decoyTraits: string[];
       portrait: string;
       portraitImageUrl: string | null;
     }
   | { ok: false; reason: string };
 
-type ParsedCharacter = { name: string; tagline: string; description: string; traits: string[]; portrait: string };
+type ParsedCharacter = {
+  name: string;
+  tagline: string;
+  description: string;
+  traits: string[];
+  decoyTraits: string[];
+  portrait: string;
+};
 
 const SYSTEM_PROMPT =
   "You invent a single original fictional character for a general-audience website used by all ages, " +
@@ -22,12 +30,15 @@ const SYSTEM_PROMPT =
   "card, not a novel. " +
   'Respond with ONLY a valid JSON object, no markdown formatting, no code fences, no text outside ' +
   'the JSON, in exactly this shape: {"name": string, "tagline": string, "description": string, ' +
-  '"traits": [string, string, string], "portrait": string}. "name" is a full character name. ' +
-  '"tagline" is a punchy one-sentence hook, under 12 words. "description" is exactly 2 short ' +
-  'sentences of backstory/personality, under 40 words total. "traits" is exactly 3 short (1-2 word) ' +
-  'personality traits. "portrait" is exactly 1 sentence, under 30 words, describing their visual ' +
-  "appearance so someone could use it as a prompt for a separate art tool - specific about clothing, " +
-  "features, and vibe, but never explicit or suggestive.";
+  '"traits": [string, string, string], "decoyTraits": [string, string], "portrait": string}. "name" ' +
+  'is a full character name. "tagline" is a punchy one-sentence hook, under 12 words. "description" ' +
+  'is exactly 2 short sentences of backstory/personality, under 40 words total. "traits" is exactly ' +
+  '3 short (1-2 word) personality traits that genuinely fit this character. "decoyTraits" is exactly ' +
+  "2 short (1-2 word) traits that sound equally plausible for a character card but do NOT fit this " +
+  'specific character - used for a "guess the real trait" mini-game, so they must be believable, not ' +
+  'obviously wrong or joke traits. "portrait" is exactly 1 sentence, under 30 words, describing their ' +
+  "visual appearance so someone could use it as a prompt for a separate art tool - specific about " +
+  "clothing, features, and vibe, but never explicit or suggestive.";
 
 // Once-a-day generation shared by the whole site, so a failure here blocks every
 // visitor until it succeeds, not just one person clicking again like the other AI
@@ -61,6 +72,7 @@ async function tryGenerateCharacterText(): Promise<ParsedCharacter | null> {
       typeof parsed.tagline !== "string" ||
       typeof parsed.description !== "string" ||
       !Array.isArray(parsed.traits) ||
+      !Array.isArray(parsed.decoyTraits) ||
       typeof parsed.portrait !== "string"
     ) {
       return null;
@@ -70,6 +82,7 @@ async function tryGenerateCharacterText(): Promise<ParsedCharacter | null> {
       tagline: parsed.tagline,
       description: parsed.description,
       traits: parsed.traits.slice(0, 3),
+      decoyTraits: parsed.decoyTraits.slice(0, 2),
       portrait: parsed.portrait,
     };
   } catch {

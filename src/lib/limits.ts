@@ -93,6 +93,21 @@ export function maxSavedCharactersFor(planTier: "FREE" | "PRO" | null) {
   return ANON_MAX_SAVED_CHARACTERS;
 }
 
+// Daily quota for asking today's character a question (src/lib/character-chat.ts) -
+// unlike the character generation itself (once/day, site-wide, nearly free), each
+// question is a real per-viewer AI call, so this needs the same daily-quota
+// treatment as AI summary/adventure. Kept small since it's a scoped Q&A, not a
+// chat feature people are meant to spend a long session in.
+export const ANON_DAILY_CHARACTER_CHAT_LIMIT = 3;
+export const FREE_DAILY_CHARACTER_CHAT_LIMIT = 10;
+export const PRO_DAILY_CHARACTER_CHAT_LIMIT = 30;
+
+export function dailyCharacterChatLimitFor(planTier: "FREE" | "PRO" | null) {
+  if (planTier === "PRO") return PRO_DAILY_CHARACTER_CHAT_LIMIT;
+  if (planTier === "FREE") return FREE_DAILY_CHARACTER_CHAT_LIMIT;
+  return ANON_DAILY_CHARACTER_CHAT_LIMIT;
+}
+
 // Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
 export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
 
