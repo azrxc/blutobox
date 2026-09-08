@@ -8,6 +8,15 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "New: optional streak reminder emails for Daily Character",
+    intro: "For people building a streak on Daily Character:",
+    highlights: [
+      "New: turn on an email reminder that only fires if you claimed yesterday but haven't claimed today yet, so your streak doesn't quietly reset",
+      "Opt-in, off by default, and you can turn it off anytime from the Daily Character page",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "New: comparison pages against other file hosts",
     intro: "Added a few honest, fact-checked comparisons for people evaluating alternatives:",
     highlights: [

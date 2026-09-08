@@ -135,6 +135,8 @@ export async function GET(req: Request) {
     claimedToday: streak?.lastClaimedDate === today,
     currentStreak: streak?.currentStreak ?? 0,
     longestStreak: streak?.longestStreak ?? 0,
+    reminderOptIn: streak?.reminderOptIn ?? false,
+    canSetReminder: identity.type === "user",
     saved,
     maxSaved,
     guessedToday,
@@ -153,6 +155,7 @@ const bodySchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("save") }),
   z.object({ action: z.literal("guess"), choice: z.string().min(1) }),
   z.object({ action: z.literal("chat"), question: z.string().min(1).max(200) }),
+  z.object({ action: z.literal("reminder-opt-in"), optIn: z.boolean() }),
 ]);
 
 export async function POST(req: Request) {
@@ -198,6 +201,18 @@ export async function POST(req: Request) {
     });
     setAnonCookie(res, identity);
     return res;
+  }
+
+  if (parsed.data.action === "reminder-opt-in") {
+    if (identity.type !== "user") {
+      return NextResponse.json({ error: "Log in to turn on streak reminders" }, { status: 400 });
+    }
+    await prisma.characterStreak.upsert({
+      where,
+      create: { ownerId: identity.userId, reminderOptIn: parsed.data.optIn },
+      update: { reminderOptIn: parsed.data.optIn },
+    });
+    return NextResponse.json({ reminderOptIn: parsed.data.optIn });
   }
 
   if (parsed.data.action === "guess") {

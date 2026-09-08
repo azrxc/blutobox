@@ -156,6 +156,27 @@ export async function sendShareLinkEmail(params: {
   }
 }
 
+export async function sendStreakReminderEmail(email: string, currentStreak: number) {
+  const url = `${process.env.NEXTAUTH_URL}/ai/daily-character`;
+
+  const resend = getResend();
+  if (!resend) {
+    console.log(`[dev] Streak reminder for ${email}: ${currentStreak}-day streak`);
+    return;
+  }
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: email,
+    subject: `Your ${currentStreak}-day streak resets today`,
+    html: `<p>You claimed today's character yesterday, keeping a <strong>${currentStreak}-day streak</strong> going - but you haven't claimed today's yet.</p><p><a href="${url}">Claim today's character</a> before it resets at midnight UTC.</p><p>You're getting this because you turned on streak reminders. Turn it off anytime from the Daily Character page.</p>`,
+  });
+  if (error) {
+    console.error(`[email] Failed to send streak reminder to ${email}:`, error);
+    throw new Error("Failed to send streak reminder email");
+  }
+}
+
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
 

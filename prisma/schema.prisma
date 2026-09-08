@@ -245,6 +245,11 @@ model CharacterStreak {
   lastClaimedDate  String?
   lastGuessDate    String?
   lastGuessCorrect Boolean?
+  // Opt-in only, and only meaningful for logged-in users (anon has no email on file).
+  // When on, a daily cron checks for streaks that claimed yesterday but not yet today
+  // and emails a reminder before the streak resets - see src/lib/character-reminders.ts.
+  reminderOptIn        Boolean @default(false)
+  lastReminderSentDate String?
   updatedAt        DateTime @updatedAt
 }
 

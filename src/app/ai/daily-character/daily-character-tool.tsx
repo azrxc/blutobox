@@ -23,6 +23,8 @@ type State = {
   claimedToday: boolean;
   currentStreak: number;
   longestStreak: number;
+  reminderOptIn: boolean;
+  canSetReminder: boolean;
   saved: SavedCharacter[];
   maxSaved: number;
   guessedToday: boolean;
@@ -44,6 +46,7 @@ export function DailyCharacterTool() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatSending, setChatSending] = useState(false);
+  const [reminderSaving, setReminderSaving] = useState(false);
 
   useEffect(() => {
     fetch("/api/daily-character")
@@ -69,6 +72,23 @@ export function DailyCharacterTool() {
       setError(e instanceof Error ? e.message : "Couldn't claim today's streak");
     } finally {
       setClaiming(false);
+    }
+  }
+
+  async function handleReminderToggle(optIn: boolean) {
+    setReminderSaving(true);
+    try {
+      const res = await fetch("/api/daily-character", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reminder-opt-in", optIn }),
+      });
+      if (!res.ok) throw new Error();
+      setState((prev) => (prev ? { ...prev, reminderOptIn: optIn } : prev));
+    } catch {
+      setError("Couldn't update your reminder setting, try again in a moment");
+    } finally {
+      setReminderSaving(false);
     }
   }
 
@@ -258,6 +278,18 @@ export function DailyCharacterTool() {
         </div>
         {state.longestStreak > 0 && (
           <p className="mt-2 text-xs text-muted">Longest streak: {state.longestStreak} days</p>
+        )}
+        {state.canSetReminder && state.currentStreak > 0 && (
+          <label className="mt-2 flex items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={state.reminderOptIn}
+              disabled={reminderSaving}
+              onChange={(e) => handleReminderToggle(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-border accent-accent"
+            />
+            Email me if my streak is about to reset
+          </label>
         )}
       </div>
 
