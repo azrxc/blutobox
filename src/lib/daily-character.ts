@@ -25,9 +25,11 @@ type ParsedCharacter = {
 
 const SYSTEM_PROMPT =
   "You invent a single original fictional character for a general-audience website used by all ages, " +
-  "including kids. Family-friendly only: no romance beyond wholesome, no violence beyond mild " +
-  "adventure-story peril, no real people, no real brands. Keep every field short - this is a compact " +
-  "card, not a novel. " +
+  "including kids. Vary who the character is from one generation to the next - adults, young adults, " +
+  "elderly characters, and kids should all come up over time, not just kids or teens by default. " +
+  "Family-friendly only: no " +
+  "romance beyond wholesome, no violence beyond mild adventure-story peril, no real people, no real " +
+  "brands. Keep every field short - this is a compact card, not a novel. " +
   'Respond with ONLY a valid JSON object, no markdown formatting, no code fences, no text outside ' +
   'the JSON, in exactly this shape: {"name": string, "tagline": string, "description": string, ' +
   '"traits": [string, string, string], "decoyTraits": [string, string], "portrait": string}. "name" ' +

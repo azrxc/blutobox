@@ -24,7 +24,8 @@ export async function generatePortraitImage(description: string): Promise<ImageR
       body: JSON.stringify({
         model: IMAGE_MODEL,
         prompt:
-          `Portrait illustration, ${description} ` +
+          `Modern webtoon-style illustration, clean linework, semi-realistic proportions, polished professional ` +
+          `character art, dynamic lighting. ${description} ` +
           "Family-friendly, safe for all ages, wholesome, no violence, no suggestive or explicit content.",
         n: 1,
         aspect_ratio: "1:1",
