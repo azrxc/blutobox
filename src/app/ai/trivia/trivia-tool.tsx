@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LoadingIcon } from "../../loading-icon";
 
 type Question = { question: string; options: string[]; category: string };
 type CommunityStats = { players: number; averageScore: number };
@@ -77,7 +78,12 @@ export function TriviaTool() {
   }
 
   if (loading) {
-    return <p className="text-sm text-muted">Loading today&apos;s trivia...</p>;
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <LoadingIcon size={40} />
+        <p className="text-sm text-muted">Loading today&apos;s trivia…</p>
+      </div>
+    );
   }
   if (error && !state) {
     return <p className="text-sm text-red-600 dark:text-red-400">{error}</p>;

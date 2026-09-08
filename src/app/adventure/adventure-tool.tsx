@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ShareEndingCard } from "./share-ending-card";
+import { LoadingIcon } from "../loading-icon";
 
 type Turn = { role: "narrator" | "player"; content: string; choices?: string[]; critical?: boolean };
 type Adventure = {
@@ -121,7 +122,12 @@ export function AdventureTool() {
   }
 
   if (loading) {
-    return <p className="text-sm text-muted">Loading…</p>;
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <LoadingIcon size={40} />
+        <p className="text-sm text-muted">Loading…</p>
+      </div>
+    );
   }
 
   if (showPicker || adventures.length === 0) {

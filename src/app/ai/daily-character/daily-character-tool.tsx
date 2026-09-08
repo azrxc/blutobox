@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LoadingIcon } from "../../loading-icon";
 
 type Character = {
   id: string;
@@ -161,7 +162,14 @@ export function DailyCharacterTool() {
     setConfirmingDeleteId(null);
   }
 
-  if (loading) return <p className="text-sm text-muted">Loading…</p>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-8">
+        <LoadingIcon size={40} />
+        <p className="text-sm text-muted">Loading…</p>
+      </div>
+    );
+  }
   if (!state || !state.today) return <p className="text-sm text-red-500">{error ?? "Couldn't load today's character"}</p>;
 
   const { today } = state;

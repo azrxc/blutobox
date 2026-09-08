@@ -107,21 +107,26 @@ async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null
   }
 }
 
+// Leaves headroom under the route's maxDuration (60s) so this function always
+// returns its own clean JSON error instead of Vercel killing the invocation with a
+// bare FUNCTION_INVOCATION_TIMEOUT - reasoning-heavy attempts can each take well
+// over 10s, so MAX_ATTEMPTS alone doesn't bound wall-clock time.
+const TIME_BUDGET_MS = 45_000;
+
 export async function generateDailyTrivia(): Promise<TriviaResult> {
   if (!isAIConfigured()) return { ok: false, reason: "The trivia generator isn't configured yet" };
 
-  const debugLog: string[] = [];
+  const startedAt = Date.now();
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    if (Date.now() - startedAt > TIME_BUDGET_MS) break;
     try {
       const { questions, debug } = await tryGenerateTrivia();
       if (questions) return { ok: true, questions };
-      debugLog.push(`attempt ${attempt}: ${debug}`);
+      console.warn(`[daily-trivia] attempt ${attempt} came back empty/malformed (${debug}), retrying`);
     } catch (err) {
-      debugLog.push(`attempt ${attempt} threw: ${err instanceof Error ? err.message : String(err)}`);
+      console.warn(`[daily-trivia] attempt ${attempt} threw, retrying`, err);
     }
   }
 
-  // TEMPORARY (round 2): confirming the widened parser + 5-attempt budget actually
-  // resolves this in production before reverting to a plain user-facing message.
-  return { ok: false, reason: `DEBUG: ${debugLog.join(" || ")}` };
+  return { ok: false, reason: "Something went wrong generating today's trivia" };
 }
