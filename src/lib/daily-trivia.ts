@@ -96,18 +96,24 @@ const PER_ATTEMPT_TIMEOUT_MS = 35_000;
 
 async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null; debug: string }> {
   const completion = await withTimeout(
-    chatCompletion({
-      // Generous headroom, not a tight estimate - this model spends a highly variable,
-      // sometimes very large chunk of max_tokens on hidden reasoning before ever
-      // emitting the answer. The per-attempt timeout below is what actually bounds
-      // wall-clock time now; this just needs to be big enough that a genuinely fast
-      // attempt isn't truncated.
-      max_tokens: 6000,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: "Generate today's trivia quiz. Make it interesting and varied." },
-      ],
-    }),
+    chatCompletion(
+      {
+        // Generous headroom, not a tight estimate - this model spends a highly
+        // variable, sometimes very large chunk of max_tokens on hidden reasoning
+        // before ever emitting the answer. The per-attempt timeout below is what
+        // actually bounds wall-clock time now; this just needs to be big enough
+        // that a genuinely fast attempt isn't truncated.
+        max_tokens: 6000,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: "Generate today's trivia quiz. Make it interesting and varied." },
+        ],
+      },
+      // Bound by a hard 60s function timeout, not just cost - skip DeepSeek's
+      // direct API, which has consistently run heavier/slower reasoning than
+      // OpenRouter's price-routed hosts for this exact prompt (see chatCompletion).
+      { skipDirect: true }
+    ),
     PER_ATTEMPT_TIMEOUT_MS
   );
 

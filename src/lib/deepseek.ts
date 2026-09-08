@@ -47,8 +47,18 @@ export function isAIConfigured(): boolean {
 
 type ChatCompletionParams = Omit<OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming, "model">;
 
-export async function chatCompletion(params: ChatCompletionParams): Promise<OpenAI.Chat.Completions.ChatCompletion> {
-  const direct = getDirectClient();
+export async function chatCompletion(
+  params: ChatCompletionParams,
+  options?: {
+    // DeepSeek's own direct API has consistently run in a heavier reasoning mode
+    // than most OpenRouter-routed hosts for the same nominal model (observed
+    // 600-1485 reasoning tokens on every direct call tested vs. 0-759 on
+    // OpenRouter, price-sorted) - callers that are latency-sensitive (bounded by a
+    // hard function timeout, not just cost) can skip straight to OpenRouter.
+    skipDirect?: boolean;
+  }
+): Promise<OpenAI.Chat.Completions.ChatCompletion> {
+  const direct = options?.skipDirect ? null : getDirectClient();
   if (direct) {
     try {
       return await direct.chat.completions.create({ ...params, model: DIRECT_MODEL });
