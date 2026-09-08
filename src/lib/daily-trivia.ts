@@ -26,11 +26,12 @@ const SYSTEM_PROMPT =
   '"correctIndex" is the 0-based index into "options" of the right answer. "category" is ' +
   "one or two words naming the topic.";
 
-// Higher than the analogous Daily Character retry count - this larger 5-question
-// payload has shown more format drift in practice (occasionally wrapped in prose
-// and/or shaped as a bare array instead of the requested object), so more attempts
-// buys real reliability for a feature that only needs to succeed once per day.
-const MAX_ATTEMPTS = 5;
+// A real attempt (reasoning included) can genuinely take 20-30s, so this can't be
+// many short attempts the way Daily Character's retry loop is - there's only a 60s
+// function budget total. 2 gives a real full-length shot, plus one more only if the
+// first failed fast (a content/format problem, not a slow one) - see the timing
+// constants below for how that's enforced.
+const MAX_ATTEMPTS = 2;
 
 // The model doesn't always follow "respond with only JSON, no fence, no prose" -
 // observed in production: a plain object, a fenced object, and prose followed by a
@@ -88,7 +89,10 @@ function isValidQuestion(q: unknown): q is TriviaQuestion {
   );
 }
 
-const PER_ATTEMPT_TIMEOUT_MS = 15_000;
+// 15s cut off real completions before they finished (production runs took up to
+// 20-30s under heavy reasoning) - this needs to be long enough to let a genuine
+// attempt actually land, not just short enough to fit several in.
+const PER_ATTEMPT_TIMEOUT_MS = 35_000;
 
 async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null; debug: string }> {
   const completion = await withTimeout(
@@ -137,11 +141,12 @@ async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null
   }
 }
 
-// Leaves real headroom under the route's maxDuration (60s): worst case is roughly
-// TIME_BUDGET_MS + PER_ATTEMPT_TIMEOUT_MS (an attempt can start just under the
-// budget checkpoint and still run its full timeout), so 35s + 15s = 50s, leaving
-// ~10s for response overhead before Vercel's hard cutoff.
-const TIME_BUDGET_MS = 35_000;
+// A second attempt only gets to start if the first one failed fast (a format/
+// content problem, not a slow one) - otherwise there's no time left in the 60s
+// function budget for a real second shot anyway. Worst case total is roughly
+// TIME_BUDGET_MS + PER_ATTEMPT_TIMEOUT_MS = 20s + 35s = 55s, leaving a real margin
+// under Vercel's 60s hard cutoff.
+const TIME_BUDGET_MS = 20_000;
 
 export async function generateDailyTrivia(): Promise<TriviaResult> {
   if (!isAIConfigured()) return { ok: false, reason: "The trivia generator isn't configured yet" };
