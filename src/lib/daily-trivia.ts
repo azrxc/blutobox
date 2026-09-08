@@ -18,9 +18,10 @@ const SYSTEM_PROMPT =
   "same quiz. Family-friendly only: no politics, no religion, no violence, nothing requiring mature or " +
   "specialist knowledge. Every question must have exactly one unambiguously correct answer among the 4 " +
   'options. Your entire response must be a single JSON object - the first character must be "{" and the ' +
-  'last character must be "}", nothing before or after it, no markdown formatting, no code fences, no ' +
-  `explanation. Exactly this shape: {"questions": [{"question": string, "options": [string, string, string, ` +
-  'string], "correctIndex": number, "category": string}, ...]}. Exactly ' +
+  'last character must be "}", nothing before or after it. Do not write the quiz out as readable text or a ' +
+  "numbered list, do not use markdown headers or bold text or lettered options (A/B/C/D) - it must be raw " +
+  `JSON data only, no code fences, no explanation. Exactly this shape: {"questions": [{"question": string, ` +
+  '"options": [string, string, string, string], "correctIndex": number, "category": string}, ...]}. Exactly ' +
   `${QUESTION_COUNT} questions. "question" is under 20 words. Each of the 4 "options" is short, under 8 words. ` +
   '"correctIndex" is the 0-based index into "options" of the right answer. "category" is ' +
   "one or two words naming the topic.";
@@ -64,13 +65,11 @@ function isValidQuestion(q: unknown): q is TriviaQuestion {
 
 async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null; debug: string }> {
   const completion = await chatCompletion({
-    // Generous headroom, not a tight estimate - this model spends a variable, often
-    // large chunk of max_tokens on hidden reasoning before ever emitting the answer
-    // (observed 275 reasoning tokens vs ~190 real content for a lucky run locally,
-    // and a full budget-exhausted empty response from a slower host in production).
-    // A tighter cap here reproduces the exact "finish_reason=length, empty content"
-    // failure this was debugged from.
-    max_tokens: 3000,
+    // Generous headroom, not a tight estimate - this model spends a highly variable,
+    // sometimes very large chunk of max_tokens on hidden reasoning before ever
+    // emitting the answer. 3000 still wasn't enough on some production runs (empty
+    // content, finish_reason=length, 20+ seconds spent thinking). Pushed further.
+    max_tokens: 6000,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: "Generate today's trivia quiz. Make it interesting and varied." },
