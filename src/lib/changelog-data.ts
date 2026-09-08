@@ -7,6 +7,16 @@ export type ChangelogEntry = {
 
 export const changelog: ChangelogEntry[] = [
   {
+    date: "2026-09-08",
+    title: "Adventures are now saved, not overwritten",
+    intro: "Small but useful change to the AI text adventure:",
+    highlights: [
+      "Starting a new adventure no longer erases your old one - it's now a saved history you can reopen anytime",
+      "Save up to 2 adventures at once if you're not logged in, 5 on Free, 15 on Pro (delete one to free up a slot)",
+      "Each saved adventure shows its progress and whether it's still going, won, or ended",
+    ],
+  },
+  {
     date: "2026-09-07",
     title: "AI text adventure",
     intro: "New free tool:",

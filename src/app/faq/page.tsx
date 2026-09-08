@@ -193,10 +193,11 @@ const faqs: QA[] = [
         </p>
         <p className="mt-2">
           Some moments are tense enough that only the suggested choices are available - no time to type something
-          else. You get one active adventure at a time. If you&apos;re logged in, it&apos;s tied to your account
-          and picks up where you left off on any device. If you&apos;re not logged in, it&apos;s remembered on
-          that browser only. Each action you take (starting or continuing a story) uses one of your daily turns:
-          8/day if you&apos;re not logged in, 25/day on Free, 100/day on Pro.
+          else. Your adventures are saved as a list you can reopen anytime - starting a new one doesn&apos;t delete
+          the others. You can save up to 2 at once if you&apos;re not logged in, 5 on Free, 15 on Pro (delete one to
+          free up a slot). If you&apos;re logged in, they&apos;re tied to your account and work from any device; if
+          not, they&apos;re remembered on that browser only. Each action you take (starting or continuing a story)
+          uses one of your daily turns: 8/day if you&apos;re not logged in, 25/day on Free, 100/day on Pro.
         </p>
       </>
     ),
