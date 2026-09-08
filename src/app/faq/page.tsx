@@ -232,6 +232,21 @@ const faqs: QA[] = [
       </>
     ),
   },
+  {
+    q: "What's Daily Trivia?",
+    a: (
+      <p>
+        A free tool at{" "}
+        <Link href="/ai/trivia" className="underline underline-offset-2">
+          /ai/trivia
+        </Link>
+        : 5 AI-generated trivia questions revealed each day, the same ones for everyone. Answer all 5, then see
+        your score, the correct answers, and how your score compares to everyone else who played today. One
+        attempt per day - answering builds a running streak, same as Daily Character&apos;s. No sign-up required,
+        and there&apos;s no limit tied to plan tier since it&apos;s already capped at once a day by design.
+      </p>
+    ),
+  },
 ];
 
 export default function FaqPage() {

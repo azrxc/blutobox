@@ -21,6 +21,13 @@ const EXPERIENCES = [
       "A new AI-generated character every day, the same one for everyone. Build a streak by coming back daily, and save your favorites to a personal collection.",
     status: "live" as const,
   },
+  {
+    href: "/ai/trivia",
+    title: "Daily Trivia",
+    description:
+      "5 new trivia questions every day, the same ones for everyone. Build a streak, and see how your score compares to everyone else who played.",
+    status: "live" as const,
+  },
 ];
 
 export default function AiHubPage() {

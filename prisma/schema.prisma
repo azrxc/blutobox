@@ -68,6 +68,7 @@ model User {
   adventures      Adventure[]
   characterStreak CharacterStreak?
   savedCharacters SavedCharacter[]
+  triviaStreak    TriviaStreak?
 }
 
 model CreatorLink {
@@ -272,6 +273,33 @@ model SavedCharacter {
 
   @@index([ownerId])
   @@index([anonToken])
+}
+
+// One AI-generated 5-question trivia quiz per calendar day, shared site-wide -
+// same once-a-day, lazily-generated-then-cached pattern as DailyCharacter.
+// "questions" never includes the answer key in API responses until someone has
+// actually played, to keep the correct answers out of view-source.
+model DailyTrivia {
+  id        String   @id @default(cuid())
+  date      String   @unique // "2026-09-08" (UTC)
+  questions Json     // [{ question, options: [4 strings], correctIndex, category }, ...]
+  createdAt DateTime @default(now())
+}
+
+// One streak record per identity - mirrors CharacterStreak. lastAnswers/lastScore
+// cache today's completed attempt so revisiting the page after playing shows the
+// same result instead of re-querying or allowing a second attempt.
+model TriviaStreak {
+  id             String   @id @default(cuid())
+  ownerId        String?  @unique
+  owner          User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  anonToken      String?  @unique
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastPlayedDate String?
+  lastScore      Int?
+  lastAnswers    Json?
+  updatedAt      DateTime @updatedAt
 }
 
 model Report {

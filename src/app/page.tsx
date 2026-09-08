@@ -106,7 +106,7 @@ export default async function Home() {
             </Link>
           </div>
           <p className="mt-1 text-sm text-muted">Free AI experiences, separate from file hosting.</p>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Link
               href="/adventure"
               className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-accent/5"
@@ -123,6 +123,15 @@ export default async function Home() {
               <h3 className="text-base font-semibold">Daily Character</h3>
               <p className="text-sm text-muted">
                 A new AI-generated character every day, the same one for everyone. Build a streak by coming back.
+              </p>
+            </Link>
+            <Link
+              href="/ai/trivia"
+              className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-accent/5"
+            >
+              <h3 className="text-base font-semibold">Daily Trivia</h3>
+              <p className="text-sm text-muted">
+                5 new trivia questions every day, the same ones for everyone. See how your score compares.
               </p>
             </Link>
           </div>

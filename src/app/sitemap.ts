@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/ai",
     "/adventure",
     "/ai/daily-character",
+    "/ai/trivia",
     "/compare",
     "/gofile-alternative",
     "/wetransfer-alternative",
@@ -53,6 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             route === "/ai" ||
             route === "/adventure" ||
             route === "/ai/daily-character" ||
+            route === "/ai/trivia" ||
             route === "/compare" ||
             route === "/gofile-alternative" ||
             route === "/wetransfer-alternative" ||

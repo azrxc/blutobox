@@ -8,6 +8,16 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "New: Daily Trivia",
+    intro: "A third Bluto Box AI experience:",
+    highlights: [
+      "New: Daily Trivia at /ai/trivia - 5 new AI-generated trivia questions every day, the same ones for everyone",
+      "One attempt per day, build a streak by coming back, see how your score compares to everyone else who played today",
+      "Free, no sign-up required",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "Clearer upgrade paths and referral visibility",
     highlights: [
       "Hitting a file size or storage limit while uploading now shows an actual link to fix it (sign up if you're anonymous, upgrade to Pro if you're on Free), not just plain error text",
