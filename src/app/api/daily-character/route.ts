@@ -8,7 +8,7 @@ import { maxSavedCharactersFor } from "@/lib/limits";
 import { generateDailyCharacter } from "@/lib/daily-character";
 import { ANON_IDENTITY_COOKIE, ANON_IDENTITY_COOKIE_MAX_AGE, newAnonToken } from "@/lib/anon-identity";
 
-export const maxDuration = 30;
+export const maxDuration = 60; // text + image generation sequentially can take longer than a text-only call
 
 function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
@@ -67,6 +67,7 @@ async function getOrCreateTodaysCharacter() {
         description: result.description,
         traits: result.traits,
         portrait: result.portrait,
+        portraitImageUrl: result.portraitImageUrl,
       },
     });
     return { ok: true as const, character };
@@ -173,6 +174,7 @@ export async function POST(req: Request) {
       description: character.description,
       traits: character.traits as string[],
       portrait: character.portrait,
+      portraitImageUrl: character.portraitImageUrl,
       sourceDate: character.date,
     },
   });

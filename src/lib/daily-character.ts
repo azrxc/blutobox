@@ -1,7 +1,16 @@
 import { chatCompletion, isAIConfigured } from "@/lib/deepseek";
+import { generatePortraitImage } from "@/lib/image-gen";
 
 export type CharacterResult =
-  | { ok: true; name: string; tagline: string; description: string; traits: string[]; portrait: string }
+  | {
+      ok: true;
+      name: string;
+      tagline: string;
+      description: string;
+      traits: string[];
+      portrait: string;
+      portraitImageUrl: string | null;
+    }
   | { ok: false; reason: string };
 
 const SYSTEM_PROMPT =
@@ -49,6 +58,11 @@ export async function generateDailyCharacter(): Promise<CharacterResult> {
       return { ok: false, reason: "The character came back in an unexpected format" };
     }
 
+    // Best-effort - if image generation fails (provider hiccup, content policy,
+    // not configured), the character still works text-only. One image per day
+    // site-wide, so this is never in the per-viewer request path.
+    const imageResult = await generatePortraitImage(parsed.portrait);
+
     return {
       ok: true,
       name: parsed.name,
@@ -56,6 +70,7 @@ export async function generateDailyCharacter(): Promise<CharacterResult> {
       description: parsed.description,
       traits: parsed.traits.slice(0, 3),
       portrait: parsed.portrait,
+      portraitImageUrl: imageResult.ok ? imageResult.dataUrl : null,
     };
   } catch (err) {
     console.error("[daily-character] generation failed", err);

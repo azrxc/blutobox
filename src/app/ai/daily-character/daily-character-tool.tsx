@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-type Character = { id: string; date: string; name: string; tagline: string; description: string; traits: string[]; portrait: string };
+type Character = {
+  id: string;
+  date: string;
+  name: string;
+  tagline: string;
+  description: string;
+  traits: string[];
+  portrait: string;
+  portraitImageUrl: string | null;
+};
 type SavedCharacter = Omit<Character, "date"> & { sourceDate: string; savedAt: string };
 
 type State = {
@@ -92,6 +101,13 @@ export function DailyCharacterTool() {
       </div>
 
       <div className="rounded-2xl border border-border bg-surface p-5">
+        {today.portraitImageUrl && (
+          <img
+            src={today.portraitImageUrl}
+            alt={`Portrait of ${today.name}`}
+            className="mb-4 aspect-square w-full rounded-xl border border-border object-cover"
+          />
+        )}
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">{today.name}</h2>
@@ -106,10 +122,14 @@ export function DailyCharacterTool() {
             </span>
           ))}
         </div>
-        <p className="mt-3 text-xs text-muted">
-          <span className="font-medium">Portrait: </span>
-          {today.portrait}
-        </p>
+        {today.portraitImageUrl ? (
+          <p className="mt-3 text-xs text-muted">{today.portrait}</p>
+        ) : (
+          <p className="mt-3 text-xs text-muted">
+            <span className="font-medium">Portrait: </span>
+            {today.portrait}
+          </p>
+        )}
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {state.claimedToday ? (
@@ -153,6 +173,13 @@ export function DailyCharacterTool() {
           <div className="mt-2 space-y-2">
             {state.saved.map((c) => (
               <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
+                {c.portraitImageUrl && (
+                  <img
+                    src={c.portraitImageUrl}
+                    alt={`Portrait of ${c.name}`}
+                    className="h-12 w-12 shrink-0 rounded-lg border border-border object-cover"
+                  />
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{c.name}</p>
                   <p className="truncate text-xs text-muted">{c.tagline}</p>

@@ -218,6 +218,11 @@ model DailyCharacter {
   description String   @db.Text
   traits      Json
   portrait    String   @db.Text
+  // Data URI (base64), null if image generation failed or wasn't configured -
+  // the feature still works text-only either way. One image per day, generated
+  // once site-wide, so the real per-image cost (~$0.01-0.04) is trivial at any
+  // traffic level - see src/lib/image-gen.ts.
+  portraitImageUrl String? @db.Text
   createdAt   DateTime @default(now())
 }
 
@@ -248,6 +253,7 @@ model SavedCharacter {
   description String   @db.Text
   traits      Json
   portrait    String   @db.Text
+  portraitImageUrl String? @db.Text
   sourceDate  String
   savedAt     DateTime @default(now())
 
