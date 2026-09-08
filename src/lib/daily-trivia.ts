@@ -48,6 +48,31 @@ function extractJsonCandidate(text: string): string {
   return end > start ? trimmed.slice(start, end + 1) : trimmed;
 }
 
+class AttemptTimeoutError extends Error {}
+
+// The OpenAI SDK call itself has no bound on how long a single reasoning-heavy
+// generation can take - one attempt alone has been observed to run past the
+// route's entire 60s maxDuration, which defeats the between-attempts time budget
+// below (it only checks *before* starting a new attempt, not during one). Racing
+// against a timer here caps each individual attempt so the budget can actually
+// govern total wall-clock time. This doesn't cancel the underlying HTTP request,
+// just stops waiting on it - the abandoned call finishes or fails on its own.
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new AttemptTimeoutError(`attempt exceeded ${ms}ms`)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
 function isValidQuestion(q: unknown): q is TriviaQuestion {
   if (typeof q !== "object" || q === null) return false;
   const question = q as Record<string, unknown>;
@@ -63,18 +88,24 @@ function isValidQuestion(q: unknown): q is TriviaQuestion {
   );
 }
 
+const PER_ATTEMPT_TIMEOUT_MS = 15_000;
+
 async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null; debug: string }> {
-  const completion = await chatCompletion({
-    // Generous headroom, not a tight estimate - this model spends a highly variable,
-    // sometimes very large chunk of max_tokens on hidden reasoning before ever
-    // emitting the answer. 3000 still wasn't enough on some production runs (empty
-    // content, finish_reason=length, 20+ seconds spent thinking). Pushed further.
-    max_tokens: 6000,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: "Generate today's trivia quiz. Make it interesting and varied." },
-    ],
-  });
+  const completion = await withTimeout(
+    chatCompletion({
+      // Generous headroom, not a tight estimate - this model spends a highly variable,
+      // sometimes very large chunk of max_tokens on hidden reasoning before ever
+      // emitting the answer. The per-attempt timeout below is what actually bounds
+      // wall-clock time now; this just needs to be big enough that a genuinely fast
+      // attempt isn't truncated.
+      max_tokens: 6000,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: "Generate today's trivia quiz. Make it interesting and varied." },
+      ],
+    }),
+    PER_ATTEMPT_TIMEOUT_MS
+  );
 
   const raw = completion.choices[0]?.message?.content;
   const finishReason = completion.choices[0]?.finish_reason;
@@ -106,11 +137,11 @@ async function tryGenerateTrivia(): Promise<{ questions: TriviaQuestion[] | null
   }
 }
 
-// Leaves headroom under the route's maxDuration (60s) so this function always
-// returns its own clean JSON error instead of Vercel killing the invocation with a
-// bare FUNCTION_INVOCATION_TIMEOUT - reasoning-heavy attempts can each take well
-// over 10s, so MAX_ATTEMPTS alone doesn't bound wall-clock time.
-const TIME_BUDGET_MS = 45_000;
+// Leaves real headroom under the route's maxDuration (60s): worst case is roughly
+// TIME_BUDGET_MS + PER_ATTEMPT_TIMEOUT_MS (an attempt can start just under the
+// budget checkpoint and still run its full timeout), so 35s + 15s = 50s, leaving
+// ~10s for response overhead before Vercel's hard cutoff.
+const TIME_BUDGET_MS = 35_000;
 
 export async function generateDailyTrivia(): Promise<TriviaResult> {
   if (!isAIConfigured()) return { ok: false, reason: "The trivia generator isn't configured yet" };
