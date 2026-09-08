@@ -8,6 +8,16 @@ export type ChangelogEntry = {
 export const changelog: ChangelogEntry[] = [
   {
     date: "2026-09-08",
+    title: "Bluto Box AI is now its own section, plus Daily Character",
+    intro: "AI experiences now have their own home, and a new daily habit to check out:",
+    highlights: [
+      "New: Bluto Box AI at /ai, a hub for free AI experiences separate from file hosting, with more planned over time",
+      "New: Daily Character at /ai/daily-character, one new AI-generated character revealed each day, the same one for everyone",
+      "Build a streak by claiming each day (resets if you miss a day), and save your favorites to a personal collection - 5 slots if you're not logged in, 20 on Free, 100 on Pro",
+    ],
+  },
+  {
+    date: "2026-09-08",
     title: "Adventures are now saved, not overwritten",
     intro: "Small but useful change to the AI text adventure:",
     highlights: [

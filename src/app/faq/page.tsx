@@ -202,6 +202,27 @@ const faqs: QA[] = [
       </>
     ),
   },
+  {
+    q: "What's Daily Character?",
+    a: (
+      <>
+        <p>
+          A free tool at{" "}
+          <Link href="/ai/daily-character" className="underline underline-offset-2">
+            /ai/daily-character
+          </Link>
+          : one new AI-generated character revealed each day, the same one for everyone (like a daily puzzle) -
+          a name, personality, backstory, and a portrait description you could hand to an art tool.
+        </p>
+        <p className="mt-2">
+          Clicking &quot;Claim today&apos;s streak&quot; counts that day toward a running streak, which resets if
+          you miss a day. You can also save characters you like to a personal collection - up to 5 if
+          you&apos;re not logged in, 20 on Free, 100 on Pro. Saving and claiming are both free and don&apos;t use
+          any daily-turn quota from the other AI tools.
+        </p>
+      </>
+    ),
+  },
 ];
 
 export default function FaqPage() {
