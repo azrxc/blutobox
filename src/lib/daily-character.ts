@@ -72,7 +72,9 @@ async function tryGenerateCharacterText(): Promise<ParsedCharacter | null> {
       typeof parsed.tagline !== "string" ||
       typeof parsed.description !== "string" ||
       !Array.isArray(parsed.traits) ||
+      parsed.traits.length < 3 ||
       !Array.isArray(parsed.decoyTraits) ||
+      parsed.decoyTraits.length < 2 ||
       typeof parsed.portrait !== "string"
     ) {
       return null;
