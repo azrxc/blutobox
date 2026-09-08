@@ -80,6 +80,19 @@ export function maxSavedAdventuresFor(planTier: "FREE" | "PRO" | null) {
   return ANON_MAX_SAVED_ADVENTURES;
 }
 
+// Saved-character collection cap (Daily Character feature). Generous relative to
+// saved adventures since collecting a character costs nothing beyond one DB row -
+// the real cost (one DeepSeek call/day) is shared site-wide, not per save.
+export const ANON_MAX_SAVED_CHARACTERS = 5;
+export const FREE_MAX_SAVED_CHARACTERS = 20;
+export const PRO_MAX_SAVED_CHARACTERS = 100;
+
+export function maxSavedCharactersFor(planTier: "FREE" | "PRO" | null) {
+  if (planTier === "PRO") return PRO_MAX_SAVED_CHARACTERS;
+  if (planTier === "FREE") return FREE_MAX_SAVED_CHARACTERS;
+  return ANON_MAX_SAVED_CHARACTERS;
+}
+
 // Free accounts can only pick from these fixed expiry windows; Pro can set any custom duration.
 export const FREE_ALLOWED_EXPIRY_HOURS = [24, 24 * 7];
 

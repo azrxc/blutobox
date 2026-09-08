@@ -8,7 +8,7 @@ import { getCurrentPlanTier } from "@/lib/plan";
 import { dailyAdventureTurnLimitFor, maxSavedAdventuresFor } from "@/lib/limits";
 import { checkDailyQuota, consumeDailyQuota } from "@/lib/daily-quota";
 import { startAdventure, continueAdventure, STAT_MIN, STAT_MAX, type Turn, type StatGoal } from "@/lib/adventure";
-import { ADVENTURE_ANON_COOKIE, ADVENTURE_ANON_COOKIE_MAX_AGE, newAnonToken } from "@/lib/adventure-session";
+import { ANON_IDENTITY_COOKIE, ANON_IDENTITY_COOKIE_MAX_AGE, newAnonToken } from "@/lib/anon-identity";
 
 export const maxDuration = 30;
 
@@ -20,7 +20,7 @@ async function resolveIdentity(userId: string | undefined): Promise<Identity> {
   if (userId) return { type: "user", userId };
 
   const cookieStore = await cookies();
-  const existing = cookieStore.get(ADVENTURE_ANON_COOKIE)?.value;
+  const existing = cookieStore.get(ANON_IDENTITY_COOKIE)?.value;
   if (existing) return { type: "anon", token: existing, isNew: false };
   return { type: "anon", token: newAnonToken(), isNew: true };
 }
@@ -33,12 +33,12 @@ function adventureWhere(identity: Identity) {
 
 function setAnonCookie(res: NextResponse, identity: Identity) {
   if (identity.type === "anon" && identity.isNew) {
-    res.cookies.set(ADVENTURE_ANON_COOKIE, identity.token, {
+    res.cookies.set(ANON_IDENTITY_COOKIE, identity.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: ADVENTURE_ANON_COOKIE_MAX_AGE,
+      maxAge: ANON_IDENTITY_COOKIE_MAX_AGE,
     });
   }
 }

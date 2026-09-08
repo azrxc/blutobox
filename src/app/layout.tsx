@@ -98,6 +98,9 @@ export default function RootLayout({
                   <Link href="/adventure" className="transition-colors hover:text-foreground">
                     AI text adventure
                   </Link>
+                  <Link href="/ai/daily-character" className="transition-colors hover:text-foreground">
+                    Daily character
+                  </Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Company</span>

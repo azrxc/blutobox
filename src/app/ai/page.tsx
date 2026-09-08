@@ -14,6 +14,13 @@ const EXPERIENCES = [
       "An AI game master narrates a story, you type or choose what happens next, and a meter tracks how things are going. No two playthroughs are the same.",
     status: "live" as const,
   },
+  {
+    href: "/ai/daily-character",
+    title: "Daily Character",
+    description:
+      "A new AI-generated character every day, the same one for everyone. Build a streak by coming back daily, and save your favorites to a personal collection.",
+    status: "live" as const,
+  },
 ];
 
 export default function AiHubPage() {

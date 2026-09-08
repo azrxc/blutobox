@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/speed-test",
     "/ai",
     "/adventure",
+    "/ai/daily-character",
     "/file-converter",
     "/file-converter/png-to-webp",
     "/file-converter/jpg-to-png",
@@ -44,7 +45,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
             route === "/text-diff" ||
             route === "/speed-test" ||
             route === "/ai" ||
-            route === "/adventure"
+            route === "/adventure" ||
+            route === "/ai/daily-character"
           ? 0.8
           : 0.5,
   }));

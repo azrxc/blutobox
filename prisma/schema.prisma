@@ -66,6 +66,8 @@ model User {
   creatorLinks    CreatorLink[]
   bookmarks       Bookmark[]
   adventures      Adventure[]
+  characterStreak CharacterStreak?
+  savedCharacters SavedCharacter[]
 }
 
 model CreatorLink {
@@ -198,6 +200,56 @@ model Adventure {
   won          Boolean   @default(false)
   createdAt    DateTime  @default(now())
   lastPlayedAt DateTime  @default(now())
+
+  @@index([ownerId])
+  @@index([anonToken])
+}
+
+// One AI-generated character per calendar day, shared site-wide (not per viewer) -
+// generated lazily on whoever's the first visitor to ask for that day's character,
+// then cached here so it costs one DeepSeek call per day total, not per viewer.
+// Same character for everyone that day is deliberate - it's the "did you see
+// today's character?" shared-moment hook, same idea as Wordle's daily puzzle.
+model DailyCharacter {
+  id          String   @id @default(cuid())
+  date        String   @unique // "2026-09-08" (UTC), one row per calendar day
+  name        String
+  tagline     String
+  description String   @db.Text
+  traits      Json
+  portrait    String   @db.Text
+  createdAt   DateTime @default(now())
+}
+
+// One streak record per identity - tracks consecutive days claimed. Claiming
+// resets to 1 if a day was missed, increments if the last claim was yesterday,
+// no-ops if today is already claimed.
+model CharacterStreak {
+  id              String   @id @default(cuid())
+  ownerId         String?  @unique
+  owner           User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  anonToken       String?  @unique
+  currentStreak   Int      @default(0)
+  longestStreak   Int      @default(0)
+  lastClaimedDate String?
+  updatedAt       DateTime @updatedAt
+}
+
+// A viewer's personal collection of characters they chose to keep - snapshotted
+// at save time (not a live reference to DailyCharacter) so it survives even if
+// the daily-character table were ever pruned.
+model SavedCharacter {
+  id          String   @id @default(cuid())
+  ownerId     String?
+  owner       User?    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  anonToken   String?
+  name        String
+  tagline     String
+  description String   @db.Text
+  traits      Json
+  portrait    String   @db.Text
+  sourceDate  String
+  savedAt     DateTime @default(now())
 
   @@index([ownerId])
   @@index([anonToken])
