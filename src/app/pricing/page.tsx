@@ -46,6 +46,7 @@ const sections: Section[] = [
     rows: [
       { label: "AI file summary (uses per day)", anon: "1/day", free: "3/day", pro: "15/day" },
       { label: "AI text adventure (turns per day)", anon: "8/day", free: "25/day", pro: "100/day" },
+      { label: "AI text adventure (saved at once)", anon: "2", free: "5", pro: "15" },
     ],
   },
   {
