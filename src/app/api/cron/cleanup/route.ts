@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { deleteInactiveFreeFiles, warnUsersOfUpcomingDeletion } from "@/lib/cleanup";
 import { snapshotYesterdaySiteDownloadBytes } from "@/lib/site-stats";
-import { sendStreakReminders } from "@/lib/character-reminders";
 
 export const maxDuration = 60;
 
@@ -13,7 +12,6 @@ export async function GET(req: Request) {
 
   const warnResult = await warnUsersOfUpcomingDeletion();
   const deleteResult = await deleteInactiveFreeFiles();
-  const reminderResult = await sendStreakReminders().catch(() => ({ sent: 0 }));
   await snapshotYesterdaySiteDownloadBytes().catch(() => {});
-  return NextResponse.json({ ok: true, ...warnResult, ...deleteResult, ...reminderResult });
+  return NextResponse.json({ ok: true, ...warnResult, ...deleteResult, sent: 0 });
 }

@@ -98,42 +98,18 @@ export default async function Home() {
       </section>
 
       <section className="border-t border-border/80">
-        <div className="mx-auto max-w-5xl px-6 py-16">
-          <div className="flex items-baseline justify-between gap-4">
-            <h2 className="text-lg font-semibold tracking-tight">Bluto Box AI</h2>
-            <Link href="/ai" className="text-xs text-muted underline underline-offset-2 hover:text-foreground">
-              See all
-            </Link>
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-xl font-semibold tracking-tight">Bluto Box Study</h2>
+            <Link href="/study" className="text-sm underline underline-offset-2">Open study workspace</Link>
           </div>
-          <p className="mt-1 text-sm text-muted">Free AI experiences, separate from file hosting.</p>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Link
-              href="/adventure"
-              className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-accent/5"
-            >
-              <h3 className="text-base font-semibold">AI Text Adventure</h3>
-              <p className="text-sm text-muted">
-                An AI game master narrates a story, you choose what happens next. No two playthroughs alike.
-              </p>
-            </Link>
-            <Link
-              href="/ai/daily-character"
-              className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-accent/5"
-            >
-              <h3 className="text-base font-semibold">Daily Character</h3>
-              <p className="text-sm text-muted">
-                A new AI-generated character every day, the same one for everyone. Build a streak by coming back.
-              </p>
-            </Link>
-            <Link
-              href="/ai/trivia"
-              className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-accent/5"
-            >
-              <h3 className="text-base font-semibold">Daily Trivia</h3>
-              <p className="text-sm text-muted">
-                5 new trivia questions every day, the same ones for everyone. See how your score compares.
-              </p>
-            </Link>
+          <p className="mt-2 text-sm text-muted">Write, revise and get assignments ready for submission.</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {[
+              ["Paraphrase & natural writing","Improve your draft without losing your voice.","/study#studio"],
+              ["Revision tools","Summarize notes and generate practice questions.","/study#studio"],
+              ["Assignment planner","Keep your deadlines organized.","/study#planner"],
+            ].map(([title,description,href]) => <Link key={title} href={href} className="rounded-2xl border border-border bg-surface p-5 hover:bg-accent/5"><h3 className="font-semibold">{title}</h3><p className="mt-2 text-sm text-muted">{description}</p></Link>)}
           </div>
         </div>
       </section>

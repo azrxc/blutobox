@@ -28,8 +28,8 @@ export function Header() {
           <Link href="/upload" className="transition-colors hover:text-foreground">
             Upload
           </Link>
-          <Link href="/ai" className="transition-colors hover:text-foreground">
-            AI
+          <Link href="/study" className="transition-colors hover:text-foreground">
+            Study
           </Link>
           <Link href="/pricing" className="transition-colors hover:text-foreground">
             Pricing
@@ -104,8 +104,8 @@ export function Header() {
           <Link href="/text-diff" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             Text diff
           </Link>
-          <Link href="/ai" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
-            Bluto Box AI
+          <Link href="/study" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
+            Study tools
           </Link>
           <Link href="/faq" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             FAQ

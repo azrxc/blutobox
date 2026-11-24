@@ -91,19 +91,10 @@ export default function RootLayout({
                   </Link>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="font-medium text-foreground">Bluto Box AI</span>
-                  <Link href="/ai" className="transition-colors hover:text-foreground">
-                    Overview
-                  </Link>
-                  <Link href="/adventure" className="transition-colors hover:text-foreground">
-                    AI text adventure
-                  </Link>
-                  <Link href="/ai/daily-character" className="transition-colors hover:text-foreground">
-                    Daily character
-                  </Link>
-                  <Link href="/ai/trivia" className="transition-colors hover:text-foreground">
-                    Daily trivia
-                  </Link>
+                  <span className="font-medium text-foreground">Study</span>
+                  <Link href="/study" className="transition-colors hover:text-foreground">Student workspace</Link>
+                  <Link href="/study#studio" className="transition-colors hover:text-foreground">AI writing &amp; revision</Link>
+                  <Link href="/study#planner" className="transition-colors hover:text-foreground">Assignment planner</Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Compare</span>
