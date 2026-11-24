@@ -14,3 +14,6 @@ New study workspace with eight AI text modes, word counts, editable/copyable/dow
 
 ## International readiness
 English interface, original-language mode and 17 explicit output languages; auto text direction for source/results. Test quality with native speakers, including Arabic right-to-left and non-space-delimited languages. Word counts are approximate for scripts without spaces. Full interface localization is future work.
+
+## Creator preview
+Test PNG/JPEG/WebP imports, color-key removal, crop presets, output sizes, slider adjustments, PNG transparency and JPEG white background, watermark and export on older phones. Image edits stay client-side; no new dependencies or service costs. Color-key is not AI segmentation. Test social text copy, calculator currencies and navigation. Full AI background removal, object removal, collage, and native app remain future work.

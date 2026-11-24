@@ -50,12 +50,13 @@ export default async function Home() {
       </Suspense>
       <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-24 text-center">
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Upload. Share. Done.
+          Everything you need, in one box.
         </h1>
         <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">
-          A fast, simple file host. No clutter, no bloat, just a link you can send anywhere.
+          Study, create, edit and share. Simple tools for everyday life.
         </p>
-        <p className="mt-2 text-xs text-muted">
+        <nav aria-label="Explore workspaces" className="mt-5 flex flex-wrap justify-center gap-2">{[["/study","Study"],["/create","Create"],["/study#studio","AI"],["/file-converter","Files"]].map(([href,label])=><Link key={href} href={href} className="rounded-full border bg-surface px-4 py-2 text-sm hover:bg-accent/5">{label}</Link>)}</nav>
+        <p className="mt-5 text-xs text-muted">
           Up to {formatGB(ANON_MAX_UPLOAD_BYTES)} with no account, {formatGB(FREE_MAX_UPLOAD_BYTES)} with a free one
         </p>
 
@@ -113,6 +114,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      <section className="border-t border-border/80"><div className="mx-auto max-w-5xl px-6 py-12"><h2 className="text-xl font-semibold">Bluto Box Create</h2><p className="mt-2 text-sm text-muted">Edit photos, create social posts and make QR codes.</p><div className="mt-5 grid gap-3 sm:grid-cols-3">{[["/create#photo","Photo editor","Crop, adjust and remove solid backgrounds."],["/qr","QR codes","Turn links into scannable codes."],["/create#social","Creator tools","Aesthetic text and profit calculator."]].map(([href,title,desc])=><Link key={href} href={href} className="rounded-2xl border bg-surface p-5 hover:bg-accent/5"><h3 className="font-semibold">{title}</h3><p className="mt-2 text-sm text-muted">{desc}</p></Link>)}</div></div></section>
     </main>
   );
 }

@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/text-diff",
     "/speed-test",
     "/study",
+    "/create",
     "/compare",
     "/gofile-alternative",
     "/wetransfer-alternative",
@@ -49,6 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
             route === "/text-diff" ||
             route === "/speed-test" ||
             route === "/study" ||
+            route === "/create" ||
             route === "/compare" ||
             route === "/gofile-alternative" ||
             route === "/wetransfer-alternative" ||

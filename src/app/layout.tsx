@@ -27,16 +27,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   title: "Bluto Box",
-  description: "Upload and share files.",
+  description: "Study, create, edit and share files. Everyday tools in one box.",
   openGraph: {
     title: "Bluto Box",
-    description: "Upload and share files.",
+    description: "Study, create, edit and share files. Everyday tools in one box.",
     siteName: "Bluto Box",
   },
   twitter: {
     card: "summary_large_image",
     title: "Bluto Box",
-    description: "Upload and share files.",
+    description: "Study, create, edit and share files. Everyday tools in one box.",
   },
 };
 
@@ -95,6 +95,12 @@ export default function RootLayout({
                   <Link href="/study" className="transition-colors hover:text-foreground">Student workspace</Link>
                   <Link href="/study#studio" className="transition-colors hover:text-foreground">AI writing &amp; revision</Link>
                   <Link href="/study#planner" className="transition-colors hover:text-foreground">Assignment planner</Link>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium text-foreground">Create</span>
+                  <Link href="/create" className="transition-colors hover:text-foreground">Creator workspace</Link>
+                  <Link href="/create#photo" className="transition-colors hover:text-foreground">Photo editor</Link>
+                  <Link href="/create#social" className="transition-colors hover:text-foreground">Social tools</Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Compare</span>
