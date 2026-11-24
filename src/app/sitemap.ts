@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/speed-test",
     "/study",
     "/create",
+    "/install",
     "/compare",
     "/gofile-alternative",
     "/wetransfer-alternative",

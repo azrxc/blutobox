@@ -17,3 +17,6 @@ English interface, original-language mode and 17 explicit output languages; auto
 
 ## Creator preview
 Test PNG/JPEG/WebP imports, color-key removal, crop presets, output sizes, slider adjustments, PNG transparency and JPEG white background, watermark and export on older phones. Image edits stay client-side; no new dependencies or service costs. Color-key is not AI segmentation. Test social text copy, calculator currencies and navigation. Full AI background removal, object removal, collage, and native app remain future work.
+
+## PWA preview
+Check manifest and 192/512 icons, Android Chrome install, iOS Safari Add to Home Screen, installed navigation, login persistence, offline fallback, and update/rollback. The service worker only caches the static offline notice; no personal data or API responses. Full offline tools, push reminders, native stores, and cloud notes are not implemented. PWA icons use a newly drawn box mark consistent with the design, not the original logo asset. The manifest is online-first; preview deployments may require authentication.

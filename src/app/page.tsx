@@ -56,6 +56,7 @@ export default async function Home() {
           Study, create, edit and share. Simple tools for everyday life.
         </p>
         <nav aria-label="Explore workspaces" className="mt-5 flex flex-wrap justify-center gap-2">{[["/study","Study"],["/create","Create"],["/study#studio","AI"],["/file-converter","Files"]].map(([href,label])=><Link key={href} href={href} className="rounded-full border bg-surface px-4 py-2 text-sm hover:bg-accent/5">{label}</Link>)}</nav>
+        <Link href="/install" className="mt-3 text-sm underline underline-offset-4 text-muted hover:text-foreground">Install Bluto Box</Link>
         <p className="mt-5 text-xs text-muted">
           Up to {formatGB(ANON_MAX_UPLOAD_BYTES)} with no account, {formatGB(FREE_MAX_UPLOAD_BYTES)} with a free one
         </p>

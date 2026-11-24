@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "./header";
+import { PwaShell } from "./pwa-shell";
 import { ProPromoBanner } from "./pro-promo-banner";
 
 // Self-hides until a real publisher ID is set, same pattern as Google sign-in and
@@ -24,7 +25,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = { themeColor: [{media:"(prefers-color-scheme: light)",color:"#fafaf8"},{media:"(prefers-color-scheme: dark)",color:"#171613"}], viewportFit:"cover" };
+
 export const metadata: Metadata = {
+  appleWebApp: {capable:true,title:"Bluto Box",statusBarStyle:"default"},
+  icons: {apple:"/pwa-icon-180.png"},
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   title: "Bluto Box",
   description: "Study, create, edit and share files. Everyday tools in one box.",
@@ -63,6 +68,7 @@ export default function RootLayout({
           <Header />
           {children}
           <ProPromoBanner />
+          <PwaShell />
         </Providers>
         <footer className="border-t border-border/80">
           <div className="mx-auto max-w-5xl px-6 py-10 text-xs text-muted">
@@ -128,6 +134,7 @@ export default function RootLayout({
                   <Link href="/about" className="transition-colors hover:text-foreground">
                     About
                   </Link>
+                  <Link href="/install" className="transition-colors hover:text-foreground">Install app</Link>
                   <Link href="/pricing" className="transition-colors hover:text-foreground">
                     Pricing
                   </Link>
