@@ -11,3 +11,6 @@ New study workspace with eight AI text modes, word counts, editable/copyable/dow
 - Do not connect a preview to production database, storage or billing if avoidable. Do not deploy the branch as production until checks pass.
 - Planner is local to the current browser, not account-synced. AI drafts are not persisted by this tool. Native app, sync, PDF import, interactive flashcards and reminders are future work.
 - Rollback: revert the study commit, or redeploy the prior production revision. No database migrations or record deletions are required.
+
+## International readiness
+English interface, original-language mode and 17 explicit output languages; auto text direction for source/results. Test quality with native speakers, including Arabic right-to-left and non-space-delimited languages. Word counts are approximate for scripts without spaces. Full interface localization is future work.

@@ -7,9 +7,10 @@ import { prisma } from "@/lib/prisma";
 import { effectivePlanTier } from "@/lib/plan";
 import { isAIConfigured, chatCompletion } from "@/lib/deepseek";
 import { getClientIp } from "@/lib/request-ip";
+import { studyLanguages, studyLanguageCodes } from "@/lib/study-languages";
 
 export const maxDuration=30;
-const schema=z.object({text:z.string().trim().min(1).max(4000),mode:z.enum(["paraphrase","natural","grammar","academic","simplify","summarize","flashcards","quiz"]),language:z.enum(["original","en","ms"])});
+const schema=z.object({text:z.string().trim().min(1).max(4000),mode:z.enum(["paraphrase","natural","grammar","academic","simplify","summarize","flashcards","quiz"]),language:z.enum(studyLanguageCodes)});
 const instructions={
   paraphrase:"Rewrite with new phrasing and sentence structure, preserving meaning.",
   natural:"Improve natural flow, clarity and readability, preserving the writer's voice.",
@@ -20,7 +21,7 @@ const instructions={
   flashcards:"Create up to 10 numbered question-and-answer flashcards based only on the source. Clearly label each question and answer.",
   quiz:"Create up to 8 numbered practice questions, then a separate answer key. Use only facts supported by the source.",
 };
-const languages={original:"Keep the source language.",en:"Write in English.",ms:"Write in natural Bahasa Melayu."};
+const languages = Object.fromEntries(studyLanguages.map(([code,,instruction]) => [code,instruction]));
 let limiters:{free:Ratelimit;pro:Ratelimit;ip:Ratelimit;global:Ratelimit}|undefined;
 function getLimits(){
   if(!process.env.UPSTASH_REDIS_REST_URL||!process.env.UPSTASH_REDIS_REST_TOKEN)return null;

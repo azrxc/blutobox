@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { studyLanguages, type StudyLanguage } from "@/lib/study-languages";
 
 const modes = [
   ["paraphrase","Paraphrase","Express the same meaning in fresh words."],
@@ -18,7 +19,7 @@ function words(s:string) { return s.trim() ? s.trim().split(/\s+/).length : 0; }
 export function StudyStudio() {
   const { data: session, status } = useSession();
   const [mode,setMode] = useState<(typeof modes)[number][0]>("paraphrase");
-  const [language,setLanguage] = useState("original");
+  const [language,setLanguage] = useState<StudyLanguage>("original");
   const [input,setInput] = useState("");
   const [output,setOutput] = useState("");
   const [busy,setBusy] = useState(false);
@@ -46,23 +47,23 @@ export function StudyStudio() {
   }
   return (
     <div className="space-y-5 rounded-2xl border border-border bg-surface p-4 sm:p-6">
-      <div><h2 className="text-xl font-semibold">AI writing &amp; revision studio</h2><p className="mt-1 text-sm text-muted">For assignments, reports and revision. English and Bahasa Melayu supported.</p></div>
+      <div><h2 className="text-xl font-semibold">AI writing &amp; revision studio</h2><p className="mt-1 text-sm text-muted">For assignments, reports and revision. Write in your own language or choose from 17 output languages.</p></div>
       <div role="group" aria-label="AI mode" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {modes.map(([id,label])=><button key={id} type="button" disabled={busy} aria-pressed={mode===id} onClick={()=>setMode(id)} className={"min-h-11 rounded-lg border px-2 py-2 text-sm "+(mode===id?"border-accent bg-accent text-accent-foreground":"border-border hover:bg-accent/5")}>{label}</button>)}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted">{modes.find(m=>m[0]===mode)?.[2]}</p>
-        <label className="flex items-center gap-2 text-sm">Language <select value={language} disabled={busy} onChange={e=>setLanguage(e.target.value)} className="min-h-10 rounded-lg border border-border bg-background px-2"><option value="original">Original</option><option value="en">English</option><option value="ms">Bahasa Melayu</option></select></label>
+        <label className="flex items-center gap-2 text-sm">Language <select value={language} disabled={busy} onChange={e=>setLanguage(e.target.value as StudyLanguage)} className="min-h-10 rounded-lg border border-border bg-background px-2">{studyLanguages.map(([code,label])=><option key={code} value={code}>{label}</option>)}</select></label>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="source-text" className="text-sm font-medium">Your text</label>
-          <textarea id="source-text" value={input} maxLength={MAX} disabled={busy} onChange={e=>setInput(e.target.value)} placeholder="Paste your draft or lecture notes…" className="min-h-56 w-full resize-y rounded-xl border border-border bg-background p-3 text-base leading-relaxed"/>
+          <textarea id="source-text" dir="auto" value={input} maxLength={MAX} disabled={busy} onChange={e=>setInput(e.target.value)} placeholder="Paste your draft or lecture notes…" className="min-h-56 w-full resize-y rounded-xl border border-border bg-background p-3 text-base leading-relaxed"/>
           <div className="flex justify-between text-xs text-muted"><span>{words(input)} words · {input.length}/{MAX} characters</span><button type="button" disabled={busy} onClick={()=>{setInput("");setOutput("");setError("");setCopied(false);}} className="underline">Clear</button></div>
         </div>
         <div className="space-y-2">
           <label htmlFor="study-output" className="text-sm font-medium">Result (editable)</label>
-          <textarea id="study-output" value={output} disabled={busy} onChange={e=>{setOutput(e.target.value);setCopied(false);}} placeholder={busy?"Working on your text…":"Your result will appear here."} className="min-h-56 w-full resize-y rounded-xl border border-border bg-background p-3 text-base leading-relaxed"/>
+          <textarea id="study-output" dir="auto" value={output} disabled={busy} onChange={e=>{setOutput(e.target.value);setCopied(false);}} placeholder={busy?"Working on your text…":"Your result will appear here."} className="min-h-56 w-full resize-y rounded-xl border border-border bg-background p-3 text-base leading-relaxed"/>
           <div className="flex flex-wrap justify-between gap-2 text-xs text-muted"><span>{words(output)} words</span><div className="flex gap-3"><button type="button" disabled={!output||busy} onClick={copy} className="underline">{copied?"Copied":"Copy"}</button><button type="button" disabled={!output||busy} onClick={download} className="underline">Download</button></div></div>
         </div>
       </div>
