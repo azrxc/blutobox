@@ -2,7 +2,7 @@ export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-2xl flex-1 space-y-6 px-6 py-16 text-sm leading-relaxed">
       <h1 className="text-2xl font-semibold tracking-tight">Privacy Policy</h1>
-      <p className="text-muted">Last updated: August 5, 2026</p>
+      <p className="text-muted">Last updated: November 25, 2026</p>
 
       <section className="space-y-2">
         <h2 className="text-lg font-medium">1. What we collect</h2>
@@ -11,6 +11,7 @@ export default function PrivacyPage() {
           <li>Uploaded files and their metadata (filename, size, type)</li>
           <li>The IP address of uploaders and downloaders, used for abuse prevention, rate limiting, and enforcing daily download limits</li>
           <li>Payment information for Pro subscriptions, handled entirely by Stripe. We never see or store your card number</li>
+          <li>Study planner tasks are stored locally in your browser, not synced to our servers. You can remove them or clear browser storage.</li>
           <li>A session cookie to keep you signed in, and a short-lived cookie to remember that you&apos;ve unlocked a password-protected link</li>
         </ul>
       </section>
@@ -52,6 +53,7 @@ export default function PrivacyPage() {
           <li>Upstash: rate limiting infrastructure</li>
           <li>Cloudflare: DNS, domain, and email routing</li>
           <li>VirusTotal: malware hash-reputation checks on uploaded files (only a hash is sent, not the file)</li>
+          <li>DeepSeek and OpenRouter (including routed model providers): process text submitted to AI tools to generate results. Study AI does not save drafts in our database; third-party provider processing and retention may differ. Avoid submitting confidential or personal information.</li>
           <li>Google AdSense: displays ads on some pages and uses cookies for ad personalization</li>
         </ul>
       </section>

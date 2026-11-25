@@ -24,13 +24,14 @@ export function Header() {
           Bluto Box
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm text-muted sm:flex">
+        <nav className="hidden items-center gap-5 text-sm text-muted md:flex">
           <Link href="/upload" className="transition-colors hover:text-foreground">
             Upload
           </Link>
-          <Link href="/ai" className="transition-colors hover:text-foreground">
-            AI
+          <Link href="/study" className="transition-colors hover:text-foreground">
+            Study
           </Link>
+          <Link href="/create" className="transition-colors hover:text-foreground">Create</Link>
           <Link href="/pricing" className="transition-colors hover:text-foreground">
             Pricing
           </Link>
@@ -55,7 +56,7 @@ export function Header() {
             <>
               <Link
                 href="/login"
-                className="hidden text-sm text-muted transition-colors hover:text-foreground sm:block"
+                className="hidden text-sm text-muted transition-colors hover:text-foreground md:block"
               >
                 Log in
               </Link>
@@ -72,7 +73,7 @@ export function Header() {
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Menu"
             aria-expanded={menuOpen}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:text-foreground sm:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:text-foreground md:hidden"
           >
             {menuOpen ? (
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -88,7 +89,7 @@ export function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="flex flex-col gap-1 border-t border-border/80 bg-background px-6 py-3 text-sm sm:hidden">
+        <nav className="flex flex-col gap-1 border-t border-border/80 bg-background px-6 py-3 text-sm md:hidden">
           <Link href="/upload" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             Upload
           </Link>
@@ -104,9 +105,10 @@ export function Header() {
           <Link href="/text-diff" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             Text diff
           </Link>
-          <Link href="/ai" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
-            Bluto Box AI
+          <Link href="/study" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
+            Study tools
           </Link>
+          <Link href="/create" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">Create</Link>
           <Link href="/faq" onClick={() => setMenuOpen(false)} className="rounded-lg px-2 py-2.5 text-muted hover:bg-surface hover:text-foreground">
             FAQ
           </Link>

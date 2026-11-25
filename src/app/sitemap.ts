@@ -20,10 +20,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/qr",
     "/text-diff",
     "/speed-test",
-    "/ai",
-    "/adventure",
-    "/ai/daily-character",
-    "/ai/trivia",
+    "/study",
+    "/create",
+    "/install",
     "/compare",
     "/gofile-alternative",
     "/wetransfer-alternative",
@@ -51,10 +50,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
             route === "/qr" ||
             route === "/text-diff" ||
             route === "/speed-test" ||
-            route === "/ai" ||
-            route === "/adventure" ||
-            route === "/ai/daily-character" ||
-            route === "/ai/trivia" ||
+            route === "/study" ||
+            route === "/create" ||
             route === "/compare" ||
             route === "/gofile-alternative" ||
             route === "/wetransfer-alternative" ||

@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "./header";
+import { PwaShell } from "./pwa-shell";
 import { ProPromoBanner } from "./pro-promo-banner";
 
 // Self-hides until a real publisher ID is set, same pattern as Google sign-in and
@@ -24,19 +25,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = { themeColor: [{media:"(prefers-color-scheme: light)",color:"#fafaf8"},{media:"(prefers-color-scheme: dark)",color:"#171613"}], viewportFit:"cover" };
+
 export const metadata: Metadata = {
+  appleWebApp: {capable:true,title:"Bluto Box",statusBarStyle:"default"},
+  icons: {apple:"/pwa-icon-180.png"},
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
   title: "Bluto Box",
-  description: "Upload and share files.",
+  description: "Study, create, edit and share files. Everyday tools in one box.",
   openGraph: {
     title: "Bluto Box",
-    description: "Upload and share files.",
+    description: "Study, create, edit and share files. Everyday tools in one box.",
     siteName: "Bluto Box",
   },
   twitter: {
     card: "summary_large_image",
     title: "Bluto Box",
-    description: "Upload and share files.",
+    description: "Study, create, edit and share files. Everyday tools in one box.",
   },
 };
 
@@ -63,6 +68,7 @@ export default function RootLayout({
           <Header />
           {children}
           <ProPromoBanner />
+          <PwaShell />
         </Providers>
         <footer className="border-t border-border/80">
           <div className="mx-auto max-w-5xl px-6 py-10 text-xs text-muted">
@@ -91,19 +97,16 @@ export default function RootLayout({
                   </Link>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="font-medium text-foreground">Bluto Box AI</span>
-                  <Link href="/ai" className="transition-colors hover:text-foreground">
-                    Overview
-                  </Link>
-                  <Link href="/adventure" className="transition-colors hover:text-foreground">
-                    AI text adventure
-                  </Link>
-                  <Link href="/ai/daily-character" className="transition-colors hover:text-foreground">
-                    Daily character
-                  </Link>
-                  <Link href="/ai/trivia" className="transition-colors hover:text-foreground">
-                    Daily trivia
-                  </Link>
+                  <span className="font-medium text-foreground">Study</span>
+                  <Link href="/study" className="transition-colors hover:text-foreground">Student workspace</Link>
+                  <Link href="/study#studio" className="transition-colors hover:text-foreground">AI writing &amp; revision</Link>
+                  <Link href="/study#planner" className="transition-colors hover:text-foreground">Assignment planner</Link>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium text-foreground">Create</span>
+                  <Link href="/create" className="transition-colors hover:text-foreground">Creator workspace</Link>
+                  <Link href="/create#photo" className="transition-colors hover:text-foreground">Photo editor</Link>
+                  <Link href="/create#social" className="transition-colors hover:text-foreground">Social tools</Link>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">Compare</span>
@@ -131,6 +134,7 @@ export default function RootLayout({
                   <Link href="/about" className="transition-colors hover:text-foreground">
                     About
                   </Link>
+                  <Link href="/install" className="transition-colors hover:text-foreground">Install app</Link>
                   <Link href="/pricing" className="transition-colors hover:text-foreground">
                     Pricing
                   </Link>
