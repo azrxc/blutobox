@@ -45,10 +45,8 @@ const sections: Section[] = [
     section: "AI tools",
     rows: [
       { label: "AI file summary (uses per day)", anon: "1/day", free: "3/day", pro: "15/day" },
-      { label: "AI text adventure (turns per day)", anon: "8/day", free: "25/day", pro: "100/day" },
-      { label: "AI text adventure (saved at once)", anon: "2", free: "5", pro: "15" },
-      { label: "Daily Character (saved collection size)", anon: "5", free: "20", pro: "100" },
-      { label: "Daily Character (questions per day)", anon: "3/day", free: "10/day", pro: "30/day" },
+      { label: "Study AI requests per day (shared capacity applies)", anon: "Examples", free: "5/day", pro: "30/day" },
+      { label: "Assignment planner (browser storage)", anon: true, free: true, pro: true },
     ],
   },
   {
@@ -89,44 +87,26 @@ function Cell({ value }: { value: string | boolean }) {
 export default function PricingPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(false);
-  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("yearly");
+  const [checkoutError, setCheckoutError] = useState("");
+  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly");
 
   useEffect(() => {
     update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function upgrade() {
-    setLoading(true);
-    const res = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ interval: billingInterval }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (data.url) window.location.href = data.url;
+  async function checkout(endpoint: string, body?: object) {
+    setLoading(true); setCheckoutError("");
+    try {
+      const res=await fetch(endpoint,{method:"POST",...(body?{headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}:{})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok||typeof data.url!=="string")throw new Error(typeof data.error==="string"?data.error:"Checkout is unavailable. Please try again.");
+      window.location.href=data.url;
+    }catch(err){setCheckoutError(err instanceof Error?err.message:"Checkout is unavailable.");}finally{setLoading(false);}
   }
-
-  async function buyPass(passType: "day" | "week") {
-    setLoading(true);
-    const res = await fetch("/api/stripe/checkout-pass", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ passType }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (data.url) window.location.href = data.url;
-  }
-
-  async function manage() {
-    setLoading(true);
-    const res = await fetch("/api/stripe/portal", { method: "POST" });
-    const data = await res.json();
-    setLoading(false);
-    if (data.url) window.location.href = data.url;
-  }
+  function upgrade(){return checkout("/api/stripe/checkout",{interval:billingInterval});}
+  function buyPass(passType:"day"|"week"){return checkout("/api/stripe/checkout-pass",{passType});}
+  function manage(){return checkout("/api/stripe/portal");}
 
   const isPro = session?.user?.planTier === "PRO";
 
@@ -134,9 +114,11 @@ export default function PricingPage() {
     <main className="flex flex-1 flex-col items-center gap-10 px-6 py-16">
       <div className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Pricing</h1>
-        <p className="mt-2 text-sm text-muted">Simple, honest pricing. No surprises.</p>
+        <p className="mt-2 text-sm text-muted">Start free. More AI requests and storage when you need them.</p>
       </div>
 
+      <p className="text-center text-xs text-muted">Prices in USD. Subscriptions renew unless canceled; day and week passes do not renew.</p>
+      {checkoutError&&<p role="alert" className="w-full max-w-3xl rounded-xl border border-border p-3 text-sm">{checkoutError}</p>}
       <div className="inline-flex rounded-full border border-border p-1 text-xs">
         <button
           onClick={() => setBillingInterval("monthly")}

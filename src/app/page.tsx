@@ -27,7 +27,7 @@ const features = [
   },
   {
     title: "Built to last",
-    description: "Files stay up as long as they're used. No surprise deletions.",
+    description: "Retention depends on your plan and link expiry. Review your options before sharing.",
   },
 ];
 
@@ -48,46 +48,15 @@ export default async function Home() {
       <Suspense fallback={null}>
         <WelcomeToast />
       </Suspense>
-      <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Everything you need, in one box.
-        </h1>
-        <p className="mt-4 max-w-lg text-base text-muted sm:text-lg">
-          Study, create, edit and share. Simple tools for everyday life.
-        </p>
-        <nav aria-label="Explore workspaces" className="mt-5 flex flex-wrap justify-center gap-2">{[["/study","Study"],["/create","Create"],["/study#studio","AI"],["/file-converter","Files"]].map(([href,label])=><Link key={href} href={href} className="rounded-full border bg-surface px-4 py-2 text-sm hover:bg-accent/5">{label}</Link>)}</nav>
-        <Link href="/install" className="mt-3 text-sm underline underline-offset-4 text-muted hover:text-foreground">Install Bluto Box</Link>
-        <p className="mt-5 text-xs text-muted">
-          Up to {formatGB(ANON_MAX_UPLOAD_BYTES)} with no account, {formatGB(FREE_MAX_UPLOAD_BYTES)} with a free one
-        </p>
-
-        <div className="mt-8 flex w-full justify-center">
-          <UploadTool compact />
+      <section className="mx-auto w-full max-w-5xl px-4 pb-10 pt-14 sm:px-6 sm:pt-24">
+        <div className="grid items-center gap-8 md:grid-cols-[1.15fr_0.85fr]">
+          <div><p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted">Your everyday workspace</p><h1 className="max-w-xl text-4xl font-semibold leading-[1.1] tracking-tight sm:text-6xl">From first draft to final submission.</h1><p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">Write, revise, create and share. Practical tools for students, creators and everyday work, wherever you are.</p>
+          <div className="mt-7 flex flex-wrap gap-3"><Link href="/study#studio" className="rounded-xl bg-accent px-5 py-3 text-sm font-medium text-accent-foreground">Start studying →</Link><Link href="/file-converter" className="rounded-xl border border-border bg-surface px-5 py-3 text-sm font-medium">File tools</Link><Link href="/create" className="rounded-xl border border-border bg-surface px-5 py-3 text-sm font-medium">Create</Link></div><p className="mt-4 text-xs text-muted">Free file tools and writing examples. AI account limits apply.</p></div>
+          <div className="rounded-3xl border border-border bg-surface p-5 sm:p-7"><p className="text-xs font-medium uppercase tracking-widest text-muted">Example · Natural writing</p><div className="mt-5 space-y-2"><p className="text-xs font-semibold text-muted">Before</p><p className="rounded-xl border border-border bg-background p-4 text-sm leading-relaxed">Students should do time management because it is important for them to finish their assignments.</p></div><div className="mt-4 space-y-2"><p className="text-xs font-semibold text-muted">After</p><p className="rounded-xl border border-border bg-background p-4 text-sm leading-relaxed">Managing time effectively helps students complete their assignments on schedule.</p></div><Link href="/study#studio" className="mt-5 inline-block text-sm font-medium underline underline-offset-4">Try with your own draft</Link><p className="mt-2 text-xs text-muted">Illustrative example, not a live AI result.</p></div>
         </div>
-
-        <Link
-          href="/pricing"
-          className="mt-4 text-xs text-muted underline underline-offset-2 transition-colors hover:text-foreground"
-        >
-          See pricing
-        </Link>
-
-        {showTrustStats && (
-          <p className="mt-6 text-xs text-muted">
-            {totalFiles.toLocaleString()} files shared · {totalDownloads.toLocaleString()} downloads served
-          </p>
-        )}
-
-        {session?.user && user && (
-          <div className="mt-10 flex items-center gap-3 text-sm text-muted">
-            <span>
-              Signed in as {user.name || session.user.email} · {user.planTier === "PRO" ? "Pro plan" : "Free plan"}
-            </span>
-            <LogoutButton />
-          </div>
-        )}
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">{[["Paraphrase","/study#studio"],["Grammar & natural writing","/study#studio"],["Assignment planner","/study#planner"],["Merge PDF","/file-converter/merge-pdf"],["Word to PDF","/file-converter/word-to-pdf"],["Photo editor","/create#photo"]].map(([name,href])=><Link key={name} href={href} className="rounded-xl border border-border bg-surface p-4 text-sm font-medium hover:bg-accent/5">{name} <span aria-hidden="true" className="text-muted">↗</span></Link>)}</div>
       </section>
-
+      <section id="share" className="border-t border-border/80"><div className="mx-auto grid max-w-5xl items-center gap-8 px-4 py-12 sm:px-6 md:grid-cols-2"><div><h2 className="text-2xl font-semibold tracking-tight">Share files in seconds.</h2><p className="mt-3 text-sm text-muted">Up to {formatGB(ANON_MAX_UPLOAD_BYTES)} without an account, {formatGB(FREE_MAX_UPLOAD_BYTES)} with a free one. Drop files or choose them from your device.</p><div className="mt-4 flex flex-wrap gap-4 text-sm"><Link href="/upload" className="underline underline-offset-4">Open file sharing</Link><Link href="/pricing" className="underline underline-offset-4">Compare plans</Link><Link href="/install" className="underline underline-offset-4">Install app</Link></div>{showTrustStats&&<p className="mt-4 text-xs text-muted">{totalFiles.toLocaleString()} files shared · {totalDownloads.toLocaleString()} downloads served</p>}{session?.user&&user&&<div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted"><span>Signed in as {user.name || session.user.email}</span><LogoutButton/></div>}</div><div className="flex justify-center"><UploadTool compact/></div></div></section>
       <section className="border-t border-border/80">
         <div className="mx-auto grid max-w-5xl gap-10 px-6 py-16 sm:grid-cols-3">
           {features.map((f) => (

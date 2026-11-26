@@ -11,7 +11,7 @@ import { useSession } from "next-auth/react";
 const PERKS = [
   "Pro files are never auto-deleted for inactivity. Free files go after 30 days unused.",
   "Pro gets password-protected links and a custom link name instead of a random one.",
-  "Pro sees today's Daily Character portrait art. Free gets a locked preview.",
+  "Pro includes up to 30 Study AI requests per day, versus 5 on Free, subject to shared capacity.",
   "Pro's daily download quota is 25GB, 5x Free's 5GB.",
   "Pro can set any custom link expiry, not just the 24h/7d presets.",
 ];

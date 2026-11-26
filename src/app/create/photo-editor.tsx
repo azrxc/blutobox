@@ -1,4 +1,5 @@
 "use client";
+import { FileDropZone } from "../file-drop-zone";
 import { useRef,useState,useEffect } from "react";
 type Size={w:number;h:number};
 const MAX=2048;
@@ -44,7 +45,7 @@ export function PhotoEditor(){
  const control="block min-h-11 w-full rounded-lg border bg-background px-3 text-base";
  return <div className="space-y-5 rounded-2xl border bg-surface p-4 sm:p-6">
  <div><h2 className="text-xl font-semibold">Photo editor</h2><p className="mt-1 text-sm text-muted">Crop, resize, adjust colors, remove a solid background and add a watermark. Your image stays in your browser.</p></div>
- <label className="block space-y-2 text-sm font-medium">Choose photo<input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>{void load(e.target.files?.[0]);}} className="block w-full rounded-lg border p-3 text-sm"/></label>
+ <FileDropZone accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" title="Drop a photo here" hint="PNG, JPG or WebP · or browse" onFiles={picked=>{void load(picked[0]);}} />
  {loading&&<p role="status" className="text-sm">Opening photo…</p>}{error&&<p role="alert" className="text-sm">{error}</p>}
  {size&&<div className="grid gap-5 md:grid-cols-2">
  <div className="min-w-0 space-y-2"><div className="flex min-h-40 items-center justify-center overflow-hidden rounded-xl border p-2" style={{backgroundImage:"conic-gradient(#ddd 25%,#fff 0 50%,#ddd 0 75%,#fff 0)",backgroundSize:"20px 20px"}}><canvas ref={canvas} aria-label="Edited image preview" className="block max-h-[480px] max-w-full object-contain"/></div><p className="text-xs text-muted">Original: {size.w} × {size.h}. Export capped at 2048 px for mobile performance.</p></div>

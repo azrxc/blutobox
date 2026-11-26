@@ -13,6 +13,7 @@ import { EmailShareForm } from "./email-share-form";
 import { SocialShareButtons } from "./social-share-buttons";
 import { takePendingUpload } from "@/lib/pending-upload";
 import { ProBadge } from "./pro-badge";
+import { FileDropZone } from "./file-drop-zone";
 
 const RISKY_EXTENSIONS = [".exe", ".scr", ".bat", ".cmd", ".com", ".msi", ".vbs", ".ps1"];
 
@@ -207,19 +208,8 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
         </p>
       )}
 
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface px-6 py-10 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">
-          {files.length > 0 ? `${files.length} file${files.length > 1 ? "s" : ""} selected` : "Choose files"}
-        </span>
-        <span className="text-xs text-muted">{files.length > 0 ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          multiple
-          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
-          disabled={uploading}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone multiple disabled={uploading||zipping} title={files.length?`${files.length} file(s) selected`:"Drop files here"} hint={files.length?"Drop or browse to add more files":"Or browse files on your device"} onFiles={picked=>{setError(null);setErrorUpgradeTo(null);setFiles(prev=>[...prev,...picked.filter(f=>!prev.some(old=>old.name===f.name&&old.size===f.size&&old.lastModified===f.lastModified))]);}} />
+      {files.length>0&&<div className="flex items-center justify-between text-xs text-muted"><span>Total: {formatBytes(files.reduce((sum,f)=>sum+f.size,0))}</span><button type="button" disabled={uploading||zipping} onClick={()=>{setFiles([]);setError(null);setErrorUpgradeTo(null);}} className="min-h-9 underline">Clear all</button></div>}
 
       {files.length > 1 && (
         <p className="text-xs text-muted">
@@ -241,6 +231,7 @@ export function UploadTool({ compact = false }: { compact?: boolean }) {
                 {f.name} <span className="text-muted">· {formatBytes(f.size)}</span>
               </span>
               <button
+                aria-label={"Remove "+f.name}
                 onClick={() => removeFile(i)}
                 disabled={uploading}
                 className="shrink-0 text-muted transition-colors hover:text-foreground"
