@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
@@ -77,16 +78,7 @@ export function DocToPdfConverter() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">{file ? file.name : "Choose a .docx file"}</span>
-        <span className="text-xs text-muted">{file ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          accept=".docx"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"  disabled={converting} title={file?.name || "Drop a Word document here"} hint="DOCX files only" onFiles={picked=>{setFile(picked[0]??null);setResult(null);setError(null);}} />
 
       <p className="rounded-lg bg-yellow-500/10 px-3 py-2 text-xs text-yellow-800 dark:text-yellow-300">
         Works best for simple documents (text, headings, basic images). Complex tables, columns, or heavy

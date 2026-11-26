@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 
 function formatBytes(bytes: number) {
   const units = ["B", "KB", "MB", "GB"];
@@ -53,21 +54,7 @@ export function DuplicateFinder() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">
-          {files.length > 0 ? `${files.length} files selected` : "Choose files"}
-        </span>
-        <span className="text-xs text-muted">{files.length > 0 ? "Click to change" : "or drag and drop, pick 2+ files"}</span>
-        <input
-          type="file"
-          multiple
-          onChange={(e) => {
-            setFiles(Array.from(e.target.files ?? []));
-            setGroups(null);
-          }}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone  multiple disabled={checking} title={files.length ? `${files.length} files selected` : "Drop files here"} hint="Choose at least two files" onFiles={picked=>{setFiles(picked);setGroups(null);}} />
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 

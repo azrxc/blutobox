@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
 function loadImage(file: File): Promise<HTMLImageElement> {
@@ -90,19 +91,7 @@ export function ImagesToPdfConverter() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">
-          {files.length > 0 ? `${files.length} image${files.length > 1 ? "s" : ""} selected` : "Choose images"}
-        </span>
-        <span className="text-xs text-muted">{files.length > 0 ? "Click to add more" : "or drag and drop"}</span>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept="image/*" multiple disabled={converting} title={files.length ? `${files.length} images selected` : "Drop images here"} hint="Add images in the order you want" onFiles={picked=>{setFiles(prev=>[...prev,...picked]);setResult(null);setError(null);}} />
 
       {files.length > 0 && (
         <ul className="space-y-1.5 rounded-xl border border-border bg-background p-3">

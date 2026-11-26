@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 
 type Algorithm = "SHA-256" | "SHA-1" | "SHA-512";
 
@@ -51,19 +52,7 @@ export function HashCalculator() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">{file ? file.name : "Choose a file"}</span>
-        <span className="text-xs text-muted">{file ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          onChange={(e) => {
-            setFile(e.target.files?.[0] ?? null);
-            setHash(null);
-            setError(null);
-          }}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone   disabled={computing} title={file?.name || "Drop a file here"} hint="Choose one file" onFiles={picked=>{setFile(picked[0]??null);setHash(null);setError(null);}} />
 
       {file && file.size > LARGE_FILE_WARNING_BYTES && (
         <p className="text-xs text-muted">

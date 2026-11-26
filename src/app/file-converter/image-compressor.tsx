@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { zipFiles } from "@/lib/zip-files";
@@ -87,24 +88,7 @@ export function ImageCompressor() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">
-          {files.length > 0 ? `${files.length} image${files.length > 1 ? "s" : ""} selected` : "Choose images"}
-        </span>
-        <span className="text-xs text-muted">{files.length > 0 ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => {
-            const chosen = Array.from(e.target.files ?? []);
-            setFiles(chosen.slice(0, maxBatch));
-            setResults([]);
-            setDownloadResult(null);
-          }}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept="image/*" multiple disabled={compressing} title={files.length ? `${files.length} images selected` : "Drop images here"} hint="Choose images to compress" onFiles={picked=>{setFiles(picked.slice(0,maxBatch));setResults([]);setDownloadResult(null);}} />
       {files.length >= maxBatch && !isPro && (
         <p className="text-xs text-muted">
           Free is limited to {FREE_MAX_BATCH} images at once.{" "}

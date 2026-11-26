@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
@@ -127,16 +128,7 @@ export function VideoToGifConverter() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">{file ? file.name : "Choose a video"}</span>
-        <span className="text-xs text-muted">{file ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          accept="video/*"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept="video/*"  disabled={converting} title={file?.name || "Drop a video here"} hint="Choose one video" onFiles={picked=>{setFile(picked[0]??null);setResult(null);setError(null);}} />
 
       <p className="text-xs text-muted">
         Converts the first {duration}s of the video, entirely in your browser. Longer or higher-FPS conversions

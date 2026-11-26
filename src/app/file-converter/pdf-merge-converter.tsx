@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
@@ -77,19 +78,7 @@ export function PdfMergeConverter() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">
-          {files.length > 0 ? `${files.length} PDF${files.length > 1 ? "s" : ""} selected` : "Choose PDFs"}
-        </span>
-        <span className="text-xs text-muted">{files.length > 0 ? "Click to add more" : "select 2 or more, in order"}</span>
-        <input
-          type="file"
-          accept="application/pdf"
-          multiple
-          onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept=".pdf,application/pdf" multiple disabled={converting} title={files.length ? `${files.length} PDFs selected` : "Drop PDFs here"} hint="Add PDFs in the order you want to merge them" onFiles={picked=>{setFiles(prev=>[...prev,...picked]);setResult(null);setError(null);}} />
 
       {files.length > 0 && (
         <ul className="space-y-1.5 rounded-xl border border-border bg-background p-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import { zipFiles } from "@/lib/zip-files";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
@@ -62,16 +63,7 @@ export function PdfSplitConverter() {
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">{file ? file.name : "Choose a PDF"}</span>
-        <span className="text-xs text-muted">{file ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept=".pdf,application/pdf"  disabled={converting} title={file?.name || "Drop a PDF here"} hint="Choose one PDF" onFiles={picked=>{setFile(picked[0]??null);setResult(null);setError(null);}} />
 
       <p className="text-xs text-muted">Splits every page into its own PDF, bundled as a .zip.</p>
 

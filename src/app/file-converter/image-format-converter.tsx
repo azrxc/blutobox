@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FileDropZone } from "../file-drop-zone";
 import { zipFiles } from "@/lib/zip-files";
 import { UploadToBlutoButton } from "./upload-to-bluto-button";
 
@@ -99,19 +100,7 @@ export function ImageFormatConverter({ initialFormat = "png" }: { initialFormat?
 
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-surface p-5">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-6 py-8 text-center transition-colors hover:border-foreground/30">
-        <span className="text-sm font-medium">
-          {files.length > 0 ? `${files.length} image${files.length > 1 ? "s" : ""} selected` : "Choose images"}
-        </span>
-        <span className="text-xs text-muted">{files.length > 0 ? "Click to change" : "or drag and drop"}</span>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
-          className="hidden"
-        />
-      </label>
+      <FileDropZone accept="image/*" multiple disabled={converting} title={files.length ? `${files.length} images selected` : "Drop images here"} hint="Choose images to convert" onFiles={picked=>{setFiles(picked);setResult(null);setError(null);}} />
 
       <div className="space-y-1.5">
         <label className="text-xs text-muted" htmlFor="format">
